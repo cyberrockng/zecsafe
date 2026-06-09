@@ -1,0 +1,18 @@
+{
+  "name": "zecsafe",
+  "version": "0.1.0",
+  "description": "FROST-style Zcash safety vault prototype with read-only mainnet evidence.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "verify": "node scripts/verify.mjs"
+  },
+  "keywords": [
+    "zcash",
+    "frost",
+    "threshold-signing",
+    "self-custody",
+    "hackathon"
+  ],
+  "license": "MIT"
+}
