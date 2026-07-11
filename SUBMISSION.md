@@ -1,7 +1,7 @@
 # ZecSafe - ZecHub Hackathon 2026 Submission
 
 Track: FROST
-Team: [Your name / handle]
+Team: cyberrockng
 Date: July 2026
 
 ## What Was Built

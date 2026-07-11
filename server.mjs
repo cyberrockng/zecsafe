@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createIntentV1, findIntentNumericSyntaxError } from "./src/intent-v1.mjs";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const port = Number(process.env.PORT ?? 4173);
@@ -28,6 +29,23 @@ function sendJson(response, statusCode, payload) {
     "Cache-Control": "no-store",
   });
   response.end(JSON.stringify(payload));
+}
+
+function badRequest(message) {
+  const error = new Error(message);
+  error.statusCode = 400;
+  error.code = "bad_request";
+  return error;
+}
+
+function sendInputError(response, error) {
+  if (error?.statusCode !== 400) return false;
+
+  sendJson(response, 400, {
+    status: error.code ?? "bad_request",
+    message: error.message,
+  });
+  return true;
 }
 
 function sha256Hex(value) {
@@ -88,11 +106,39 @@ async function readJsonBody(request) {
   for await (const chunk of request) {
     body += chunk;
     if (body.length > 64_000) {
-      throw new Error("Request body is too large.");
+      throw badRequest("Request body is too large.");
     }
   }
 
-  return body ? JSON.parse(body) : {};
+  if (!body) return {};
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw badRequest("Malformed JSON body.");
+  }
+}
+
+async function readJsonBodyWithRaw(request) {
+  let rawBody = "";
+
+  for await (const chunk of request) {
+    rawBody += chunk;
+    if (rawBody.length > 64_000) {
+      throw badRequest("Request body is too large.");
+    }
+  }
+
+  if (!rawBody) return { body: {}, rawBody: "" };
+
+  try {
+    return {
+      body: JSON.parse(rawBody),
+      rawBody,
+    };
+  } catch {
+    throw badRequest("Malformed JSON body.");
+  }
 }
 
 function zcashRpcConfig() {
@@ -320,6 +366,8 @@ async function handleViewingKeyBalance(request, response) {
       result: rpc.result,
     });
   } catch (error) {
+    if (sendInputError(response, error)) return;
+
     sendJson(response, 200, {
       status: "unavailable",
       balance: null,
@@ -371,6 +419,8 @@ async function handleMainnetStatus(_request, response) {
       },
     });
   } catch (error) {
+    if (sendInputError(response, error)) return;
+
     sendJson(
       response,
       200,
@@ -409,6 +459,8 @@ async function handleAddressBalance(request, response) {
       },
     });
   } catch (error) {
+    if (sendInputError(response, error)) return;
+
     sendJson(
       response,
       200,
@@ -442,6 +494,8 @@ async function handleTransactionProof(request, response) {
       result: proof,
     });
   } catch (error) {
+    if (sendInputError(response, error)) return;
+
     sendJson(
       response,
       200,
@@ -450,6 +504,35 @@ async function handleTransactionProof(request, response) {
         "Transaction proof lookup is temporarily unavailable. Connect ZecSafe to a working Zcash mainnet RPC source to verify confirmations.",
       ),
     );
+  }
+}
+
+async function handleIntentCreate(request, response) {
+  try {
+    const { body, rawBody } = await readJsonBodyWithRaw(request);
+    const numericSyntaxError = findIntentNumericSyntaxError(rawBody);
+    if (numericSyntaxError) throw badRequest(numericSyntaxError);
+
+    const result = createIntentV1(body);
+    sendJson(response, 200, {
+      status: "success",
+      message: "Intent created",
+      intent: result.intent,
+      canonical_intent_json: result.canonical_intent_json,
+      intent_commitment: result.intent_commitment,
+    });
+  } catch (error) {
+    if (sendInputError(response, error)) return;
+
+    if (error?.name === "IntentValidationError") {
+      sendJson(response, 400, {
+        status: error.code ?? "invalid_intent",
+        message: error.message,
+      });
+      return;
+    }
+
+    throw error;
   }
 }
 
@@ -622,7 +705,13 @@ function runFrostDemoScript(options = {}) {
 
 async function handleFrostDemo(request, response) {
   if (request.method === "POST") {
-    const body = await readJsonBody(request);
+    let body;
+    try {
+      body = await readJsonBody(request);
+    } catch (error) {
+      if (sendInputError(response, error)) return;
+      throw error;
+    }
     const message = String(body.message ?? "").trim();
     const proposalPayloadHash = String(body.proposalPayloadHash ?? "").trim();
     const proposalId = String(body.proposalId ?? "").trim();
@@ -679,6 +768,11 @@ async function handleApi(request, response, pathname) {
     return true;
   }
 
+  if (request.method === "POST" && pathname === "/api/intent/create") {
+    await handleIntentCreate(request, response);
+    return true;
+  }
+
   if (request.method === "GET" && pathname === "/api/frost-demo") {
     await handleFrostDemo(request, response);
     return true;
@@ -700,7 +794,9 @@ async function handleApi(request, response, pathname) {
       rpcConfigured: Boolean(zcashRpcConfig()),
       supportedViewingKeys: ["uview1", "uvf1", "zviews"],
       transactionProof: true,
-      frostDemo: true,
+      intentV1: true,
+      frostDemoRoute: true,
+      frostStatus: "check /api/frost-demo",
     });
     return true;
   }
@@ -719,8 +815,15 @@ const server = createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "127.0.0.1"}`);
 
   if (url.pathname.startsWith("/api/")) {
-    const handled = await handleApi(request, response, url.pathname);
-    if (!handled) sendJson(response, 404, { status: "not_found" });
+    try {
+      const handled = await handleApi(request, response, url.pathname);
+      if (!handled) sendJson(response, 404, { status: "not_found" });
+    } catch {
+      sendJson(response, 500, {
+        status: "server_error",
+        message: "ZecSafe could not complete this API request.",
+      });
+    }
     return;
   }
 
@@ -742,6 +845,9 @@ const server = createServer(async (request, response) => {
     response.end("Not found");
   }
 });
+
+server.requestTimeout = 15_000;
+server.headersTimeout = 16_000;
 
 server.listen(port, () => {
   console.log(`ZecSafe listening on http://127.0.0.1:${port}`);

@@ -5,7 +5,27 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "verify": "node scripts/verify.mjs"
+    "verify": "node scripts/verify.mjs",
+    "test:intent": "node scripts/intent-v1.test.mjs",
+    "test:pczt": "node scripts/pczt-inspect-v1.test.mjs",
+    "test:bind": "node scripts/pczt-bind-v1.test.mjs",
+    "test:events": "node scripts/proof-event-v1.test.mjs",
+    "test:runner": "node scripts/fixed-runner-v1.test.mjs",
+    "test:signers": "node scripts/signer-selection-v1.test.mjs",
+    "test:signing": "node scripts/signing-context-v1.test.mjs",
+    "test:review": "node scripts/signer-review-v1.test.mjs",
+    "test:frost-session": "node scripts/frost-session-v1.test.mjs",
+    "intent:create": "node scripts/create-intent.mjs",
+    "pczt:inspect": "node scripts/pczt-inspect.mjs",
+    "pczt:bind": "node scripts/pczt-bind.mjs",
+    "proof:event": "node scripts/proof-event.mjs",
+    "fixed:run": "node scripts/fixed-runner.mjs",
+    "signers:select": "node scripts/signer-selection.mjs",
+    "signer:review": "node scripts/signer-review.mjs",
+    "frost:session": "node scripts/frost-session.mjs",
+    "check:syntax": "node --check server.mjs && node --check src/app.js && node --check src/intent-v1.mjs && node --check src/pczt-inspect-v1.mjs && node --check src/pczt-bind-v1.mjs && node --check src/proof-event-v1.mjs && node --check src/fixed-runner-v1.mjs && node --check src/signer-selection-v1.mjs && node --check src/signing-context-v1.mjs && node --check src/signer-review-v1.mjs && node --check src/frost-session-v1.mjs && node --check scripts/verify.mjs && node --check scripts/security-scan.mjs && node --check scripts/frost-demo.mjs && node --check scripts/frost-local-wrapper.mjs && node --check scripts/capture-screenshots.mjs && node --check scripts/create-intent.mjs && node --check scripts/intent-v1.test.mjs && node --check scripts/pczt-inspect.mjs && node --check scripts/pczt-inspect-v1.test.mjs && node --check scripts/pczt-bind.mjs && node --check scripts/pczt-bind-v1.test.mjs && node --check scripts/proof-event.mjs && node --check scripts/proof-event-v1.test.mjs && node --check scripts/fixed-runner.mjs && node --check scripts/fixed-runner-v1.test.mjs && node --check scripts/signer-selection.mjs && node --check scripts/signer-selection-v1.test.mjs && node --check scripts/signing-context-v1.test.mjs && node --check scripts/signer-review.mjs && node --check scripts/signer-review-v1.test.mjs && node --check scripts/frost-session.mjs && node --check scripts/frost-session-v1.test.mjs",
+    "security:scan": "node scripts/security-scan.mjs",
+    "check": "npm run verify && npm run test:intent && npm run test:pczt && npm run test:bind && npm run test:events && npm run test:runner && npm run test:signers && npm run test:signing && npm run test:review && npm run test:frost-session && npm run check:syntax && npm run security:scan"
   },
   "keywords": [
     "zcash",
