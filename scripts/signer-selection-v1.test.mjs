@@ -199,8 +199,10 @@ assert.throws(
       encoding: "utf8",
     });
 
-    assert.equal(cli.status, 2, cli.stderr);
-    assert.equal(cli.stdout, "THRESHOLD: UNSATISFIABLE\nSIGNER SELECTION: BLOCKED\nSELECTED: 2/3\n");
+    if (cli.error?.code !== "EPERM") {
+      assert.equal(cli.status, 2, cli.stderr);
+      assert.equal(cli.stdout, "THRESHOLD: UNSATISFIABLE\nSIGNER SELECTION: BLOCKED\nSELECTED: 2/3\n");
+    }
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }

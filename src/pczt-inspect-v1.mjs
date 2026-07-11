@@ -77,6 +77,12 @@ function parseHeader(line, label) {
   return Number(match[1]);
 }
 
+function parseColonHeader(line, label) {
+  const match = line.match(new RegExp(`^(\\d+) ${label}:$`));
+  if (!match) invalidPcztReview(`missing ${label} header.`);
+  return Number(match[1]);
+}
+
 function requireLine(lines, index, label) {
   const line = lines[index];
   if (line === undefined) invalidPcztReview(`missing ${label}.`);
@@ -158,6 +164,143 @@ function skipBlankLines(lines, cursor) {
   return cursor;
 }
 
+function parseFooter(lines, cursor) {
+  const txidLine = requireLine(lines, cursor, "TxID");
+  const txidMatch = txidLine.match(/^TxID: ([0-9a-f]{64})$/);
+  if (!txidMatch) invalidPcztReview("missing TxID.");
+  const transactionId = txidMatch[1];
+  cursor += 1;
+
+  const versionLine = requireLine(lines, cursor, "Version");
+  const versionMatch = versionLine.match(/^Version: (V\d+)$/);
+  if (!versionMatch) invalidPcztReview("missing transaction version.");
+  const transactionVersion = versionMatch[1];
+  cursor += 1;
+  cursor = skipBlankLines(lines, cursor);
+
+  if (cursor !== lines.length) invalidPcztReview("unexpected extra inspect output.");
+  if (!HEX_64_PATTERN.test(transactionId)) invalidPcztReview("transaction id must be 64 lowercase hex characters.");
+
+  return { transactionId, transactionVersion };
+}
+
+function parseTransparentReview(lines, network) {
+  let cursor = 0;
+  const inputResult = parseTransparentInputs(lines, cursor);
+  cursor = skipBlankLines(lines, inputResult.cursor);
+  const outputResult = parseTransparentOutputs(lines, cursor, network);
+  cursor = skipBlankLines(lines, outputResult.cursor);
+  const footer = parseFooter(lines, cursor);
+
+  if (outputResult.outputs.length === 0) invalidPcztReview("at least one output is required.");
+  const fee = inputResult.total - outputResult.total;
+  if (!Number.isSafeInteger(fee) || fee < 0) invalidPcztReview("computed fee is invalid.");
+
+  return {
+    pool: "transparent",
+    recipients: outputResult.outputs.map((output) => output.recipient),
+    amounts_zatoshis: outputResult.outputs.map((output) => output.amount_zatoshis),
+    fee_metadata: {
+      status: "computed_from_transparent_values",
+      input_total_zatoshis: inputResult.total,
+      output_total_zatoshis: outputResult.total,
+      fee_zatoshis: fee,
+    },
+    output_count: outputResult.outputs.length,
+    transaction_id: footer.transactionId,
+    transaction_version: footer.transactionVersion,
+  };
+}
+
+function parseIronwoodSpend(line) {
+  if (line === "  - Spend: Zero value (likely a dummy)") return 0;
+  const match = line.match(/^  - Spend: (\d+) zatoshis$/);
+  if (!match) invalidPcztReview("malformed Ironwood spend line.");
+  const amount = Number(match[1]);
+  if (!Number.isSafeInteger(amount)) invalidPcztReview("Ironwood spend amount is not a safe integer.");
+  return amount;
+}
+
+function parseIronwoodOutput(line, network, index) {
+  const match = line.match(/^  - Output: (\d+) zatoshis(?: to ([^\s]+))?$/);
+  if (!match) invalidPcztReview("malformed Ironwood output line.");
+  const amount = Number(match[1]);
+  const recipient = match[2] ?? null;
+  if (!Number.isSafeInteger(amount)) invalidPcztReview("Ironwood output amount is not a safe integer.");
+  if (recipient) assertRecipientNetwork(recipient, network);
+
+  return {
+    index,
+    amount_zatoshis: amount,
+    recipient,
+    pool: "ironwood",
+    role: recipient ? "recipient" : "change",
+    recipient_status: recipient ? "reported_by_zcash_devtool_inspect" : "not_reported_by_zcash_devtool_inspect",
+  };
+}
+
+function parseIronwoodReview(lines, network) {
+  let cursor = 0;
+  const count = parseColonHeader(requireLine(lines, cursor, "Ironwood actions header"), "Ironwood actions");
+  cursor += 1;
+
+  let inputTotal = 0;
+  let outputTotal = 0;
+  const actions = [];
+  const outputs = [];
+
+  for (let expectedIndex = 0; expectedIndex < count; expectedIndex += 1) {
+    const actionLine = requireLine(lines, cursor, "Ironwood action");
+    const actionMatch = actionLine.match(/^- (\d+):$/);
+    if (!actionMatch) invalidPcztReview("malformed Ironwood action line.");
+    const index = Number(actionMatch[1]);
+    if (index !== expectedIndex) invalidPcztReview("Ironwood action indexes must be contiguous.");
+    cursor += 1;
+
+    const spend = parseIronwoodSpend(requireLine(lines, cursor, "Ironwood spend"));
+    cursor += 1;
+
+    const output = parseIronwoodOutput(requireLine(lines, cursor, "Ironwood output"), network, index);
+    cursor += 1;
+
+    inputTotal += spend;
+    outputTotal += output.amount_zatoshis;
+    actions.push({
+      index,
+      spend_zatoshis: spend,
+      output_zatoshis: output.amount_zatoshis,
+      output_role: output.role,
+    });
+    outputs.push(output);
+  }
+
+  cursor = skipBlankLines(lines, cursor);
+  const footer = parseFooter(lines, cursor);
+  if (outputs.length === 0) invalidPcztReview("at least one output is required.");
+
+  const fee = inputTotal - outputTotal;
+  if (!Number.isSafeInteger(fee) || fee < 0) invalidPcztReview("computed fee is invalid.");
+
+  const reportedOutputs = outputs.filter((output) => output.recipient);
+  return {
+    pool: "ironwood",
+    ironwood_action_count: count,
+    ironwood_actions: actions,
+    outputs,
+    recipients: reportedOutputs.map((output) => output.recipient),
+    amounts_zatoshis: reportedOutputs.map((output) => output.amount_zatoshis),
+    fee_metadata: {
+      status: "computed_from_ironwood_action_values",
+      input_total_zatoshis: inputTotal,
+      output_total_zatoshis: outputTotal,
+      fee_zatoshis: fee,
+    },
+    output_count: outputs.length,
+    transaction_id: footer.transactionId,
+    transaction_version: footer.transactionVersion,
+  };
+}
+
 export function parseZcashDevtoolPcztInspect(rawInspect, options = {}) {
   const {
     network,
@@ -176,52 +319,32 @@ export function parseZcashDevtoolPcztInspect(rawInspect, options = {}) {
   const fingerprint =
     pcztBytes === undefined ? assertFingerprint(pcztFingerprint, "pczt_fingerprint") : sha256Fingerprint(pcztBytes);
   const lines = rawInspect.replace(/\r\n/g, "\n").trimEnd().split("\n");
-  let cursor = 0;
-
-  const inputResult = parseTransparentInputs(lines, cursor);
-  cursor = skipBlankLines(lines, inputResult.cursor);
-  const outputResult = parseTransparentOutputs(lines, cursor, normalizedNetwork);
-  cursor = skipBlankLines(lines, outputResult.cursor);
-
-  const txidLine = requireLine(lines, cursor, "TxID");
-  const txidMatch = txidLine.match(/^TxID: ([0-9a-f]{64})$/);
-  if (!txidMatch) invalidPcztReview("missing TxID.");
-  const transactionId = txidMatch[1];
-  cursor += 1;
-
-  const versionLine = requireLine(lines, cursor, "Version");
-  const versionMatch = versionLine.match(/^Version: (V\d+)$/);
-  if (!versionMatch) invalidPcztReview("missing transaction version.");
-  const transactionVersion = versionMatch[1];
-  cursor += 1;
-  cursor = skipBlankLines(lines, cursor);
-
-  if (cursor !== lines.length) invalidPcztReview("unexpected extra inspect output.");
-  if (outputResult.outputs.length === 0) invalidPcztReview("at least one output is required.");
-  if (!HEX_64_PATTERN.test(transactionId)) invalidPcztReview("transaction id must be 64 lowercase hex characters.");
-
-  const fee = inputResult.total - outputResult.total;
-  if (!Number.isSafeInteger(fee) || fee < 0) invalidPcztReview("computed fee is invalid.");
+  const parsed = lines[0]?.endsWith(" Ironwood actions:")
+    ? parseIronwoodReview(lines, normalizedNetwork)
+    : parseTransparentReview(lines, normalizedNetwork);
 
   return {
     network: normalizedNetwork,
     source_fingerprint: sha256Fingerprint(rawInspect),
     source: PCZT_INSPECT_SOURCE,
     tool_commit: toolIdentity.commit,
-    recipients: outputResult.outputs.map((output) => output.recipient),
-    amounts_zatoshis: outputResult.outputs.map((output) => output.amount_zatoshis),
+    pool: parsed.pool,
+    recipients: parsed.recipients,
+    amounts_zatoshis: parsed.amounts_zatoshis,
     memo_metadata: {
       status: "not_reported_by_zcash_devtool_inspect",
     },
-    fee_metadata: {
-      status: "computed_from_transparent_values",
-      input_total_zatoshis: inputResult.total,
-      output_total_zatoshis: outputResult.total,
-      fee_zatoshis: fee,
-    },
-    output_count: outputResult.outputs.length,
+    fee_metadata: parsed.fee_metadata,
+    output_count: parsed.output_count,
     pczt_fingerprint: fingerprint,
-    transaction_id: transactionId,
-    transaction_version: transactionVersion,
+    transaction_id: parsed.transaction_id,
+    transaction_version: parsed.transaction_version,
+    ...(parsed.outputs ? { outputs: parsed.outputs } : {}),
+    ...(parsed.ironwood_action_count === undefined
+      ? {}
+      : {
+          ironwood_action_count: parsed.ironwood_action_count,
+          ironwood_actions: parsed.ironwood_actions,
+        }),
   };
 }

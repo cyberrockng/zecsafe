@@ -9,6 +9,8 @@ import { selectSignersV1 } from "./signer-selection-v1.mjs";
 import { prepareSigningContextV1 } from "./signing-context-v1.mjs";
 import { reviewSignerPackageV1 } from "./signer-review-v1.mjs";
 import { startFrostSessionV1 } from "./frost-session-v1.mjs";
+import { completePcztV1 } from "./pczt-completion-v1.mjs";
+import { generateZecsafeProofV1, verifyZecsafeProofV1 } from "./zecsafe-proof-v1.mjs";
 import { EXPECTED_ZCASH_DEVTOOL_COMMIT } from "./pczt-inspect-v1.mjs";
 
 export const FIXED_RUNNER_RESULT_SCHEMA_VERSION = "zecsafe-fixed-runner-result-v1";
@@ -386,6 +388,71 @@ async function operationFrostSessionStart(context) {
   };
 }
 
+async function operationPcztCompletion(context) {
+  const completionPackage =
+    context.input.completion_package_path === undefined
+      ? context.input.completion_package ?? context.input
+      : await readWorkspaceJson(context.workspaceRoot, context.input.completion_package_path, "completion_package_path");
+  const completion = completePcztV1({ completionPackage });
+
+  return {
+    operation_status: completion.status,
+    output: completion,
+    command_results: [],
+    public_message:
+      completion.status === "PASS"
+        ? "Signed, proven, and combined PCZT passed final binding without broadcasting."
+        : "PCZT completion did not pass all signing, proving, combine, and binding checks.",
+    limitations: completion.limitations,
+  };
+}
+
+async function operationProofGenerate(context) {
+  const completionPackage =
+    context.input.completion_package_path === undefined
+      ? context.input.completion_package
+      : await readWorkspaceJson(context.workspaceRoot, context.input.completion_package_path, "completion_package_path");
+  const proof = generateZecsafeProofV1({
+    completionPackage,
+    network: context.input.network,
+    recorded_at: context.input.recorded_at ?? context.now,
+    zecsafe_commit: context.input.zecsafe_commit,
+    transaction: context.input.transaction ?? {},
+    toolchain: context.input.toolchain ?? {},
+  });
+  const verification = verifyZecsafeProofV1(proof);
+
+  return {
+    operation_status: verification.status,
+    output: proof,
+    command_results: [],
+    public_message:
+      verification.status === "PASS"
+        ? "zecsafe-proof-v1 bundle generated and self-verified."
+        : "zecsafe-proof-v1 bundle generation did not self-verify.",
+    limitations: proof.limitations,
+  };
+}
+
+async function operationProofVerify(context) {
+  const proof =
+    context.input.proof_path === undefined
+      ? context.input.proof
+      : await readWorkspaceJson(context.workspaceRoot, context.input.proof_path, "proof_path");
+  const verification = verifyZecsafeProofV1(proof);
+
+  return {
+    operation_status: verification.status,
+    output: verification,
+    command_results: [],
+    public_message:
+      verification.status === "PASS"
+        ? "zecsafe-proof-v1 verifier accepted the recorded public bundle."
+        : "zecsafe-proof-v1 verifier rejected the recorded public bundle.",
+    limitations: verification.status === "PASS" ? [] : ["Proof verification failed; inspect check statuses before using this artifact."],
+  };
+}
+
 const OPERATION_HANDLERS = {
   "toolchain.status": operationToolchainStatus,
   "wallet.status": operationWalletStatus,
@@ -395,6 +462,11 @@ const OPERATION_HANDLERS = {
   "signer.review": operationSignerReview,
   "frost.session.start": operationFrostSessionStart,
   "frost.session.status": operationFrostSessionStatus,
+  "pczt.sign.complete": operationPcztCompletion,
+  "pczt.prove": operationPcztCompletion,
+  "pczt.combine": operationPcztCompletion,
+  "proof.generate": operationProofGenerate,
+  "proof.verify": operationProofVerify,
 };
 
 const OPERATION_STAGES = {
@@ -502,6 +574,32 @@ function publicDataFor(operation, operationStatus, output, commandResults) {
     data.signature_byte_length = output.signature_byte_length;
     data.check_statuses = Object.fromEntries(output.checks.map((check) => [check.field, check.status]));
     data.limitations = output.limitations;
+  }
+  if (["pczt.sign.complete", "pczt.prove", "pczt.combine"].includes(operation) && output) {
+    data.pczt_fingerprint = output.final_pczt_fingerprint;
+    data.binding_report_ref = output.final_binding_report_ref;
+    data.sighash_fingerprint = output.sighash_fingerprint;
+    data.aggregate_signature_fingerprint = output.aggregate_signature_fingerprint;
+    data.signature_byte_length = output.signature_byte_length;
+    data.signed_pczt_status = output.signed_pczt_status;
+    data.proven_pczt_status = output.proven_pczt_status;
+    data.pczt_combine_status = output.pczt_combine_status;
+    data.final_binding_status = output.final_binding_status;
+    data.broadcast_status = output.broadcast_status;
+    data.check_statuses = Object.fromEntries(output.checks.map((check) => [check.field, check.status]));
+    data.limitations = output.limitations;
+  }
+  if (operation === "proof.generate" && output) {
+    data.bundle_hash = output.bundle_hash;
+    data.proof_bundle_hash = output.bundle_hash;
+    data.verifier_status = operationStatus;
+    data.limitations = output.limitations;
+  }
+  if (operation === "proof.verify" && output) {
+    data.bundle_hash = output.bundle_hash;
+    data.proof_bundle_hash = output.bundle_hash;
+    data.proof_verify_status = output.status;
+    data.verifier_status = output.status;
   }
 
   return data;

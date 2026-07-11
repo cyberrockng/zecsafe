@@ -75,18 +75,25 @@ function assertSafeInteger(value, fieldName, { minimum = 0 } = {}) {
 function normalizeOutput(output, index) {
   if (!isPlainObject(output)) invalidBinding(`outputs[${index}] must be an object.`);
   const amount = assertSafeInteger(output.amount_zatoshis, `outputs[${index}].amount_zatoshis`, { minimum: 0 });
-  if (typeof output.recipient !== "string" || output.recipient.trim() === "") {
-    invalidBinding(`outputs[${index}].recipient is required.`);
-  }
   const role = output.role ?? (output.is_change === true ? "change" : "unclassified");
   if (!OUTPUT_ROLES.has(role)) invalidBinding(`outputs[${index}].role is unsupported.`);
+  const recipient = typeof output.recipient === "string" && output.recipient.trim() ? output.recipient.trim() : null;
+  if (!recipient && role !== "change") {
+    invalidBinding(`outputs[${index}].recipient is required for non-change outputs.`);
+  }
 
   return {
     index: Number.isSafeInteger(output.index) ? output.index : index,
-    recipient: output.recipient.trim(),
+    recipient: recipient ?? `unreported-change-output:${Number.isSafeInteger(output.index) ? output.index : index}`,
     amount_zatoshis: amount,
     pool: typeof output.pool === "string" && output.pool.trim() ? output.pool.trim() : "unknown",
     role,
+    recipient_status:
+      typeof output.recipient_status === "string" && output.recipient_status.trim()
+        ? output.recipient_status.trim()
+        : recipient
+          ? "reported"
+          : "not_reported",
   };
 }
 

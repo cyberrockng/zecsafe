@@ -1,0 +1,109 @@
+{
+  "schema_version": "zecsafe-proof-v1",
+  "project": "ZecSafe",
+  "network": "test",
+  "run_id": "p0-014-20260711T183213Z",
+  "recorded_at": "2026-07-11T19:30:00.000Z",
+  "zecsafe_commit": "38c2464a8512dade6c5e11511ce81d2864896339",
+  "vault": {
+    "group_fingerprint": "sha256:74d814d1ee5114db18439b44bb3ccde50e6dd64952eda3675ac3797a117fefc3",
+    "ciphersuite": "redpallas-rerandomized",
+    "threshold": 2,
+    "participants_total": 3
+  },
+  "availability": {
+    "available": 2,
+    "unavailable": 1
+  },
+  "intent": {
+    "commitment": "sha256:5ceb129fa0e0447d039ead6a1e2faaab5eddc9371787b1d97ff0652f071e9d50"
+  },
+  "pczt": {
+    "source_fingerprint": "sha256:7d494c53178afbd39c50dafedd5d2755681d02d49bd95918847ae672382a2789",
+    "signed_fingerprint": "sha256:01730fc518d4a83ae6a6172e714650feebc0a0d3b5851ddd6bf8b28529ac85ce",
+    "proven_fingerprint": "sha256:4e4518d785ed027da3adaae6a4b381b92e5e5c8b314900f2bdc14baabefda0f0",
+    "final_fingerprint": "sha256:2eb89c4c78bc11eff300ea9362fb771960658d643d97f3e8b14bc5e27938f54f",
+    "source_binding_report_ref": "sha256:c0541a9c6bbf869299364da65beb75e499e7a553e4af3ba6f0998c9124768d7f",
+    "final_binding_report_ref": "sha256:65007adbcb1956482e41633ea6cea7597be23367f8f4f84b32ded8a1e710f767",
+    "binding_status": "PASS",
+    "signed_pczt_status": "PASS",
+    "proven_pczt_status": "PASS",
+    "combine_status": "PASS",
+    "checks": [
+      {
+        "field": "source",
+        "status": "PASS"
+      },
+      {
+        "field": "network",
+        "status": "MATCH"
+      },
+      {
+        "field": "recipient",
+        "status": "MATCH"
+      },
+      {
+        "field": "amount",
+        "status": "MATCH"
+      },
+      {
+        "field": "fee_policy",
+        "status": "PASS"
+      },
+      {
+        "field": "memo_policy",
+        "status": "LIMITED"
+      },
+      {
+        "field": "unexpected_output",
+        "status": "PASS"
+      },
+      {
+        "field": "change_output",
+        "status": "PASS"
+      }
+    ]
+  },
+  "frost": {
+    "group_fingerprint": "sha256:74d814d1ee5114db18439b44bb3ccde50e6dd64952eda3675ac3797a117fefc3",
+    "pczt_fingerprint": "sha256:7d494c53178afbd39c50dafedd5d2755681d02d49bd95918847ae672382a2789",
+    "binding_report_ref": "sha256:c0541a9c6bbf869299364da65beb75e499e7a553e4af3ba6f0998c9124768d7f",
+    "session_fingerprint": "sha256:4541cb757a9808081ca43e59843ee8f1ec66e7f8e47bc13697fe8b3fae03101c",
+    "selected_signers": [
+      "sha256:5acbfa31627023e0919067f6e7708f5d3b21a9be357dad615851830b89ed04db",
+      "sha256:296bba404832fa3d613340d85813cd4cab99202524813335b1f298a41b42047a"
+    ],
+    "unavailable_participants": 1,
+    "threshold_status": "THRESHOLD_REACHED",
+    "aggregate_signature_status": "AGGREGATE_SIGNATURE_VERIFIED",
+    "aggregate_signature_fingerprint": "sha256:6752d1b0eae9fc190848545a1b7868e3dd78a3e3883208c3620d17a78acfd231",
+    "signature_byte_length": 64,
+    "sighash_fingerprint": "sha256:855d695441fd87747ebf92109b041fe88adff8a539f9850901ed5f5c1d6e60e3"
+  },
+  "transaction": {
+    "txid": "1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b",
+    "chain_status": "NOT_BROADCAST",
+    "broadcast_status": "NOT_BROADCAST",
+    "observed_block_height": null,
+    "confirmations_at_recording": 0
+  },
+  "toolchain": {
+    "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+    "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "pczt_signer_library_commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+  },
+  "evidence": {
+    "source_binding_report_ref": "sha256:c0541a9c6bbf869299364da65beb75e499e7a553e4af3ba6f0998c9124768d7f",
+    "final_binding_report_ref": "sha256:65007adbcb1956482e41633ea6cea7597be23367f8f4f84b32ded8a1e710f767",
+    "completion_report_ref": "sha256:da27d3b93d24ec6686441ad3efa4330f76b8bd648be0de164041f58dedc677e5",
+    "proof_event_ref": "sha256:b2e0e5d5443fa6bcb327221b75ede6c593bc975068cc5d8fbf74403fce1ac78b"
+  },
+  "limitations": [
+    "Public zecsafe-proof-v1 contains only fingerprints, statuses, counts, tool commits, limitations, and transaction observation status.",
+    "Raw PCZT bytes, raw SIGHASH, raw aggregate signature, action randomizer, UFVK, wallet database, and FROST shares are excluded from public evidence.",
+    "Broadcast remains gated by separate human approval.",
+    "The final transaction was extracted offline as a txid only and was not broadcast.",
+    "The public package excludes UFVK, wallet paths, FROST config paths, raw PCZT bytes, raw SIGHASH bytes, action randomizer, and raw aggregate signature bytes."
+  ],
+  "bundle_hash": "sha256:e3e8862fa44b010721cb40fdaaf241a98b12729b2e798fdeb0274a4183effa3e"
+}

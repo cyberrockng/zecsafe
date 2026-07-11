@@ -1,0 +1,87 @@
+{
+  "schema_version": "zecsafe-mainnet-demo-env-v1",
+  "task_id": "ZSAFE-P0-017",
+  "run_id": "p0-017-20260711T231314Z",
+  "recorded_at": "2026-07-11T23:14:41.000Z",
+  "status": "READY_FOR_FUNDING_APPROVAL",
+  "network": "main",
+  "funding_status": "NOT_FUNDED",
+  "broadcast_status": "NOT_BROADCAST",
+  "group": {
+    "setup_mode": "DKG",
+    "ciphersuite": "redpallas",
+    "description": "ZecSafe P0-017 Mainnet Demo DKG RedPallas 2-of-3",
+    "public_group_key": "df7823871b1ceb00632a60ba9cfe348ad5f2c14f36ebf27083873d37a0b32a26",
+    "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "threshold": 2,
+    "participants_total": 3,
+    "participants": [
+      {
+        "label": "A",
+        "role": "selected-signer-candidate",
+        "communication_public_fingerprint": "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b"
+      },
+      {
+        "label": "B",
+        "role": "selected-signer-candidate",
+        "communication_public_fingerprint": "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+      },
+      {
+        "label": "C",
+        "role": "unavailable-demo-participant",
+        "communication_public_fingerprint": "sha256:d6400dfe81d098e85cce57fe785b15c2ae5a3916e9b319022af6d14c2e31213c"
+      }
+    ],
+    "dkg_status": {
+      "participant_a": "PASS",
+      "participant_b": "PASS",
+      "participant_c": "PASS",
+      "same_group_key_reported_by_all_participants": true
+    }
+  },
+  "wallet": {
+    "type": "view-only",
+    "status": "INITIALIZED",
+    "address_type": "orchard-only unified address",
+    "orchard_address": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+    "purpose": "disposable tiny-value ZecSafe mainnet demo; not production custody",
+    "recommended_tiny_funding_amount": "0.0001 ZEC"
+  },
+  "mainnet_info": {
+    "chain_name": "main",
+    "chain_tip_height": 3409081,
+    "server_uri": "https://zec.rocks:443",
+    "address_inspect": {
+      "network": "main",
+      "kind": "Unified Address",
+      "receivers": [
+        "Orchard"
+      ]
+    }
+  },
+  "toolchain": {
+    "zecsafe_commit": "38c2464a8512dade6c5e11511ce81d2864896339",
+    "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+    "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "zf_frost_commit": "2016e44ba4a4757a996300350063b937a2ad33e8",
+    "zcash_sign_network": "main"
+  },
+  "human_gate": {
+    "network": "main",
+    "orchard_address": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+    "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "threshold": 2,
+    "participant_count": 3,
+    "wallet_purpose": "disposable tiny-value ZecSafe mainnet demo; not production custody",
+    "recommended_tiny_funding_amount": "0.0001 ZEC",
+    "risk_warning": "Fund only disposable tiny mainnet ZEC after explicit approval; no production or personal funds; no broadcast is approved by this step."
+  },
+  "private_material_location": "outside-repository",
+  "limitations": [
+    "Participant configs, contact tokens, TLS private keys, UFVK, and wallet databases are stored outside the repository.",
+    "The public fixture records only the funding gate and public fingerprints.",
+    "The wallet is not funded.",
+    "No Zcash transaction was created or broadcast.",
+    "This is a disposable demonstration environment and not a production custody claim."
+  ]
+}

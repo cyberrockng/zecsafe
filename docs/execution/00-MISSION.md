@@ -35,11 +35,11 @@ Every remaining core task must produce, protect, or unblock public-safe evidence
 
 Current active wave: `P0 - Upstream toolchain and headless reproduction`.
 
-Latest completed task: `ZSAFE-P0-011 - Build signing-context preparation`.
+Latest completed task: `ZSAFE-P0-017 - Create dedicated mainnet demo wallet/group`.
 
-Current active task: `awaiting approval for ZSAFE-P0-012 - Implement signer review command`.
+Current active task: `awaiting approval/funding for ZSAFE-P0-018 - Verify view-only mainnet synchronization and balance`.
 
-No primary demo UI work is allowed until the headless proof kernel can demonstrate the required proof-run sequence.
+The headless proof kernel dry-run gate is now PASS. Primary demo UI work remains deferred until the active plan and human approval select that phase.
 
 No real mainnet funding, broadcast, ZecHub PR publication, or Discord submission post may happen without explicit human approval.
 

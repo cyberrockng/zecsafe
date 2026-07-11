@@ -4643,3 +4643,572 @@ Boundary not satisfied:
 ```text
 The live signature is not yet over a real shielded PCZT SIGHASH because no such funded/shielded PCZT artifact exists in the current workspace.
 ```
+
+## ZSAFE-P0-014 - Signed, Proven, Combined PCZT
+
+Status: `ZSAFE-P0-014` complete.
+
+Completed UTC: `2026-07-11T18:52:00Z`.
+
+### Outcome
+
+ZecSafe resolved the PCZT input boundary by funding a FROST-controlled testnet unified address derived from the existing RedPallas DKG group public key. The live run created a real Ironwood source PCZT, extracted the PCZT SIGHASH through the pinned PCZT signer-library path, produced a live A+B FROST aggregate signature with Eve offline, applied that signature to the PCZT, created proofs separately, combined the signed and proven PCZTs, re-ran binding, and stopped before broadcast.
+
+### Gate Added
+
+```text
+module: src/pczt-completion-v1.mjs
+CLI: scripts/pczt-complete.mjs
+test: scripts/pczt-completion-v1.test.mjs
+package alias: npm run pczt:complete
+test alias: npm run test:pczt-complete
+schema: zecsafe-pczt-completion-v1
+fixed-runner operations implemented: pczt.sign.complete, pczt.prove, pczt.combine
+proof event stage: PCZT_COMBINE
+```
+
+The PCZT inspect adapter was also extended to parse V6/Ironwood action output and model unreported non-recipient outputs as change.
+
+### Live External Run
+
+External run:
+
+```text
+/home/dell/.zecsafe/runs/p0-014-20260711T183213Z
+```
+
+Funding proof:
+
+```text
+source: Fauzec Zcash testnet faucet direct API
+request_id: 01KX977K8G59R5EZGGR21JBVFG
+txid: d8b6f151c2265a40fc7c5ee42313b84ae494018157f257a5a60c2c353ddb697a
+mined_height: 4160374
+amount: 1.00000000 TAZ
+```
+
+Source and completion artifacts:
+
+```text
+source PCZT sha256: 7d494c53178afbd39c50dafedd5d2755681d02d49bd95918847ae672382a2789
+source inspect sha256: 6b3f8edf8fc34d92a2ac9cae3ae4fe767d74f20a779ae220082c57b2e139fd33
+shielded SIGHASH bytes: 32
+shielded SIGHASH sha256: 855d695441fd87747ebf92109b041fe88adff8a539f9850901ed5f5c1d6e60e3
+aggregate signature bytes: 64
+aggregate signature sha256: 6752d1b0eae9fc190848545a1b7868e3dd78a3e3883208c3620d17a78acfd231
+signed PCZT sha256: 01730fc518d4a83ae6a6172e714650feebc0a0d3b5851ddd6bf8b28529ac85ce
+proven PCZT sha256: 4e4518d785ed027da3adaae6a4b381b92e5e5c8b314900f2bdc14baabefda0f0
+combined PCZT sha256: 2eb89c4c78bc11eff300ea9362fb771960658d643d97f3e8b14bc5e27938f54f
+offline extracted txid: 1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b
+broadcast status: NOT_BROADCAST
+```
+
+Completion gate output:
+
+```text
+SIGNED_PCZT                 PASS
+PROVEN_PCZT                 PASS
+PCZT_COMBINE                PASS
+FINAL BINDING               PASS
+BROADCAST                   NOT_BROADCAST
+FINAL PCZT                  sha256:2eb89c4c78bc11eff300ea9362fb771960658d643d97f3e8b14bc5e27938f54f
+```
+
+### Claim Now Allowed
+
+```text
+ZecSafe completed a real funded testnet Ironwood PCZT through signing, proving, combining, final binding, and offline extraction, using a live A+B FROST aggregate signature over the PCZT SIGHASH with Eve offline.
+```
+
+### Claim Still Forbidden
+
+```text
+ZecSafe has not broadcast this transaction, has not produced a mainnet spend, has not implemented zecsafe-proof-v1, and has not implemented the one-command judge verifier.
+```
+
+### Judge-proof Impact
+
+```text
+The proof kernel can now link intent binding, real PCZT SIGHASH fingerprint, FROST aggregate signature fingerprint, signed PCZT fingerprint, proven PCZT fingerprint, combined PCZT fingerprint, final binding PASS, and an explicit non-broadcast gate.
+```
+
+### Public-safe Evidence Emitted
+
+```text
+source PCZT fingerprint
+source binding report ref
+final binding report ref
+SIGHASH fingerprint
+aggregate signature fingerprint
+signature byte length
+signed PCZT fingerprint
+proven PCZT fingerprint
+combined PCZT fingerprint
+offline extracted txid
+completion check statuses
+broadcast gate status
+PCZT_COMBINE ProofEvent v1
+```
+
+### Private Material Intentionally Excluded
+
+```text
+UFVK
+wallet database
+FROST participant configs
+contact tokens
+TLS private keys
+signing shares
+nonces
+randomizers
+raw SIGHASH
+raw aggregate signature
+raw PCZT bodies
+raw extracted transaction material
+logs with protocol transcript material
+```
+
+### Negative/Tamper Case
+
+```text
+mock signature source -> signed PCZT FAIL
+63-byte signature -> FROST signature and signed PCZT FAIL
+corrupt signed PCZT status -> signed PCZT FAIL
+corrupt proven PCZT proof status -> proven PCZT FAIL
+mismatched signed/proven pair -> PCZT combine FAIL
+raw/private fields in completion package -> rejected
+Ironwood malformed output line -> PCZT inspect rejected
+unreported change outputs -> modeled as change, not treated as recipient payments
+```
+
+### Acceptance Criteria
+
+- [x] Real funded FROST-controlled Ironwood PCZT created.
+- [x] Real shielded PCZT SIGHASH fingerprint extracted from the PCZT signer path.
+- [x] A+B FROST session produced a 64-byte aggregate signature over that SIGHASH with Eve offline.
+- [x] Signed PCZT produced by applying the FROST aggregate signature.
+- [x] Proven PCZT produced separately.
+- [x] Signed and proven PCZTs combined.
+- [x] Combined PCZT passed final binding verification.
+- [x] Offline extraction produced txid `1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b`.
+- [x] Broadcast gate remained `NOT_BROADCAST`.
+- [x] Dedicated execution doc and `HANDOFF.md` updated.
+- [x] `npm run check` passed.
+
+## ZSAFE-P0-015 - zecsafe-proof-v1
+
+Status: `ZSAFE-P0-015` complete.
+
+Completed UTC: `2026-07-11T22:35:59Z`.
+
+### Outcome
+
+ZecSafe implemented the public proof bundle and verifier layer:
+
+```text
+module: src/zecsafe-proof-v1.mjs
+CLI: scripts/zecsafe.mjs
+test: scripts/zecsafe-proof-v1.test.mjs
+schema doc: docs/proof/zecsafe-proof-v1.schema.json
+trust model: docs/proof/TRUST_MODEL.md
+proof spec: PROOF_SPEC.md
+fixture: fixtures/proofs/p0-014-zecsafe-proof-v1.json
+make targets: judge-proof, judge-proof-tamper
+fixed-runner operations implemented: proof.generate, proof.verify
+```
+
+Generated P0-014 public proof:
+
+```text
+bundle hash: sha256:e3e8862fa44b010721cb40fdaaf241a98b12729b2e798fdeb0274a4183effa3e
+network: test
+FROST policy: 2 of 3
+unavailable participants: 1
+selected signers: 2
+intent to PCZT: PASS
+threshold reached: PASS
+transaction txid: PRESENT
+broadcast status: NOT_BROADCAST
+```
+
+### Verifier Output
+
+```text
+Schema                       PASS
+Bundle hash                  PASS
+Network                      test
+FROST policy                 2 of 3
+Unavailable participants     1
+Selected signers             2
+Intent to PCZT               PASS
+Threshold reached            PASS
+Transaction txid             PRESENT
+Recorded run integrity       PASS
+
+VERDICT: VERIFIED RECORDED ZECSAFE PROOF
+```
+
+### Judge-proof Impact
+
+```text
+ZecSafe now has the public artifact judge-proof verifies: schema-constrained proof JSON, canonical bundle hash, no-wallet verifier, and required semantic tamper rejection.
+```
+
+### Public-safe Evidence Emitted
+
+```text
+canonical proof hash
+schema validation result
+verifier result
+network
+run id
+vault group fingerprint
+threshold and participant count
+available and unavailable counts
+intent commitment
+PCZT fingerprints
+binding report refs
+binding check statuses
+selected public signer fingerprints
+FROST session fingerprint
+aggregate signature fingerprint
+signature byte length
+offline extracted txid
+broadcast status
+toolchain commits
+limitations
+tamper rejection result
+```
+
+### Private Material Intentionally Excluded
+
+```text
+recipient address
+payment amount
+memo text
+raw PCZT bodies
+raw SIGHASH
+raw aggregate signature
+FROST participant configs
+FROST shares
+contact tokens
+TLS private keys
+wallet database
+UFVK or viewing keys
+spending keys
+protocol transcript logs
+```
+
+### Negative/Tamper Case
+
+```text
+txid mutation -> rejected
+threshold mutation -> rejected
+group fingerprint mutation -> rejected
+selected signer mutation -> rejected
+intent commitment mutation -> rejected
+PCZT fingerprint mutation -> rejected
+binding status mutation -> rejected
+unsupported public proof field -> rejected
+private/policy-excluded public proof material -> rejected
+```
+
+### Claim Now Allowed
+
+```text
+ZecSafe can generate and verify a public, tamper-evident zecsafe-proof-v1 bundle for the recorded P0-014 pre-broadcast proof, including canonical hash verification and semantic tamper rejection.
+```
+
+### Claim Still Forbidden
+
+```text
+ZecSafe has not broadcast this transaction, has not produced a mainnet spend, has not replaced the app UI/server proof-bundle route with zecsafe-proof-v1, and has not produced the final mainnet judge fixture.
+```
+
+### Acceptance Criteria
+
+- [x] `zecsafe-proof-v1` module implemented.
+- [x] Public/private field projection enforced.
+- [x] Bundle hash implemented as SHA-256 over canonical proof without `bundle_hash`.
+- [x] Verifier implemented independent of the main UI.
+- [x] Secret/policy-excluded material scanner implemented for public bundles.
+- [x] `zecsafe proof generate`, `zecsafe proof verify`, and `zecsafe proof tamper-demo` implemented through `scripts/zecsafe.mjs`.
+- [x] Fixed runner implements `proof.generate` and `proof.verify`.
+- [x] `make judge-proof` verifies the P0-014 public proof fixture.
+- [x] `make judge-proof-tamper` rejects all required semantic mutations.
+- [x] Dedicated execution doc and `HANDOFF.md` updated.
+- [x] `npm run check` passed.
+
+## ZSAFE-P0-016 - Dry-Broadcast Proof Run
+
+Status: `ZSAFE-P0-016` complete.
+
+Completed UTC: `2026-07-11T22:54:50Z`.
+
+### Outcome
+
+ZecSafe implemented the headless dry-broadcast proof-run layer:
+
+```text
+module: src/proof-run-v1.mjs
+CLI: scripts/zecsafe.mjs proof-run --dry-broadcast
+test: scripts/proof-run-v1.test.mjs
+fixture: fixtures/proof-runs/p0-016-dry-broadcast-proof-run.json
+make target: make proof-run-dry
+package alias: npm run proof:run
+schema: zecsafe-proof-run-v1
+```
+
+The command verifies the existing P0-014 public proof bundle before it emits a dry-run result. It does not fund a wallet, does not open private wallet material, and does not broadcast a Zcash transaction.
+
+Generated P0-016 dry-run proof:
+
+```text
+mode: dry-broadcast
+status: PASS
+recorded_at: 2026-07-11T22:52:30.000Z
+proof_bundle_hash: sha256:e3e8862fa44b010721cb40fdaaf241a98b12729b2e798fdeb0274a4183effa3e
+proof_run_ref: sha256:dcfa154cd662bb4e23a85f8e5977caae82f394f695b169d65466e12fea6a8048
+broadcast approval: WAIT
+```
+
+### Required Output
+
+```text
+[PASS] Toolchain pinned
+[PASS] View-only wallet available
+[PASS] Intent commitment created
+[PASS] PCZT created
+[PASS] Intent ↔ PCZT binding
+[PASS] Participant C unavailable
+[PASS] Threshold satisfiable 2/3
+[PASS] A+B selected
+[PASS] FROST threshold reached
+[PASS] Aggregate signature verified
+[PASS] Signed PCZT
+[PASS] Proven PCZT
+[PASS] Combined PCZT
+[WAIT] Mainnet broadcast requires human approval
+[PASS] Pre-broadcast proof generated
+```
+
+`View-only wallet available` is a public status carried from the recorded P0-014 proof evidence. P0-016 itself did not create, fund, open, or export any wallet.
+
+### Judge-Proof Impact
+
+This task closes the plan gate that required the whole headless proof kernel to work before mainnet funding. The dry-run fixture demonstrates the full public proof sequence through pre-broadcast proof generation while preserving a hard human approval gate before broadcast.
+
+### Public-Safe Evidence Emitted
+
+```text
+dry-run schema version
+mode and status
+source proof run id
+proof bundle hash
+proof reference hash
+toolchain commit fingerprints
+intent commitment
+PCZT fingerprints
+binding report references
+participant availability summary
+selected signer labels and public fingerprints
+FROST threshold and aggregate signature status
+aggregate signature fingerprint and byte length
+signed/proven/combined PCZT statuses and fingerprints
+offline extracted txid
+mainnet broadcast approval WAIT
+proof-run reference hash
+limitations
+```
+
+### Private Material Intentionally Excluded
+
+```text
+mainnet wallet seed
+spending key
+UFVK or viewing keys
+wallet database
+recipient address
+payment amount
+memo text
+raw PCZT bodies
+raw SIGHASH
+raw aggregate signature
+FROST participant configs
+FROST shares
+nonces
+randomizers
+contact tokens
+TLS private keys
+protocol transcript logs
+```
+
+### Negative/Tamper Case
+
+```text
+source proof must verify before dry-run PASS
+broadcasted transaction status -> rejected for dry-broadcast
+unknown view-only wallet status -> rejected
+wrong step sequence -> rejected by tests
+missing mainnet approval WAIT -> rejected by tests
+```
+
+### Claim Now Allowed
+
+```text
+ZecSafe can run the complete headless dry-broadcast proof sequence through pre-broadcast proof generation, with mainnet broadcast held at explicit human approval WAIT.
+```
+
+### Claim Still Forbidden
+
+```text
+ZecSafe has not funded a dedicated mainnet demo wallet, has not broadcast a Zcash transaction, has not produced mainnet chain acceptance evidence, and has not produced the final mainnet judge fixture.
+```
+
+### Acceptance Criteria
+
+- [x] `zecsafe-proof-run-v1` module implemented.
+- [x] `zecsafe proof-run --dry-broadcast` repository-equivalent command implemented.
+- [x] Required PASS/WAIT sequence emitted in order.
+- [x] Dry-run command verifies the source proof first.
+- [x] Dry-run rejects broadcasted proof status.
+- [x] Mainnet broadcast remains explicit `WAIT`.
+- [x] Public dry-run fixture generated.
+- [x] Dedicated execution doc and `HANDOFF.md` updated.
+- [x] `npm run check` passed.
+
+## ZSAFE-P0-017 - Mainnet Demo Wallet/Group
+
+Status: `ZSAFE-P0-017` complete.
+
+Completed UTC: `2026-07-11T23:14:41Z`.
+
+### Outcome
+
+ZecSafe created a dedicated disposable mainnet demo environment outside the repository:
+
+```text
+external run: /home/dell/.zecsafe/runs/p0-017-20260711T231314Z
+public fixture: fixtures/mainnet-demo/p0-017-mainnet-demo-env.json
+schema: zecsafe-mainnet-demo-env-v1
+status: READY_FOR_FUNDING_APPROVAL
+network: main
+funding_status: NOT_FUNDED
+broadcast_status: NOT_BROADCAST
+```
+
+### Human Funding Gate
+
+```text
+Network: main
+Orchard address: u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0
+Group fingerprint: sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354
+Threshold: 2
+Participant count: 3
+Wallet purpose: disposable tiny-value ZecSafe mainnet demo; not production custody
+Recommended tiny funding amount: 0.0001 ZEC
+Risk warning: Fund only disposable tiny mainnet ZEC after explicit approval; no production or personal funds; no broadcast is approved by this step.
+```
+
+### Group Setup
+
+```text
+setup mode: DKG
+ciphersuite: redpallas
+threshold: 2
+participants: 3
+public group key: df7823871b1ceb00632a60ba9cfe348ad5f2c14f36ebf27083873d37a0b32a26
+group fingerprint: sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354
+Alice DKG status: 0
+Bob DKG status: 0
+Eve DKG status: 0
+same group key reported by all participants: true
+```
+
+### Mainnet Compatibility Recheck
+
+```text
+frost-tools commit: 7d33a95fecc91dacdb1503933e2bee43780d3293
+zcash-devtool commit: 1b065594d958d1cad2deafe7cd2e2fcc2774c46c
+ZF FROST commit: 2016e44ba4a4757a996300350063b937a2ad33e8
+chain_name: main
+chain_tip_height: 3409081
+server_uri: https://zec.rocks:443
+address inspect: Network main, Unified Address, Orchard receiver
+```
+
+### Judge-Proof Impact
+
+This task establishes the real mainnet funding target for the final proof run while preserving the funding boundary. The public record proves that the mainnet group/address exists before funds are sent and before any transaction can be broadcast.
+
+### Public-Safe Evidence Emitted
+
+```text
+network
+funding status
+broadcast status
+DKG setup mode
+ciphersuite
+public group key
+group fingerprint
+threshold and participant count
+participant communication public fingerprints
+Orchard-only unified mainnet address
+view-only wallet initialization status
+mainnet chain info
+toolchain commits
+human funding gate text
+```
+
+### Private Material Intentionally Excluded
+
+```text
+UFVK
+wallet database
+FROST participant configs
+FROST shares
+contact tokens
+TLS private keys
+seed phrases
+spending keys
+raw protocol logs
+```
+
+### Negative/Tamper Case
+
+```text
+wrong network -> funding gate invalid
+non-DKG setup mode -> task claim invalid
+threshold other than 2/3 -> task claim invalid
+missing view-only wallet initialization -> task claim invalid
+funding_status other than NOT_FUNDED -> P0-017 boundary violated
+broadcast_status other than NOT_BROADCAST -> P0-017 boundary violated
+UFVK or participant config in repo -> security scan violation
+```
+
+### Claim Now Allowed
+
+```text
+ZecSafe has a dedicated disposable mainnet demo group/address and view-only wallet ready for a tiny-value funding approval decision.
+```
+
+### Claim Still Forbidden
+
+```text
+ZecSafe has not funded the mainnet demo wallet, has not observed a funded mainnet balance, has not created a mainnet PCZT, has not broadcast a Zcash transaction, and has not produced final mainnet proof-run evidence.
+```
+
+### Acceptance Criteria
+
+- [x] No meaningful personal funds used.
+- [x] No production custody claim made.
+- [x] Participant files remain outside repo.
+- [x] Exact group setup mode recorded as DKG.
+- [x] Network recorded as main.
+- [x] Tool compatibility rechecked against pinned commits.
+- [x] Mainnet server info observed.
+- [x] Funding gate displayed.
+- [x] Wallet remains `NOT_FUNDED`.
+- [x] Broadcast remains `NOT_BROADCAST`.
+- [x] Dedicated execution doc and `HANDOFF.md` updated.
+- [x] `npm run check` passed.

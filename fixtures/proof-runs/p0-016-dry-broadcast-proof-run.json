@@ -1,0 +1,162 @@
+{
+  "schema_version": "zecsafe-proof-run-v1",
+  "run_id": "dry-p0-014-20260711T183213Z",
+  "source_proof_run_id": "p0-014-20260711T183213Z",
+  "recorded_at": "2026-07-11T22:52:30.000Z",
+  "mode": "dry-broadcast",
+  "status": "PASS",
+  "proof_bundle_hash": "sha256:e3e8862fa44b010721cb40fdaaf241a98b12729b2e798fdeb0274a4183effa3e",
+  "proof_ref": "sha256:5b469eb98c46a1972d7421bee08852ecb5e4dda10f310982050ecddb2075e133",
+  "sequence": [
+    {
+      "code": "toolchain_pinned",
+      "label": "Toolchain pinned",
+      "status": "PASS",
+      "evidence": {
+        "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+        "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+        "pczt_signer_library_commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+      }
+    },
+    {
+      "code": "view_only_wallet_available",
+      "label": "View-only wallet available",
+      "status": "PASS",
+      "evidence": {
+        "status": "RECORDED_AVAILABLE",
+        "limitation": "Public dry-run output records wallet availability only as a status; UFVK and wallet DB remain outside public evidence."
+      }
+    },
+    {
+      "code": "intent_commitment_created",
+      "label": "Intent commitment created",
+      "status": "PASS",
+      "evidence": {
+        "intent_commitment": "sha256:5ceb129fa0e0447d039ead6a1e2faaab5eddc9371787b1d97ff0652f071e9d50"
+      }
+    },
+    {
+      "code": "pczt_created",
+      "label": "PCZT created",
+      "status": "PASS",
+      "evidence": {
+        "source_pczt_fingerprint": "sha256:7d494c53178afbd39c50dafedd5d2755681d02d49bd95918847ae672382a2789"
+      }
+    },
+    {
+      "code": "intent_pczt_binding",
+      "label": "Intent ↔ PCZT binding",
+      "status": "PASS",
+      "evidence": {
+        "binding_status": "PASS",
+        "source_binding_report_ref": "sha256:c0541a9c6bbf869299364da65beb75e499e7a553e4af3ba6f0998c9124768d7f",
+        "final_binding_report_ref": "sha256:65007adbcb1956482e41633ea6cea7597be23367f8f4f84b32ded8a1e710f767"
+      }
+    },
+    {
+      "code": "participant_c_unavailable",
+      "label": "Participant C unavailable",
+      "status": "PASS",
+      "evidence": {
+        "unavailable_participant_label": "C",
+        "unavailable_participants": 1
+      }
+    },
+    {
+      "code": "threshold_satisfiable_2_of_3",
+      "label": "Threshold satisfiable 2/3",
+      "status": "PASS",
+      "evidence": {
+        "threshold": 2,
+        "participants_total": 3,
+        "selected_signers": 2
+      }
+    },
+    {
+      "code": "a_b_selected",
+      "label": "A+B selected",
+      "status": "PASS",
+      "evidence": {
+        "selected_signer_labels": [
+          "A",
+          "B"
+        ],
+        "selected_public_fingerprints": [
+          "sha256:5acbfa31627023e0919067f6e7708f5d3b21a9be357dad615851830b89ed04db",
+          "sha256:296bba404832fa3d613340d85813cd4cab99202524813335b1f298a41b42047a"
+        ]
+      }
+    },
+    {
+      "code": "frost_threshold_reached",
+      "label": "FROST threshold reached",
+      "status": "PASS",
+      "evidence": {
+        "threshold_status": "THRESHOLD_REACHED"
+      }
+    },
+    {
+      "code": "aggregate_signature_verified",
+      "label": "Aggregate signature verified",
+      "status": "PASS",
+      "evidence": {
+        "aggregate_signature_status": "AGGREGATE_SIGNATURE_VERIFIED",
+        "signature_byte_length": 64,
+        "aggregate_signature_fingerprint": "sha256:6752d1b0eae9fc190848545a1b7868e3dd78a3e3883208c3620d17a78acfd231"
+      }
+    },
+    {
+      "code": "signed_pczt",
+      "label": "Signed PCZT",
+      "status": "PASS",
+      "evidence": {
+        "signed_pczt_status": "PASS",
+        "signed_pczt_fingerprint": "sha256:01730fc518d4a83ae6a6172e714650feebc0a0d3b5851ddd6bf8b28529ac85ce"
+      }
+    },
+    {
+      "code": "proven_pczt",
+      "label": "Proven PCZT",
+      "status": "PASS",
+      "evidence": {
+        "proven_pczt_status": "PASS",
+        "proven_pczt_fingerprint": "sha256:4e4518d785ed027da3adaae6a4b381b92e5e5c8b314900f2bdc14baabefda0f0"
+      }
+    },
+    {
+      "code": "combined_pczt",
+      "label": "Combined PCZT",
+      "status": "PASS",
+      "evidence": {
+        "combine_status": "PASS",
+        "final_pczt_fingerprint": "sha256:2eb89c4c78bc11eff300ea9362fb771960658d643d97f3e8b14bc5e27938f54f"
+      }
+    },
+    {
+      "code": "mainnet_broadcast_approval",
+      "label": "Mainnet broadcast requires human approval",
+      "status": "WAIT",
+      "evidence": {
+        "broadcast_status": "NOT_BROADCAST",
+        "chain_status": "NOT_BROADCAST",
+        "txid": "1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b"
+      }
+    },
+    {
+      "code": "pre_broadcast_proof_generated",
+      "label": "Pre-broadcast proof generated",
+      "status": "PASS",
+      "evidence": {
+        "bundle_hash": "sha256:e3e8862fa44b010721cb40fdaaf241a98b12729b2e798fdeb0274a4183effa3e",
+        "verifier_status": "PASS"
+      }
+    }
+  ],
+  "limitations": [
+    "Dry-broadcast proof run consumes public proof evidence and does not fund a wallet.",
+    "Dry-broadcast proof run does not broadcast a Zcash transaction.",
+    "View-only wallet availability is recorded as public status only; UFVK and wallet DB remain outside public evidence.",
+    "Mainnet acceptance is not claimed while broadcast_status is NOT_BROADCAST."
+  ],
+  "proof_run_ref": "sha256:dcfa154cd662bb4e23a85f8e5977caae82f394f695b169d65466e12fea6a8048"
+}

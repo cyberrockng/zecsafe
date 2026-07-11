@@ -166,6 +166,13 @@ const CHECK_STATUS_KEYS = new Set([
   "signer_review",
   "session",
   "aggregate_signature",
+  "source_pczt",
+  "frost_signature",
+  "signed_pczt",
+  "proven_pczt",
+  "pczt_combine",
+  "final_binding",
+  "broadcast_gate",
 ]);
 
 export class ProofEventValidationError extends Error {

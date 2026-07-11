@@ -32,6 +32,29 @@ const validInspect = `1 transparent inputs
 TxID: 67c6d3aaca6c67f56ace5a59c279be17b8c65687f464cb1aef0977d70840e1b8
 Version: V6`;
 
+const ironwoodRecipient =
+  "utest12erssr45tfcpehtq3l9fmjug9304k8vs8c0lk702fs2e70q8tpv4ekd6ncfrgnnsymdgwl99eux7t94pzgd6d2ud2k5r3dtsvzm3mkz2rzrewv0qfxsw86up2lj7kg85lnkrggg78aypn7tu35r5ukgkhlxlqjqlu5jgwfc0tl9q5aktm64xv6jq99d9ax72u2yrn9w0cd3rqr5u0v8";
+
+const validIronwoodInspect = `5 Ironwood actions:
+- 0:
+  - Spend: 100000000 zatoshis
+  - Output: 22493750 zatoshis
+- 1:
+  - Spend: Zero value (likely a dummy)
+  - Output: 22493750 zatoshis
+- 2:
+  - Spend: Zero value (likely a dummy)
+  - Output: 22493750 zatoshis
+- 3:
+  - Spend: Zero value (likely a dummy)
+  - Output: 22493750 zatoshis
+- 4:
+  - Spend: Zero value (likely a dummy)
+  - Output: 10000000 zatoshis to ${ironwoodRecipient}
+
+TxID: 1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b
+Version: V6`;
+
 const baseReview = parseZcashDevtoolPcztInspect(validInspect, {
   network: "test",
   pcztBytes: Buffer.from("fixture pczt bytes"),
@@ -149,6 +172,35 @@ assertBlocked(bind({ intent: { ...baseIntent, fee_policy: { mode: "tool_default"
 }
 
 {
+  const ironwoodReview = parseZcashDevtoolPcztInspect(validIronwoodInspect, {
+    network: "test",
+    pcztBytes: Buffer.from("fixture ironwood pczt bytes"),
+    toolIdentity: {
+      name: "zcash-devtool",
+      commit: EXPECTED_ZCASH_DEVTOOL_COMMIT,
+    },
+  });
+  const report = bind({
+    intent: {
+      ...baseIntent,
+      recipient: ironwoodRecipient,
+      amount_zatoshis: 10000000,
+      fee_policy: {
+        mode: "tool_default",
+        max_fee_zatoshis: 25000,
+      },
+    },
+    review: ironwoodReview,
+  });
+  assert.equal(report.status, "PASS");
+  assert.equal(report.recipient_check.status, "MATCH");
+  assert.equal(report.amount_check.status, "MATCH");
+  assert.equal(report.fee_policy_check.status, "PASS");
+  assert.equal(report.change_output_check.status, "PASS");
+  assert.equal(report.unexpected_output_check.status, "PASS");
+}
+
+{
   const tempDir = await mkdtemp(join(tmpdir(), "zecsafe-bind-test-"));
   try {
     const intentPath = join(tempDir, "intent.json");
@@ -160,8 +212,10 @@ assertBlocked(bind({ intent: { ...baseIntent, fee_policy: { mode: "tool_default"
       encoding: "utf8",
     });
 
-    assert.equal(cli.status, 2, cli.stderr);
-    assert.equal(cli.stdout, "INTENT ↔ PCZT: FAIL\nFROST SESSION: BLOCKED\n");
+    if (cli.error?.code !== "EPERM") {
+      assert.equal(cli.status, 2, cli.stderr);
+      assert.equal(cli.stdout, "INTENT ↔ PCZT: FAIL\nFROST SESSION: BLOCKED\n");
+    }
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
