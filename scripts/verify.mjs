@@ -8,6 +8,7 @@ const requiredFiles = [
   "LICENSE",
   "package.json",
   "server.mjs",
+  "vercel.json",
   "src/app.js",
   "src/intent-v1.mjs",
   "src/pczt-inspect-v1.mjs",
@@ -49,6 +50,7 @@ const requiredFiles = [
   "docs/screenshots/06-proof-detail.png",
   "docs/screenshots/07-mobile-390.png",
   "scripts/frost-local-wrapper.mjs",
+  "scripts/build-vercel.mjs",
   "scripts/create-intent.mjs",
   "scripts/intent-v1.test.mjs",
   "scripts/pczt-inspect.mjs",
@@ -104,6 +106,8 @@ const html = await readFile("index.html", "utf8");
 const app = await readFile("src/app.js", "utf8");
 const styles = await readFile("src/styles.css", "utf8");
 const server = await readFile("server.mjs", "utf8");
+const vercelConfig = JSON.parse(await readFile("vercel.json", "utf8"));
+const vercelBuild = await readFile("scripts/build-vercel.mjs", "utf8");
 const readme = await readFile("README.md", "utf8");
 const VERIFIED_PROOF_PATH = "fixtures/verified-mainnet-run/proof.json";
 const VERIFIED_EVENTS_PATH = "fixtures/verified-mainnet-run/events.public.json";
@@ -155,6 +159,13 @@ const checks = [
   [server.includes("STATIC_PREFIXES") && !server.includes("return join(rootDir, normalized);\n}"), "server serves an explicit static allowlist, not the repository root"],
   [server.includes("Content-Security-Policy"), "server sets a Content-Security-Policy"],
   [server.includes("X-Content-Type-Options"), "server sets X-Content-Type-Options"],
+
+  // Public hosting is a static allowlisted artifact, not the local repository server.
+  [vercelConfig.outputDirectory === "dist", "Vercel serves only the generated dist directory"],
+  [vercelConfig.rewrites?.some((route) => route.source === "/demo" && route.destination === "/index.html"), "Vercel routes /demo to the static proof app"],
+  [vercelConfig.headers?.some((route) => route.headers?.some((header) => header.key === "Content-Security-Policy")), "Vercel applies a Content-Security-Policy"],
+  [vercelBuild.includes("publicFiles") && vercelBuild.includes("Unexpected Vercel output"), "Vercel build enforces an exact public-file allowlist"],
+  [!vercelBuild.includes("server.mjs") && !vercelBuild.includes("docs/audit"), "Vercel output excludes the local server and audit corpus"],
 
   [(await readFile("src/intent-v1.mjs", "utf8")).includes("zecsafe-intent-v1"), "intent module defines schema version"],
   [(await readFile("scripts/create-intent.mjs", "utf8")).includes("Intent commitment:"), "intent CLI emits commitment"],
