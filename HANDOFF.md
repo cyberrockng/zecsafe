@@ -28,45 +28,11 @@ Branch and remote baseline:
 
 ```text
 branch: main
-HEAD: 38c2464a8512dade6c5e11511ce81d2864896339
+HEAD: 0cd8aeb (Complete verified mainnet FROST run: P0-018 through P0-024)
 remote: https://github.com/cyberrockng/zecsafe.git
 ```
 
-Current worktree contains post-commit `ZSAFE-P0-018` completion evidence and the pre-Ironwood lightwallet compatibility patch. `ZSAFE-P0-014` through `ZSAFE-P0-017` were committed and pushed in commit `ad83269`.
-
-Known dirty/untracked areas:
-
-```text
-HANDOFF.md
-docs/execution/
-package.json
-scripts/pczt-inspect-v1.test.mjs
-scripts/pczt-bind-v1.test.mjs
-scripts/pczt-complete.mjs
-scripts/pczt-completion-v1.test.mjs
-scripts/zecsafe.mjs
-scripts/zecsafe-proof-v1.test.mjs
-scripts/proof-run-v1.test.mjs
-scripts/mainnet-view.mjs
-scripts/mainnet-view-v1.test.mjs
-scripts/verify.mjs
-src/pczt-inspect-v1.mjs
-src/pczt-bind-v1.mjs
-src/proof-event-v1.mjs
-src/fixed-runner-v1.mjs
-src/pczt-completion-v1.mjs
-src/zecsafe-proof-v1.mjs
-src/proof-run-v1.mjs
-src/mainnet-view-v1.mjs
-docs/proof/
-fixtures/proofs/
-fixtures/proof-runs/
-fixtures/mainnet-demo/
-patches/zcash-devtool/
-docs/execution/24-VIEW-ONLY-MAINNET-PREFLIGHT.md
-PROOF_SPEC.md
-Makefile
-```
+All `ZSAFE-P0-018` through `ZSAFE-P0-024` implementation, fixtures, docs, and the compatibility patch were committed and pushed in `0cd8aeb` (2026-07-12). The worktree is clean apart from this HANDOFF bookkeeping update. Note: `fixtures/verified-mainnet-run/proof.json` records `zecsafe_commit: ad83269...` — the HEAD at proof recording time, one commit before the freeze landed; the fixture README documents this.
 
 Latest completed task ID:
 
