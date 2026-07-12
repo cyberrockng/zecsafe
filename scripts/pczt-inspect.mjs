@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
-import { dirname, isAbsolute, resolve } from "node:path";
+import { homedir } from "node:os";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import {
   EXPECTED_ZCASH_DEVTOOL_COMMIT,
@@ -9,8 +10,9 @@ import {
   PcztInspectError,
 } from "../src/pczt-inspect-v1.mjs";
 
-const defaultToolRoot = "/home/dell/.zecsafe/toolchain/zcash-devtool";
-const defaultRawDir = "/home/dell/.zecsafe/pczt-inspect";
+const zecsafeHome = process.env.ZECSAFE_HOME ?? join(homedir(), ".zecsafe");
+const defaultToolRoot = process.env.ZECSAFE_ZCASH_DEVTOOL_ROOT ?? join(zecsafeHome, "toolchain", "zcash-devtool");
+const defaultRawDir = process.env.ZECSAFE_PCZT_INSPECT_DIR ?? join(zecsafeHome, "pczt-inspect");
 
 function timestampSlug() {
   return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");

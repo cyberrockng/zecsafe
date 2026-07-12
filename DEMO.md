@@ -85,7 +85,7 @@ Txid: 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
 Recorded status: CONFIRMED
 Recorded height: 3409837
 Confirmations at recording: 4
-Bundle hash: sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64
+Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
 ```
 
 ## Do not claim

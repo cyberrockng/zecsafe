@@ -218,4 +218,102 @@ function mutate(proof, mutation) {
   assert.equal(verifyResult.proof_event.data.proof_verify_status, "PASS");
 }
 
+// --- Signer review mode (R-06) ---------------------------------------------
+// The review mode must be recorded INSIDE the hashed bundle, and only when every review is
+// cryptographically bound to this run's session. An unbound review must never become evidence.
+
+function baseSignerReviews(overrides = []) {
+  const review = (id, reviewer) => ({
+    schema_version: "zecsafe-signer-review-v1",
+    run_id: "p0-015-test",
+    signer_review_mode: "semantic_pczt_review",
+    status: "PASS",
+    reviewer_participant_id: id,
+    reviewer_public_fingerprint: reviewer,
+    group_fingerprint: h("a"),
+    pczt_fingerprint: h("1"),
+    binding_report_ref: h("2"),
+    sighash_fingerprint: h("3"),
+    intent_commitment: h("9"),
+    limitations: ["Signer review mode is semantic_pczt_review; it does not claim an independently rerun SIGHASH."],
+  });
+  const reviews = [review("A", h("b")), review("B", h("c"))];
+  return overrides.length ? overrides : reviews;
+}
+
+function proofWithReviews(signerReviews = baseSignerReviews()) {
+  return generateZecsafeProofV1({
+    completionPackage: basePackage(),
+    signerReviews,
+    network: "test",
+    recorded_at: "2026-07-11T19:30:00.000Z",
+    zecsafe_commit: "38c2464a8512dade6c5e11511ce81d2864896339",
+    transaction: {
+      txid: "1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b",
+      chain_status: "NOT_BROADCAST",
+    },
+  });
+}
+
+{
+  const proof = proofWithReviews();
+  assert.equal(proof.frost.signer_review_mode, "semantic_pczt_review");
+  assert.equal(proof.frost.signer_reviews_completed, 2);
+  assert.equal(verifyZecsafeProofV1(proof).status, "PASS");
+  // The review-mode limitation must travel inside the hashed bundle, not only in the event log.
+  assert.ok(proof.limitations.some((line) => line.includes("semantic_pczt_review")));
+}
+
+{
+  // A review bound to a DIFFERENT PCZT must not be recordable as evidence for this run.
+  const foreign = baseSignerReviews().map((review) => ({ ...review, pczt_fingerprint: h("f") }));
+  assert.throws(() => proofWithReviews(foreign), /does not match the recorded FROST session/);
+}
+
+{
+  // A reviewer who was not selected must not count toward the review.
+  const stranger = baseSignerReviews().map((review, index) =>
+    index === 0 ? { ...review, reviewer_public_fingerprint: h("e") } : review,
+  );
+  assert.throws(() => proofWithReviews(stranger), /not a selected signer/);
+}
+
+{
+  // Fewer reviews than the threshold must not produce a recorded authorization.
+  assert.throws(() => proofWithReviews([baseSignerReviews()[0]]), /at least the threshold/);
+}
+
+{
+  // A failed review must never be recorded as a passing authorization.
+  const failed = baseSignerReviews().map((review, index) =>
+    index === 0 ? { ...review, status: "FAIL" } : review,
+  );
+  assert.throws(() => proofWithReviews(failed), /status must be PASS/);
+}
+
+{
+  // An overclaimed review mode must not be silently accepted.
+  const overclaim = baseSignerReviews().map((review) => ({ ...review, signer_review_mode: "independent_sighash" }));
+  const proof = proofWithReviews(overclaim);
+  assert.equal(proof.frost.signer_review_mode, "independent_sighash");
+  // ...but signers must agree; a mixed claim is rejected.
+  const mixed = [
+    { ...baseSignerReviews()[0], signer_review_mode: "independent_sighash" },
+    baseSignerReviews()[1],
+  ];
+  assert.throws(() => proofWithReviews(mixed), /single signer_review_mode/);
+}
+
+{
+  // REPRODUCIBILITY. Generating twice from identical inputs must yield an identical bundle.
+  // Before this guard, the completion ProofEvent defaulted occurred_at to wall-clock now(), which
+  // flowed into completion_report_ref, proof_event_ref, and bundle_hash - so the "recorded" bundle
+  // could never be reproduced from its own frozen artifacts.
+  const first = proofWithReviews();
+  const second = proofWithReviews();
+  assert.deepEqual(first, second);
+  assert.equal(first.bundle_hash, second.bundle_hash);
+}
+
 console.log("ZecSafe proof v1 tests passed.");
+

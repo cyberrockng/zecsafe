@@ -78,7 +78,9 @@
     "aggregate_signature_status": "AGGREGATE_SIGNATURE_VERIFIED",
     "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
     "signature_byte_length": 64,
-    "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928"
+    "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+    "signer_review_mode": "semantic_pczt_review",
+    "signer_reviews_completed": 2
   },
   "transaction": {
     "txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
@@ -95,8 +97,8 @@
   "evidence": {
     "source_binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
     "final_binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
-    "completion_report_ref": "sha256:ac16e9c135ed8360f4b753ec6b3e5854cbf8413b5cecf8f615d2d7cb8751ebae",
-    "proof_event_ref": "sha256:bd2587c0f0057434d4fb4971dce6613ab075816dacf8923228c352bc1d618afa"
+    "completion_report_ref": "sha256:db7c5cc44e2f80999c93dca7b901e59d120254caf982b9723879e9bdd27ac0a0",
+    "proof_event_ref": "sha256:c3e6d03dfa5828d1b0977235752efb9352c26ce8c4d1a3e6b9f4b90a116701da"
   },
   "limitations": [
     "Public zecsafe-proof-v1 contains only fingerprints, statuses, counts, tool commits, limitations, and transaction observation status.",
@@ -104,7 +106,9 @@
     "Broadcast remains gated by separate human approval.",
     "Raw PCZT bodies, raw SIGHASH bytes, the raw aggregate signature, and the Orchard randomizer remain outside public evidence.",
     "The signer library verified the aggregate signature against the action's rerandomized verification key when applying it; chain acceptance is proven only by a later approved broadcast.",
-    "Broadcast happened once after explicit human approval; chain truth recorded per the P0-023 documented rule (CONFIRMED at observed tip 3409840, mined height 3409837)."
+    "Broadcast happened once after explicit human approval; chain truth recorded per the P0-023 documented rule (CONFIRMED at observed tip 3409840, mined height 3409837).",
+    "Signer review mode is semantic_pczt_review: the signer checks PCZT semantics and compares the prepared pinned-tool SIGHASH fingerprint; it does not claim an independently rerun SIGHASH.",
+    "Raw PCZT bytes, recipient, amount, memo text, randomizers, nonces, keys, and authorization material are excluded from ProofEvents."
   ],
-  "bundle_hash": "sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64"
+  "bundle_hash": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d"
 }

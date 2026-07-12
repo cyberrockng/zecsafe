@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { readdir, readFile, stat, writeFile, mkdir } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
+import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
   buildMainnetViewPreflight,
@@ -16,8 +17,11 @@ import {
 } from "../src/mainnet-view-v1.mjs";
 
 const DEFAULT_ENV_FIXTURE = "fixtures/mainnet-demo/p0-017-mainnet-demo-env.json";
-const DEFAULT_RUN_ROOT = "/home/dell/.zecsafe/runs";
-const DEFAULT_ZCASH_DEVTOOL = "/home/dell/.zecsafe/toolchain/zcash-devtool-p0-018-compat/target/debug/zcash-devtool";
+const ZECSAFE_HOME = process.env.ZECSAFE_HOME ?? join(homedir(), ".zecsafe");
+const DEFAULT_RUN_ROOT = process.env.ZECSAFE_RUNS_ROOT ?? join(ZECSAFE_HOME, "runs");
+const DEFAULT_ZCASH_DEVTOOL =
+  process.env.ZECSAFE_ZCASH_DEVTOOL ??
+  join(ZECSAFE_HOME, "toolchain", "zcash-devtool-p0-018-compat", "target", "debug", "zcash-devtool");
 const DEFAULT_ZCASH_DEVTOOL_COMPAT_PATCH_REF = "sha256:4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e";
 const DEFAULT_SERVER = "zecrocks";
 const DEFAULT_CONNECTION = "direct";

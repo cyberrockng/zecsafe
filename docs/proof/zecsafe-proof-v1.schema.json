@@ -23,39 +23,88 @@
     "bundle_hash"
   ],
   "properties": {
-    "schema_version": { "const": "zecsafe-proof-v1" },
-    "project": { "const": "ZecSafe" },
-    "network": { "enum": ["main", "test"] },
-    "run_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$" },
-    "recorded_at": { "type": "string", "format": "date-time" },
-    "zecsafe_commit": { "type": "string", "pattern": "^(unknown|[0-9a-f]{7,64})$" },
-    "bundle_hash": { "$ref": "#/$defs/sha256" },
+    "schema_version": {
+      "const": "zecsafe-proof-v1"
+    },
+    "project": {
+      "const": "ZecSafe"
+    },
+    "network": {
+      "enum": [
+        "main",
+        "test"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "zecsafe_commit": {
+      "type": "string",
+      "pattern": "^(unknown|[0-9a-f]{7,64})$"
+    },
+    "bundle_hash": {
+      "$ref": "#/$defs/sha256"
+    },
     "vault": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["group_fingerprint", "ciphersuite", "threshold", "participants_total"],
+      "required": [
+        "group_fingerprint",
+        "ciphersuite",
+        "threshold",
+        "participants_total"
+      ],
       "properties": {
-        "group_fingerprint": { "$ref": "#/$defs/sha256" },
-        "ciphersuite": { "type": "string", "minLength": 1 },
-        "threshold": { "type": "integer", "minimum": 1 },
-        "participants_total": { "type": "integer", "minimum": 1 }
+        "group_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "ciphersuite": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "participants_total": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "availability": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["available", "unavailable"],
+      "required": [
+        "available",
+        "unavailable"
+      ],
       "properties": {
-        "available": { "type": "integer", "minimum": 0 },
-        "unavailable": { "type": "integer", "minimum": 0 }
+        "available": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unavailable": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "intent": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["commitment"],
+      "required": [
+        "commitment"
+      ],
       "properties": {
-        "commitment": { "$ref": "#/$defs/sha256" }
+        "commitment": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "pczt": {
@@ -75,25 +124,70 @@
         "checks"
       ],
       "properties": {
-        "source_fingerprint": { "$ref": "#/$defs/sha256" },
-        "signed_fingerprint": { "$ref": "#/$defs/sha256" },
-        "proven_fingerprint": { "$ref": "#/$defs/sha256" },
-        "final_fingerprint": { "$ref": "#/$defs/sha256" },
-        "source_binding_report_ref": { "$ref": "#/$defs/sha256" },
-        "final_binding_report_ref": { "$ref": "#/$defs/sha256" },
-        "binding_status": { "enum": ["PASS", "FAIL", "BLOCKED"] },
-        "signed_pczt_status": { "enum": ["PASS", "FAIL", "BLOCKED"] },
-        "proven_pczt_status": { "enum": ["PASS", "FAIL", "BLOCKED"] },
-        "combine_status": { "enum": ["PASS", "FAIL", "BLOCKED"] },
+        "source_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "signed_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proven_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "final_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_binding_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "final_binding_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "binding_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "signed_pczt_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "proven_pczt_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "combine_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
         "checks": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["field", "status"],
+            "required": [
+              "field",
+              "status"
+            ],
             "properties": {
-              "field": { "type": "string", "minLength": 1 },
-              "status": { "type": "string", "minLength": 1 }
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         }
@@ -113,72 +207,182 @@
         "aggregate_signature_status",
         "aggregate_signature_fingerprint",
         "signature_byte_length",
-        "sighash_fingerprint"
+        "sighash_fingerprint",
+        "signer_review_mode",
+        "signer_reviews_completed"
       ],
       "properties": {
-        "group_fingerprint": { "$ref": "#/$defs/sha256" },
-        "pczt_fingerprint": { "$ref": "#/$defs/sha256" },
-        "binding_report_ref": { "$ref": "#/$defs/sha256" },
-        "session_fingerprint": { "$ref": "#/$defs/sha256" },
+        "group_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "pczt_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "binding_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "session_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
         "selected_signers": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/sha256" }
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
         },
-        "unavailable_participants": { "type": "integer", "minimum": 0 },
-        "threshold_status": { "type": "string", "minLength": 1 },
-        "aggregate_signature_status": { "type": "string", "minLength": 1 },
-        "aggregate_signature_fingerprint": { "$ref": "#/$defs/sha256" },
-        "signature_byte_length": { "type": "integer", "minimum": 1 },
-        "sighash_fingerprint": { "$ref": "#/$defs/sha256" }
+        "unavailable_participants": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "threshold_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregate_signature_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregate_signature_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "signature_byte_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sighash_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "signer_review_mode": {
+          "type": "string",
+          "enum": [
+            "independent_sighash",
+            "semantic_pczt_review",
+            "coordinator_only"
+          ],
+          "description": "Review mode actually performed by the selected signers before FROST authorization. semantic_pczt_review means signers checked PCZT semantics and compared the prepared pinned-tool SIGHASH fingerprint; it does NOT claim an independently recomputed SIGHASH."
+        },
+        "signer_reviews_completed": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of selected signers that completed and passed a recorded review bound to this session."
+        }
       }
     },
     "transaction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["txid", "chain_status", "broadcast_status", "observed_block_height", "confirmations_at_recording"],
+      "required": [
+        "txid",
+        "chain_status",
+        "broadcast_status",
+        "observed_block_height",
+        "confirmations_at_recording"
+      ],
       "properties": {
         "txid": {
           "anyOf": [
-            { "type": "null" },
-            { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
           ]
         },
-        "chain_status": { "enum": ["NOT_BROADCAST", "SUBMITTED", "OBSERVED", "MINED", "CONFIRMED", "REJECTED", "UNKNOWN"] },
-        "broadcast_status": { "enum": ["NOT_BROADCAST", "SUBMITTED", "OBSERVED", "MINED", "CONFIRMED", "REJECTED", "UNKNOWN"] },
+        "chain_status": {
+          "enum": [
+            "NOT_BROADCAST",
+            "SUBMITTED",
+            "OBSERVED",
+            "MINED",
+            "CONFIRMED",
+            "REJECTED",
+            "UNKNOWN"
+          ]
+        },
+        "broadcast_status": {
+          "enum": [
+            "NOT_BROADCAST",
+            "SUBMITTED",
+            "OBSERVED",
+            "MINED",
+            "CONFIRMED",
+            "REJECTED",
+            "UNKNOWN"
+          ]
+        },
         "observed_block_height": {
           "anyOf": [
-            { "type": "null" },
-            { "type": "integer", "minimum": 0 }
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            }
           ]
         },
-        "confirmations_at_recording": { "type": "integer", "minimum": 0 }
+        "confirmations_at_recording": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "toolchain": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["frost_tools_commit", "zcash_devtool_commit", "pczt_signer_library_commit"],
+      "required": [
+        "frost_tools_commit",
+        "zcash_devtool_commit",
+        "pczt_signer_library_commit"
+      ],
       "properties": {
-        "frost_tools_commit": { "type": "string", "pattern": "^(unknown|[0-9a-f]{7,64})$" },
-        "zcash_devtool_commit": { "type": "string", "pattern": "^(unknown|[0-9a-f]{7,64})$" },
-        "pczt_signer_library_commit": { "type": "string", "pattern": "^(unknown|[0-9a-f]{7,64})$" }
+        "frost_tools_commit": {
+          "type": "string",
+          "pattern": "^(unknown|[0-9a-f]{7,64})$"
+        },
+        "zcash_devtool_commit": {
+          "type": "string",
+          "pattern": "^(unknown|[0-9a-f]{7,64})$"
+        },
+        "pczt_signer_library_commit": {
+          "type": "string",
+          "pattern": "^(unknown|[0-9a-f]{7,64})$"
+        }
       }
     },
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_binding_report_ref", "final_binding_report_ref", "completion_report_ref", "proof_event_ref"],
+      "required": [
+        "source_binding_report_ref",
+        "final_binding_report_ref",
+        "completion_report_ref",
+        "proof_event_ref"
+      ],
       "properties": {
-        "source_binding_report_ref": { "$ref": "#/$defs/sha256" },
-        "final_binding_report_ref": { "$ref": "#/$defs/sha256" },
-        "completion_report_ref": { "$ref": "#/$defs/sha256" },
-        "proof_event_ref": { "$ref": "#/$defs/sha256" }
+        "source_binding_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "final_binding_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "completion_report_ref": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proof_event_ref": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "limitations": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "$defs": {

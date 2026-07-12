@@ -47,7 +47,7 @@ The app and proof commands distinguish recorded proof, current chain observation
 ```text
 Proof bundle: fixtures/verified-mainnet-run/proof.json
 Public events: fixtures/verified-mainnet-run/events.public.json
-Bundle hash: sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64
+Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
 ```
 
 The chain does not expose a special FROST marker. Zcash validates the resulting spend authorization normally. FROST provenance is evidenced by the recorded ZecSafe/FROST signing session.

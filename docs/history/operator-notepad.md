@@ -1,3 +1,9 @@
+> **SUPERSEDED — HISTORICAL RECORD.**
+> This runbook describes the older prototype (Evidence Center, guardian acknowledgements,
+> externally-broadcast txid). That product no longer exists. ZecSafe now leads with the
+> recorded verified mainnet FROST run on the default route.
+> **Use [`DEMO.md`](../../DEMO.md) for the current demo.** Retained only as a record.
+
 # ZecSafe Operator Notepad
 
 Use this as your private runbook during judging. It is intentionally not shown in the main app UI.

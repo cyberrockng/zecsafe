@@ -36,11 +36,9 @@ const requiredFiles = [
   "docs/frost-windows-setup.md",
   "docs/mainnet-integration.md",
   "docs/mainnet-readonly.md",
-  "docs/operator-notepad.md",
   "docs/pr-checklist.md",
   "docs/submission-plan.md",
   "docs/threat-model.md",
-  "docs/roadmap.md",
   "docs/execution/03-CLAIM-TO-CODE-MATRIX.md",
   "docs/execution/12-SUBMISSION-GATE.md",
   "docs/screenshots/vault-dashboard.png",
@@ -84,6 +82,15 @@ const requiredFiles = [
   "patches/zcash-devtool/p0-018-pre-ironwood-subtree-compat.patch",
   "PROOF_SPEC.md",
 ];
+
+async function exists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 for (const file of requiredFiles) {
   await access(file);
@@ -136,6 +143,13 @@ const checks = [
   [server.includes("/api/intent/create"), "server includes deterministic intent route"],
   [server.includes("/api/health"), "server includes health route"],
 
+  // R-08 hardening. These must not regress.
+  [server.includes('server.listen(port, host'), "server binds an explicit host"],
+  [server.includes('process.env.ZECSAFE_HOST ?? "127.0.0.1"'), "server defaults to loopback, not all interfaces"],
+  [server.includes("STATIC_PREFIXES") && !server.includes("return join(rootDir, normalized);\n}"), "server serves an explicit static allowlist, not the repository root"],
+  [server.includes("Content-Security-Policy"), "server sets a Content-Security-Policy"],
+  [server.includes("X-Content-Type-Options"), "server sets X-Content-Type-Options"],
+
   [(await readFile("src/intent-v1.mjs", "utf8")).includes("zecsafe-intent-v1"), "intent module defines schema version"],
   [(await readFile("scripts/create-intent.mjs", "utf8")).includes("Intent commitment:"), "intent CLI emits commitment"],
   [(await readFile("scripts/intent-v1.test.mjs", "utf8")).includes("scientific notation"), "intent tests cover scientific notation rejection"],
@@ -187,6 +201,14 @@ const checks = [
   [(await readFile("scripts/pczt-completion-v1.test.mjs", "utf8")).includes("mock_signature"), "PCZT completion tests reject mock signatures"],
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes('"pczt.combine": operationPcztCompletion'), "Fixed runner implements PCZT completion"],
   [(await readFile("src/zecsafe-proof-v1.mjs", "utf8")).includes("zecsafe-proof-v1"), "Proof v1 module defines schema version"],
+  [(await readFile("fixtures/verified-mainnet-run/proof.json", "utf8")).includes('"signer_review_mode": "semantic_pczt_review"'), "recorded bundle states the real signer review mode inside the hash boundary"],
+  [(await readFile("docs/proof/zecsafe-proof-v1.schema.json", "utf8")).includes("signer_review_mode"), "proof schema requires signer_review_mode"],
+  [(await readFile("scripts/zecsafe-proof-v1.test.mjs", "utf8")).includes("REPRODUCIBILITY"), "proof tests guard bundle reproducibility"],
+  [(await readFile("src/zecsafe-proof-v1.mjs", "utf8")).includes("occurred_at: recordedAt"), "proof generation pins the completion event time so the bundle is reproducible"],
+  [(await readFile("PROOF_SPEC.md", "utf8")).includes("semantic_pczt_review"), "proof spec discloses the signer review mode"],
+  [(await readFile("PROOF_SPEC.md", "utf8")).includes("Binding Firewall and the FROST-key linkage"), "proof spec separates the Binding Firewall from the FROST-key linkage"],
+  [(await readFile("docs/proof/TRUST_MODEL.md", "utf8")).includes("Binding Firewall vs the FROST-key linkage"), "trust model separates the Binding Firewall from the FROST-key linkage"],
+  [(await readFile("SECURITY.md", "utf8")).includes("Binding Firewall is semantic"), "SECURITY separates the Binding Firewall from the FROST-key linkage"],
   [(await readFile("src/proof-run-v1.mjs", "utf8")).includes("zecsafe-proof-run-v1"), "Proof-run module defines schema version"],
   [(await readFile("src/mainnet-view-v1.mjs", "utf8")).includes("zecsafe-mainnet-view-preflight-v1"), "Mainnet view preflight module defines schema version"],
   [(await readFile("scripts/zecsafe.mjs", "utf8")).includes("proof generate"), "ZecSafe CLI supports proof generation"],
@@ -215,6 +237,13 @@ const checks = [
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes('"proof.verify": operationProofVerify'), "Fixed runner implements proof verification"],
   [(await readFile("docs/proof/zecsafe-proof-v1.schema.json", "utf8")).includes('"zecsafe-proof-v1"'), "Proof JSON schema exists"],
   [(await readFile("PROOF_SPEC.md", "utf8")).includes("bundle_hash"), "Proof spec documents bundle hash"],
+
+  // R-09. Internal operating context stays out of the public judge path.
+  [await exists("docs/history/HANDOFF.md"), "HANDOFF is retained as historical evidence under docs/history/"],
+  [!(await exists("HANDOFF.md")), "HANDOFF is not at the public top level"],
+  [!(await exists("docs/operator-notepad.md")), "operator notepad is not on the primary docs path"],
+  [!/\/home\/[a-z]+|C:\\\\Users/.test(await readFile("docs/history/HANDOFF.md", "utf8")), "HANDOFF contains no absolute local machine paths"],
+  [await exists("docs/history/README.md"), "history directory has an index"],
   [readme.includes("27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527"), "README states the verified mainnet txid"],
   [readme.includes("make judge-proof-mainnet"), "README states the one-command judge verifier"],
   [readme.includes("Lose one key. Not your ZEC."), "README carries the memory hook"],

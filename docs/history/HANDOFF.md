@@ -1,3 +1,10 @@
+> **HISTORICAL RECORD.** Operational chronology of the ZecSafe execution gates.
+> Not current product documentation. Where this disagrees with `README.md`, `SUBMISSION.md`,
+> `PROOF_SPEC.md`, or `SECURITY.md`, **those are authoritative**.
+> Absolute local machine paths have been replaced with placeholders (`<runs>`, `<repo>`, `<plans>`).
+> The proof bundle hash recorded below was later superseded by a reproducible regeneration from the
+> same frozen artifacts; see `fixtures/verified-mainnet-run/README.md`. No evidence-bearing field changed.
+
 # ZecSafe Handoff
 
 Last updated UTC: `2026-07-12T15:14:59Z`
@@ -5,21 +12,21 @@ Last updated UTC: `2026-07-12T15:14:59Z`
 Workspace root:
 
 ```text
-/home/dell/zecsafe
+<repo>
 ```
 
 Active Windows plan source:
 
 ```text
-C:\Users\DELL\Downloads\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
-/mnt/c/Users/DELL/Downloads/ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
+<plans>\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
+<plans>/ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
 ```
 
 Historical Windows plan baseline:
 
 ```text
-C:\Users\DELL\Downloads\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
-/mnt/c/Users/DELL/Downloads/ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
+<plans>\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
+<plans>/ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
 ```
 
 ## Current State
@@ -80,7 +87,7 @@ Latest FROST-controlled PCZT completion proof:
 
 ```text
 2026-07-11T18:52:00Z
-external run: /home/dell/.zecsafe/runs/p0-014-20260711T183213Z
+external run: <runs>/p0-014-20260711T183213Z
 funding source: Fauzec Zcash testnet faucet direct API
 funding request_id: 01KX977K8G59R5EZGGR21JBVFG
 funding txid: d8b6f151c2265a40fc7c5ee42313b84ae494018157f257a5a60c2c353ddb697a
@@ -137,7 +144,7 @@ Historical P0-017 pre-funding gate (superseded by P0-018 wallet observation):
 
 ```text
 2026-07-11T23:14:41Z
-external run: /home/dell/.zecsafe/runs/p0-017-20260711T231314Z
+external run: <runs>/p0-017-20260711T231314Z
 fixture: fixtures/mainnet-demo/p0-017-mainnet-demo-env.json
 schema: zecsafe-mainnet-demo-env-v1
 status: READY_FOR_FUNDING_APPROVAL
@@ -278,7 +285,7 @@ zcash-devtool commit: 1b065594d958d1cad2deafe7cd2e2fcc2774c46c
 `ZSAFE-P0-002` reproduced a pinned 2-of-3 RedPallas FROST signing run with one unavailable participant:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-002-20260711T041846Z
+external run: <runs>/p0-002-20260711T041846Z
 selected signers: Alice and Bob
 offline signer: Eve
 signature bytes: 64
@@ -288,7 +295,7 @@ signature sha256: 70ce85e40b7bf1987e0c5af7104dc26ba76f312a58f96969ae38bcbdcc138e
 `ZSAFE-P0-003` reproduced the official zcash-devtool wallet/view-only setup path and recorded the PCZT funding boundary:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-003-20260711T070024Z
+external run: <runs>/p0-003-20260711T070024Z
 network: testnet
 endpoint: https://testnet.zec.rocks:443
 chain tip observed: 4159196
@@ -303,7 +310,7 @@ extract result: TransparentFinalize(MissingSignature)
 `ZSAFE-P0-004` reproduced DKG group setup and downstream RedPallas signing:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-004-20260711T071646Z
+external run: <runs>/p0-004-20260711T071646Z
 group setup: DKG
 threshold: 2
 participants: 3
@@ -335,8 +342,8 @@ module: src/pczt-inspect-v1.mjs
 CLI: scripts/pczt-inspect.mjs
 test: scripts/pczt-inspect-v1.test.mjs
 pinned tool: zcash-devtool 1b065594d958d1cad2deafe7cd2e2fcc2774c46c
-external fixture: /home/dell/.zecsafe/runs/p0-003-20260711T070024Z/artifacts/manual-created-transparent.pczt
-raw inspect capture: /home/dell/.zecsafe/pczt-inspect/inspect-20260711T073416Z.txt
+external fixture: <runs>/p0-003-20260711T070024Z/artifacts/manual-created-transparent.pczt
+raw inspect capture: <zecsafe-private>/pczt-inspect/inspect-20260711T073416Z.txt
 source_fingerprint: sha256:36ecbc4bdbcb956f347075c23035e048b31c722c6b746867369c4e8df6c667ac
 pczt_fingerprint: sha256:98630ff6eab3d0a5621fb17c05d62a687c09ae030a8a111ae4b4d1e4d0b129bd
 output_count: 1
@@ -348,8 +355,8 @@ check coverage: valid fixture, missing field, malformed output, unexpected extra
 `ZSAFE-V3-001` created the judge-proof integration amendment:
 
 ```text
-active plan: C:\Users\DELL\Downloads\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
-historical baseline: C:\Users\DELL\Downloads\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
+active plan: <plans>\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V3.md
+historical baseline: <plans>\ZECSAFE_ZECHUB_3_WIN_EXECUTION_PLAN_V2.md
 repo doc: docs/execution/12-JUDGE-PROOF-AMENDMENT.md
 new execution ideal: Judge-First Verifiability
 remaining-task rule: every completed task must state judge-proof impact, public-safe evidence, private exclusions, negative/tamper case, allowed claim, and forbidden claim
@@ -394,7 +401,7 @@ test: scripts/fixed-runner-v1.test.mjs
 package alias: npm run fixed:run
 test alias: npm run test:runner
 result schema: zecsafe-fixed-runner-result-v1
-default workspace: /home/dell/.zecsafe/runner
+default workspace: <zecsafe-private>/runner
 implemented operations: toolchain.status, wallet.status, intent.create, pczt.bind
 registered reserved operations: pczt.create, pczt.inspect, signing.prepare, frost.session.start, frost.session.status, pczt.sign.complete, pczt.prove, pczt.combine, broadcast.preview, broadcast.execute, transaction.status, proof.generate, proof.verify
 safety: local-only host, operation allowlist, binary allowlist, shell:false, argument arrays, canonical path containment, random run IDs, timeout, capture, redaction, typed results, ProofEvent v1 per operation
@@ -465,7 +472,7 @@ proof event stage: FROST_SESSION
 positive statuses: THRESHOLD_REACHED, AGGREGATE_SIGNATURE_VERIFIED
 public-safe evidence: group fingerprint, threshold, participant total, unavailable count, selected public fingerprints, session fingerprint, SIGHASH fingerprint, aggregate signature fingerprint, signature byte length, checked field statuses
 negative coverage: only A selected -> UNSATISFIABLE / NOT_STARTED, blocked review, SIGHASH mismatch, aggregate signature byte-length mismatch, invalid threshold, raw message/signature public-output exclusion
-live smoke: /home/dell/.zecsafe/runs/p0-013-20260711T174838Z
+live smoke: <runs>/p0-013-20260711T174838Z
 live result: coordinator=0, Alice=0, Bob=0, Eve not started, aggregate signature bytes=64, aggregate signature sha256=ba54761340ff4fe7a163cf4f1df6c015533a7e5a85044058cdb0d6e94c2f912d
 boundary: live smoke signed a private 32-byte smoke input because current P0-003 PCZT artifacts produce zero shielded SIGHASH lines; not yet transaction-completion-ready PCZT-bound signing
 ```
@@ -482,7 +489,7 @@ schema: zecsafe-pczt-completion-v1
 fixed-runner operations implemented: pczt.sign.complete, pczt.prove, pczt.combine
 proof event stage: PCZT_COMBINE
 Ironwood inspect parsing added: 5 Ironwood actions, modeled change outputs, one reviewed recipient output
-live run: /home/dell/.zecsafe/runs/p0-014-20260711T183213Z
+live run: <runs>/p0-014-20260711T183213Z
 funding txid: d8b6f151c2265a40fc7c5ee42313b84ae494018157f257a5a60c2c353ddb697a
 source PCZT sha256: 7d494c53178afbd39c50dafedd5d2755681d02d49bd95918847ae672382a2789
 shielded SIGHASH sha256: 855d695441fd87747ebf92109b041fe88adff8a539f9850901ed5f5c1d6e60e3
@@ -536,7 +543,7 @@ funding/broadcast: no wallet funded, no transaction broadcast
 `ZSAFE-P0-017` created the dedicated mainnet demo environment:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-017-20260711T231314Z
+external run: <runs>/p0-017-20260711T231314Z
 fixture: fixtures/mainnet-demo/p0-017-mainnet-demo-env.json
 schema: zecsafe-mainnet-demo-env-v1
 status: READY_FOR_FUNDING_APPROVAL
@@ -600,7 +607,7 @@ boundary: no PCZT, no FROST session, NOT_BROADCAST, no spend key or share in coo
 `ZSAFE-P0-020` created the real mainnet PCZT and passed the Binding Firewall:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-020-20260712T141448Z
+external run: <runs>/p0-020-20260712T141448Z
 fixture: fixtures/mainnet-demo/p0-020-mainnet-pczt-binding.json
 doc: docs/execution/26-MAINNET-PCZT-BINDING.md
 schema: zecsafe-mainnet-pczt-binding-v1
@@ -627,7 +634,7 @@ boundary: no FROST session, no signatures, NOT_BROADCAST, raw PCZT/inspect/sigha
 `ZSAFE-P0-021` completed the live mainnet A+B FROST session with C unavailable:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-021-20260712T142858Z
+external run: <runs>/p0-021-20260712T142858Z
 fixture: fixtures/mainnet-demo/p0-021-mainnet-frost-session.json
 doc: docs/execution/27-MAINNET-FROST-SESSION.md
 schema: zecsafe-mainnet-frost-session-evidence-v1
@@ -652,7 +659,7 @@ boundary: signature NOT applied to PCZT; nothing proven/combined; NOT_BROADCAST;
 `ZSAFE-P0-022` completed the final mainnet PCZT offline and stopped at the broadcast gate:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-022-20260712T144710Z
+external run: <runs>/p0-022-20260712T144710Z
 fixture: fixtures/mainnet-demo/p0-022-mainnet-pczt-completion.json
 doc: docs/execution/28-MAINNET-PCZT-COMPLETION.md
 schema: zecsafe-mainnet-pczt-completion-evidence-v1
@@ -671,7 +678,7 @@ next: ZSAFE-P0-023 broadcast ONLY after the user explicitly approves the exact b
 `ZSAFE-P0-023` broadcast the approved transaction and recorded chain truth:
 
 ```text
-external run: /home/dell/.zecsafe/runs/p0-023-20260712T145358Z
+external run: <runs>/p0-023-20260712T145358Z
 fixture: fixtures/mainnet-demo/p0-023-mainnet-broadcast.json
 doc: docs/execution/29-MAINNET-BROADCAST.md
 schema: zecsafe-mainnet-broadcast-evidence-v1
@@ -699,7 +706,7 @@ recorded zecsafe commit: ad83269298b73396ac0f4b743c59301de77fe937 (HEAD at recor
 make targets added: judge-proof-mainnet, judge-proof-mainnet-tamper
 verification: VERIFIED RECORDED ZECSAFE PROOF; tamper demo rejects all 7 mutations; security scan passes
 completion-gate change: src/pczt-completion-v1.mjs broadcast_gate now accepts SUBMITTED/OBSERVED/MINED/CONFIRMED only with an explicit broadcast_approval record; REJECTED and unapproved statuses still fail; tests added
-post-broadcast completion package: /home/dell/.zecsafe/runs/p0-023-20260712T145358Z/artifacts/completion-package.json (run gate result: BROADCAST CONFIRMED, all checks PASS)
+post-broadcast completion package: <runs>/p0-023-20260712T145358Z/artifacts/completion-package.json (run gate result: BROADCAST CONFIRMED, all checks PASS)
 ```
 
 ## Sensitive External Artifacts
@@ -707,19 +714,19 @@ post-broadcast completion package: /home/dell/.zecsafe/runs/p0-023-20260712T1453
 Do not commit or print raw contents from:
 
 ```text
-/home/dell/.zecsafe/runs/p0-002-20260711T041846Z
-/home/dell/.zecsafe/runs/p0-003-20260711T070024Z
-/home/dell/.zecsafe/runs/p0-004-20260711T071646Z
-/home/dell/.zecsafe/runs/p0-013-20260711T174838Z
-/home/dell/.zecsafe/runs/p0-014-20260711T183213Z
-/home/dell/.zecsafe/runs/p0-017-20260711T230737Z
-/home/dell/.zecsafe/runs/p0-017-20260711T231206Z
-/home/dell/.zecsafe/runs/p0-017-20260711T231314Z
-/home/dell/.zecsafe/runs/p0-020-20260712T141448Z
-/home/dell/.zecsafe/runs/p0-021-20260712T142858Z
-/home/dell/.zecsafe/runs/p0-022-20260712T144710Z
-/home/dell/.zecsafe/runs/p0-023-20260712T145358Z
-/home/dell/.zecsafe/pczt-inspect
+<runs>/p0-002-20260711T041846Z
+<runs>/p0-003-20260711T070024Z
+<runs>/p0-004-20260711T071646Z
+<runs>/p0-013-20260711T174838Z
+<runs>/p0-014-20260711T183213Z
+<runs>/p0-017-20260711T230737Z
+<runs>/p0-017-20260711T231206Z
+<runs>/p0-017-20260711T231314Z
+<runs>/p0-020-20260712T141448Z
+<runs>/p0-021-20260712T142858Z
+<runs>/p0-022-20260712T144710Z
+<runs>/p0-023-20260712T145358Z
+<zecsafe-private>/pczt-inspect
 ```
 
 The P0-002 directory contains local FROST participant configs, key packages, TLS keys, and logs.
@@ -789,112 +796,112 @@ Existing app runtime is still a prototype dashboard with read-only mainnet statu
 Run all current checks:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run check
 ```
 
 Run signer-selection tests only:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run test:signers
 ```
 
 Run signer-review tests only:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run test:review
 ```
 
 Run FROST session tests only:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run test:frost-session
 ```
 
 Run signer-selection CLI:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run signers:select -- --json selection.json --summary
 ```
 
 Run signer-review CLI:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run signer:review -- review review-package.json --confirm "I REVIEWED AND APPROVE" --summary
 ```
 
 Run FROST session CLI:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run frost:session -- --json session-package.json --summary
 ```
 
 Run PCZT completion CLI:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run pczt:complete -- --json completion-package.json --summary
 ```
 
 Run proof verifier:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 make judge-proof
 ```
 
 Run proof tamper demo:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 make judge-proof-tamper
 ```
 
 Run dry-broadcast proof run:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 make proof-run-dry
 ```
 
 Inspect P0-017 public fixture:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run verify
 ```
 
 Run P0-018 preflight:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run mainnet:preflight -- --summary
 ```
 
 Run bounded P0-018 watcher for a later balance re-check:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run mainnet:watch -- --sync --summary --max-attempts 30 --interval-ms 60000
 ```
 
 Run fixed runner:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm run fixed:run -- run --request request.json --pretty
 ```
 
 Start app:
 
 ```bash
-cd /home/dell/zecsafe
+cd <repo>
 npm start
 ```
 

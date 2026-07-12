@@ -116,3 +116,27 @@ npm run test:demo-proof-state
 ## Vulnerability reporting
 
 Open a private issue or contact the project maintainer before publishing details if a bug could expose keys, shares, private run material, or incorrect proof verification.
+
+## Signer review mode and the SIGHASH trust boundary
+
+The recorded mainnet run used `signer_review_mode: semantic_pczt_review`, now
+recorded inside the hash-covered proof bundle.
+
+Selected signers checked PCZT semantics and compared the prepared, pinned-tool
+SIGHASH fingerprint. They did **not** independently recompute the SIGHASH.
+ZecSafe does not claim `independent_sighash`.
+
+Consequence: SIGHASH derivation is trusted to the pinned tooling. A compromised
+pinned tool, combined with a malicious coordinator, is inside the trust boundary
+for that derivation and would not be caught by semantic review alone.
+
+## Binding Firewall is semantic, not a key-linkage proof
+
+A `binding_status: PASS` means the PCZT spends what the human reviewed. It does
+**not** prove that the FROST group key is the PCZT action's spend-authorization
+key — the pinned PCZT inspect path does not expose a FROST group fingerprint.
+
+That linkage comes from the pinned signer library verifying the aggregate
+signature against the action's rerandomized verification key at apply time, and
+from Zcash consensus accepting the shielded spend. Do not read a Binding
+Firewall PASS as the cryptographic linkage; they are separate claims.

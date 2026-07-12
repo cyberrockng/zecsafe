@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
+import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
   generateZecsafeProofV1,
@@ -9,12 +10,13 @@ import {
 } from "../src/zecsafe-proof-v1.mjs";
 import { buildDryBroadcastProofRun, formatDryBroadcastSummary, ProofRunError } from "../src/proof-run-v1.mjs";
 
-const DEFAULT_RUNS_ROOT = "/home/dell/.zecsafe/runs";
+// Private run artifacts live outside the repository. Override with ZECSAFE_RUNS_ROOT or --runs-root.
+const DEFAULT_RUNS_ROOT = process.env.ZECSAFE_RUNS_ROOT ?? join(homedir(), ".zecsafe", "runs");
 const DEFAULT_PROOF_FIXTURE = "fixtures/proofs/p0-014-zecsafe-proof-v1.json";
 
 function usage() {
   console.error(`Usage:
-  zecsafe proof generate <run-id> [--runs-root DIR] [--out proof.json] [--txid TXID] [--chain-status STATUS] [--network main|test] [--recorded-at ISO] [--zecsafe-commit COMMIT] [--summary]
+  zecsafe proof generate <run-id> [--runs-root DIR] [--out proof.json] [--txid TXID] [--chain-status STATUS] [--network main|test] [--recorded-at ISO] [--zecsafe-commit COMMIT] [--signer-review-dir DIR] [--summary]
   zecsafe proof verify <proof.json> [--summary]
   zecsafe proof tamper-demo <proof.json> [--summary]
   zecsafe proof-run --dry-broadcast [--proof proof.json] [--out proof-run.json] [--recorded-at ISO] [--summary]`);
@@ -41,6 +43,22 @@ function parseFlags(argv, startIndex = 0) {
     }
   }
   return flags;
+}
+
+// Loads every recorded signer-review result (review-result-*.json) from a run's artifacts.
+// Returns undefined when none exist, so older runs still generate a bundle without the field.
+async function readSignerReviews(artifactsDir) {
+  let names;
+  try {
+    names = await readdir(artifactsDir);
+  } catch {
+    return undefined;
+  }
+
+  const reviewFiles = names.filter((name) => /^review-result-.+\.json$/.test(name)).sort();
+  if (reviewFiles.length === 0) return undefined;
+
+  return Promise.all(reviewFiles.map((name) => readJson(join(artifactsDir, name))));
 }
 
 async function readJson(path) {
@@ -118,8 +136,16 @@ async function commandGenerate(argv) {
   const completionPackage = await readJson(join(artifactsDir, "completion-package.json"));
   const intentResult = await readJson(join(artifactsDir, "intent-result.json")).catch(() => null);
   const outputPath = flags.out ? resolve(flags.out) : join(artifactsDir, "zecsafe-proof-v1.json");
+
+  // Signer reviews are recorded by the FROST session run, which may differ from the completion run.
+  // --signer-review-dir points at that run's artifacts; the generator re-checks that every review is
+  // bound to this session's group, PCZT, binding report, SIGHASH, and intent before recording the mode.
+  const signerReviewDir = flags.signer_review_dir ? resolve(flags.signer_review_dir) : artifactsDir;
+  const signerReviews = await readSignerReviews(signerReviewDir);
+
   const proof = generateZecsafeProofV1({
     completionPackage,
+    signerReviews,
     network: flags.network ?? intentResult?.intent?.network,
     recorded_at: flags.recorded_at,
     zecsafe_commit: flags.zecsafe_commit ?? currentGitCommit(),

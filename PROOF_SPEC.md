@@ -37,6 +37,41 @@ intent commitment, PCZT fingerprints, FROST threshold status, completion status,
 and transaction observation status.
 ```
 
+## Signer review mode
+
+`frost.signer_review_mode` records the review the selected signers actually performed. It is a required field, so it sits **inside** the canonical bundle hash and cannot be altered without detection.
+
+ZecSafe's recorded mainnet run used:
+
+```text
+signer_review_mode: semantic_pczt_review
+```
+
+This means each selected signer checked the PCZT's semantics and compared the prepared, pinned-tool SIGHASH fingerprint. **It does not mean the signer independently recomputed the SIGHASH from the PCZT bytes.** ZecSafe does not claim `independent_sighash`.
+
+A bundle only records the mode when every review is bound to that run's group fingerprint, PCZT fingerprint, binding report, SIGHASH fingerprint, and intent commitment; when each reviewer is one of the selected signers; and when the number of passing reviews meets the threshold. An unbound or failed review cannot become recorded evidence.
+
+## Binding Firewall and the FROST-key linkage
+
+These are two different guarantees and must not be conflated.
+
+The **Binding Firewall** is a *semantic* check: it compares the reviewed intent to the PCZT's contents (network, recipient, exact zatoshi amount, fee policy, memo policy, unexpected outputs, change output). A `binding_status: PASS` means the PCZT spends what the human reviewed.
+
+The Binding Firewall does **not** prove that the FROST group key is the PCZT action's spend-authorization key. The pinned PCZT inspect path does not expose a FROST group fingerprint, so that linkage cannot be read from the binding report.
+
+That linkage is established elsewhere, and it is real:
+
+1. The pinned signer library verifies the aggregate signature against the PCZT action's **rerandomized verification key** when applying it. A signature from the wrong group fails at apply time.
+2. Zcash consensus validates the shielded spend authorization normally. A transaction whose spend authorization did not correspond to the note's authorization key would be rejected by the network.
+
+The recorded run's transaction was accepted and mined, so both hold. But a judge should understand that **a semantic Binding Firewall PASS is not, by itself, the cryptographic linkage** — the signer library and consensus are.
+
+## Bundle reproducibility
+
+Generation is deterministic. Given the same run artifacts and the same `--recorded-at`, `zecsafe proof generate` produces a byte-identical bundle, including `bundle_hash`. A regression test enforces this.
+
+`--recorded-at` pins the completion ProofEvent's `occurred_at`. Without it the event would default to wall-clock `now()`, which flows into `completion_report_ref`, `proof_event_ref`, and therefore `bundle_hash` — and the bundle could not be reproduced from its own artifacts.
+
 ## Non-Claims
 
 The proof bundle does not prove:
@@ -49,7 +84,8 @@ independent signer geography
 mainnet confirmation when the recorded status is NOT_BROADCAST
 anything hidden in raw private run artifacts
 privacy-blind coordination
-production custody safety
+that signers independently recomputed the SIGHASH (the mode is semantic_pczt_review)
+that the Binding Firewall alone proves the FROST-key to PCZT-authorization-key linkage
 ```
 
 ## ZIP 312 Privacy Boundary

@@ -20,12 +20,36 @@ txid:               27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e
 mined height:       3409837 (2026-07-12T14:54:27Z)
 chain status:       CONFIRMED (observed tip 3409840 at recording; rule: tip >= mined + 2)
 fee:                10000 zatoshis
-bundle hash:        sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64
+bundle hash:        sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
 zecsafe commit:     ad83269298b73396ac0f4b743c59301de77fe937 (see note below)
 recorded at (UTC):  2026-07-12T15:12:54.000Z
 ```
 
 Commit note: the recorded commit is the repository HEAD at recording time; the P0-018 through P0-024 implementation and evidence files were present in the working tree but not yet committed when the run executed. The freeze commit that lands this directory supersedes that gap.
+
+## Bundle regeneration and reproducibility
+
+This bundle is **reproducible**. Regenerating it from the same frozen run artifacts yields a byte-identical file:
+
+```bash
+npm run proof:generate -- p0-023-20260712T145358Z \
+  --signer-review-dir <runs>/p0-021-20260712T142858Z/artifacts \
+  --txid 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 \
+  --chain-status CONFIRMED --network main \
+  --observed-block-height 3409837 --confirmations-at-recording 4 \
+  --recorded-at 2026-07-12T15:12:54.000Z \
+  --zecsafe-commit ad83269298b73396ac0f4b743c59301de77fe937 \
+  --out fixtures/verified-mainnet-run/proof.json
+```
+
+The run artifacts are private (they contain raw PCZT bodies and SIGHASH bytes), so only the operator can execute this. A judge does not need to: `make judge-proof-mainnet` verifies the bundle's canonical integrity without them.
+
+**Bundle-hash history.** The originally frozen bundle hash was `sha256:e90c3c46…9cb64`. It was superseded on 2026-07-12 for two reasons, both improvements, and **no evidence-bearing field changed** — network, txid, block height, all PCZT/SIGHASH/signature/group/signer fingerprints, binding checks, and toolchain commits are byte-identical:
+
+1. `frost.signer_review_mode` and `frost.signer_reviews_completed` were added, bringing the signer-review mode (`semantic_pczt_review`) **inside** the hash-covered boundary. It was previously disclosed only in `events.public.json`, i.e. outside the tamper-evident seal.
+2. A reproducibility defect was fixed. The completion ProofEvent defaulted its `occurred_at` to wall-clock `now()`, which flowed into `completion_report_ref`, `proof_event_ref`, and therefore `bundle_hash` — so the original bundle could not be regenerated from its own artifacts. Generation is now pinned to `--recorded-at` and is deterministic, which a regression test enforces.
+
+The original bundle was **not** edited. It was regenerated from the frozen source artifacts.
 
 ## Files
 

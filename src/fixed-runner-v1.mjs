@@ -1,7 +1,8 @@
 import { mkdir, readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
-import { isAbsolute, relative, resolve } from "node:path";
+import { homedir } from "node:os";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { createIntentV1, canonicalizeJson } from "./intent-v1.mjs";
 import { bindIntentToPcztV1 } from "./pczt-bind-v1.mjs";
 import { appendProofEventLog, validateProofEventV1 } from "./proof-event-v1.mjs";
@@ -14,8 +15,10 @@ import { generateZecsafeProofV1, verifyZecsafeProofV1 } from "./zecsafe-proof-v1
 import { EXPECTED_ZCASH_DEVTOOL_COMMIT } from "./pczt-inspect-v1.mjs";
 
 export const FIXED_RUNNER_RESULT_SCHEMA_VERSION = "zecsafe-fixed-runner-result-v1";
-export const DEFAULT_RUNNER_WORKSPACE_ROOT = "/home/dell/.zecsafe/runner";
-export const DEFAULT_ZCASH_DEVTOOL_ROOT = "/home/dell/.zecsafe/toolchain/zcash-devtool";
+const ZECSAFE_HOME = process.env.ZECSAFE_HOME ?? join(homedir(), ".zecsafe");
+export const DEFAULT_RUNNER_WORKSPACE_ROOT = process.env.ZECSAFE_RUNNER_ROOT ?? join(ZECSAFE_HOME, "runner");
+export const DEFAULT_ZCASH_DEVTOOL_ROOT =
+  process.env.ZECSAFE_ZCASH_DEVTOOL_ROOT ?? join(ZECSAFE_HOME, "toolchain", "zcash-devtool");
 
 export const FIXED_OPERATIONS = Object.freeze([
   "toolchain.status",

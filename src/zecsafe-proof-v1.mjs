@@ -207,8 +207,63 @@ function bindingChecksFromReport(report) {
   }));
 }
 
+const SIGNER_REVIEW_MODES = new Set(["independent_sighash", "semantic_pczt_review", "coordinator_only"]);
+
+// Derives the signer-review mode actually used by the selected signers, and refuses to emit it
+// unless every review is cryptographically bound to this run's FROST session and reviewed PCZT.
+// Without these checks the mode would be an unverified label rather than recorded evidence.
+function signerReviewSummary(signerReviews, { frost, finalBinding }) {
+  if (signerReviews === undefined) return null;
+  if (!Array.isArray(signerReviews) || signerReviews.length === 0) {
+    invalidProof("signerReviews must be a non-empty array when provided.");
+  }
+
+  const selected = frost.selected_public_fingerprints;
+  const modes = new Set();
+  const reviewers = new Set();
+  const limitations = [];
+
+  for (const [index, entry] of signerReviews.entries()) {
+    const review = requirePlainObject(entry, `signerReviews[${index}]`);
+    const at = `signerReviews[${index}]`;
+
+    const mode = requireString(review.signer_review_mode, `${at}.signer_review_mode`);
+    if (!SIGNER_REVIEW_MODES.has(mode)) invalidProof(`${at}.signer_review_mode is unsupported.`);
+    modes.add(mode);
+
+    if (review.status !== "PASS") invalidProof(`${at}.status must be PASS for a recorded authorization.`);
+
+    const reviewer = requireHash(review.reviewer_public_fingerprint, `${at}.reviewer_public_fingerprint`);
+    if (!selected.includes(reviewer)) invalidProof(`${at}.reviewer_public_fingerprint is not a selected signer.`);
+    if (reviewers.has(reviewer)) invalidProof(`${at}.reviewer_public_fingerprint is duplicated.`);
+    reviewers.add(reviewer);
+
+    // The review must describe THIS session's group, PCZT, binding report, SIGHASH, and intent.
+    const bindings = [
+      ["group_fingerprint", review.group_fingerprint, frost.group_fingerprint],
+      ["pczt_fingerprint", review.pczt_fingerprint, frost.pczt_fingerprint],
+      ["binding_report_ref", review.binding_report_ref, frost.binding_report_ref],
+      ["sighash_fingerprint", review.sighash_fingerprint, frost.sighash_fingerprint],
+      ["intent_commitment", review.intent_commitment, finalBinding.intent_commitment],
+    ];
+    for (const [field, actual, expected] of bindings) {
+      if (actual !== expected) invalidProof(`${at}.${field} does not match the recorded FROST session.`);
+    }
+
+    limitations.push(...normalizeLimitations(review.limitations));
+  }
+
+  if (modes.size !== 1) invalidProof("signerReviews must agree on a single signer_review_mode.");
+  if (reviewers.size < frost.threshold) {
+    invalidProof("signerReviews must cover at least the threshold number of selected signers.");
+  }
+
+  return { mode: [...modes][0], reviewers_completed: reviewers.size, limitations };
+}
+
 export function generateZecsafeProofV1({
   completionPackage,
+  signerReviews,
   transaction = {},
   network,
   recorded_at,
@@ -217,11 +272,17 @@ export function generateZecsafeProofV1({
   toolchain = {},
 } = {}) {
   const pkg = requirePlainObject(completionPackage, "completionPackage");
-  const completion = completePcztV1({ completionPackage: pkg });
+
+  // recorded_at pins the completion ProofEvent's occurred_at. Without it the event would default to
+  // wall-clock now(), which flows into completion_report_ref, proof_event_ref, and therefore
+  // bundle_hash - making the bundle unreproducible from the same frozen artifacts.
+  const recordedAt = requireUtc(recorded_at ?? new Date().toISOString(), "recorded_at");
+  const completion = completePcztV1({ completionPackage: pkg, occurred_at: recordedAt });
   if (completion.status !== "PASS") invalidProof("completion package must pass before generating zecsafe-proof-v1.");
 
   const frost = requirePlainObject(pkg.frost_session, "completionPackage.frost_session");
   const finalBinding = requirePlainObject(pkg.final_binding, "completionPackage.final_binding");
+  const signerReview = signerReviewSummary(signerReviews, { frost, finalBinding });
   const inferredNetwork = network ?? transaction.network ?? pkg.network;
   const chainStatus = transaction.chain_status ?? completion.broadcast_status ?? "UNKNOWN";
   if (!CHAIN_STATUSES.has(chainStatus)) invalidProof("transaction.chain_status is unsupported.");
@@ -231,7 +292,7 @@ export function generateZecsafeProofV1({
     project: "ZecSafe",
     network: requireNetwork(inferredNetwork),
     run_id: requireRunId(completion.run_id),
-    recorded_at: requireUtc(recorded_at ?? new Date().toISOString(), "recorded_at"),
+    recorded_at: recordedAt,
     zecsafe_commit: requireCommit(zecsafe_commit, "zecsafe_commit"),
     vault: {
       group_fingerprint: requireHash(frost.group_fingerprint, "frost_session.group_fingerprint"),
@@ -273,6 +334,12 @@ export function generateZecsafeProofV1({
       aggregate_signature_fingerprint: frost.aggregate_signature_fingerprint,
       signature_byte_length: frost.signature_byte_length,
       sighash_fingerprint: frost.sighash_fingerprint,
+      ...(signerReview
+        ? {
+            signer_review_mode: signerReview.mode,
+            signer_reviews_completed: signerReview.reviewers_completed,
+          }
+        : {}),
     },
     transaction: {
       txid: requireTxid(transaction.txid),
@@ -304,11 +371,16 @@ export function generateZecsafeProofV1({
       completion_report_ref: sha256Canonical(completion),
       proof_event_ref: sha256Canonical(completion.proof_event),
     },
-    limitations: normalizeLimitations([
-      "Public zecsafe-proof-v1 contains only fingerprints, statuses, counts, tool commits, limitations, and transaction observation status.",
-      ...completion.limitations,
-      ...(Array.isArray(transaction.limitations) ? transaction.limitations : []),
-    ]),
+    limitations: [
+      ...new Set(
+        normalizeLimitations([
+          "Public zecsafe-proof-v1 contains only fingerprints, statuses, counts, tool commits, limitations, and transaction observation status.",
+          ...completion.limitations,
+          ...(signerReview ? signerReview.limitations : []),
+          ...(Array.isArray(transaction.limitations) ? transaction.limitations : []),
+        ]),
+      ),
+    ],
   };
 
   checkNoPrivateMaterial(proof);
@@ -365,6 +437,16 @@ export function validateZecsafeProofShape(proof) {
   requireHash(frost.aggregate_signature_fingerprint, "frost.aggregate_signature_fingerprint");
   requireSafeInteger(frost.signature_byte_length, "frost.signature_byte_length", { minimum: 1 });
   requireHash(frost.sighash_fingerprint, "frost.sighash_fingerprint");
+
+  if (frost.signer_review_mode !== undefined) {
+    if (!SIGNER_REVIEW_MODES.has(frost.signer_review_mode)) {
+      invalidProof("frost.signer_review_mode is unsupported.");
+    }
+    requireSafeInteger(frost.signer_reviews_completed, "frost.signer_reviews_completed", { minimum: 1 });
+    if (frost.signer_reviews_completed > frost.selected_signers.length) {
+      invalidProof("frost.signer_reviews_completed cannot exceed the selected signer count.");
+    }
+  }
 
   const transaction = requirePlainObject(proof.transaction, "transaction");
   requireTxid(transaction.txid);

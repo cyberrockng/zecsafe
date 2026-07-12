@@ -18,10 +18,19 @@ const mimeTypes = {
   ".md": "text/markdown; charset=utf-8",
 };
 
+const SECURITY_HEADERS = {
+  "Content-Security-Policy":
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "no-referrer",
+  "X-Frame-Options": "DENY",
+};
+
 function sendJson(response, statusCode, payload) {
   response.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
+    ...SECURITY_HEADERS,
   });
   response.end(JSON.stringify(payload));
 }
@@ -465,11 +474,35 @@ async function handleApi(request, response, pathname) {
   return false;
 }
 
+// The web surface serves the application and the public proof fixtures - NOT the repository.
+// Serving rootDir would expose .git/, server.mjs, HANDOFF.md, and the uncommitted working tree.
+const STATIC_FILES = new Set(["/index.html"]);
+const STATIC_PREFIXES = ["/src/", "/fixtures/verified-mainnet-run/"];
+
 function staticFilePath(pathname) {
   const requested = pathname === "/" || pathname === "/demo" ? "/index.html" : pathname;
-  const decoded = decodeURIComponent(requested);
-  const normalized = normalize(decoded).replace(/^(\.\.[/\\])+/, "");
-  return join(rootDir, normalized);
+
+  let decoded;
+  try {
+    decoded = decodeURIComponent(requested);
+  } catch {
+    return null;
+  }
+
+  // Reject traversal and NUL before the allowlist so an encoded escape cannot smuggle a prefix.
+  if (decoded.includes("\0") || decoded.includes("..")) return null;
+
+  const normalized = normalize(decoded);
+  if (!normalized.startsWith("/")) return null;
+
+  const allowed = STATIC_FILES.has(normalized) || STATIC_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+  if (!allowed) return null;
+
+  const filePath = join(rootDir, normalized);
+  // Defence in depth: normalize() plus the allowlist should make this unreachable.
+  if (!filePath.startsWith(rootDir)) return null;
+
+  return filePath;
 }
 
 const server = createServer(async (request, response) => {
@@ -488,21 +521,22 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  try {
-    const filePath = staticFilePath(url.pathname);
-    if (!filePath.startsWith(rootDir)) {
-      response.writeHead(403);
-      response.end("Forbidden");
-      return;
-    }
+  const filePath = staticFilePath(url.pathname);
+  if (!filePath) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", ...SECURITY_HEADERS });
+    response.end("Not found");
+    return;
+  }
 
+  try {
     const file = await readFile(filePath);
     response.writeHead(200, {
       "Content-Type": mimeTypes[extname(filePath)] ?? "application/octet-stream",
+      ...SECURITY_HEADERS,
     });
     response.end(file);
   } catch {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", ...SECURITY_HEADERS });
     response.end("Not found");
   }
 });
@@ -510,6 +544,10 @@ const server = createServer(async (request, response) => {
 server.requestTimeout = 15_000;
 server.headersTimeout = 16_000;
 
-server.listen(port, () => {
-  console.log(`ZecSafe listening on http://127.0.0.1:${port}`);
+// Loopback only. ZecSafe's local surface reaches the intent route and the proof fixtures; it must
+// not be reachable from the local network. Override with ZECSAFE_HOST only if you understand why.
+const host = process.env.ZECSAFE_HOST ?? "127.0.0.1";
+
+server.listen(port, host, () => {
+  console.log(`ZecSafe listening on http://${host}:${port}`);
 });
