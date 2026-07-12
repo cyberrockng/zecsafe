@@ -1,0 +1,511 @@
+{
+  "generatedAt": "2026-07-12T20:30:33.568Z",
+  "browser": "Chrome/150.0.7871.101",
+  "cases": [
+    {
+      "requestedViewport": {
+        "width": 1440,
+        "height": 1200,
+        "mobile": false
+      },
+      "dom": {
+        "url": "http://127.0.0.1:4181/demo?audit=1440",
+        "title": "ZecSafe",
+        "language": "en",
+        "viewport": {
+          "width": 1440,
+          "height": 1200,
+          "devicePixelRatio": 1
+        },
+        "documentSize": {
+          "clientWidth": 1425,
+          "scrollWidth": 1425,
+          "clientHeight": 1200,
+          "scrollHeight": 3149,
+          "bodyScrollWidth": 1425
+        },
+        "horizontalOverflowPixels": 0,
+        "overflowingElementCount": 0,
+        "overflowingElements": [],
+        "interactiveCount": 20,
+        "unnamedInteractives": [],
+        "duplicateIds": [],
+        "h1Count": 2,
+        "headings": [
+          {
+            "level": 1,
+            "text": "Protect ZEC from single-key failure."
+          },
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "Participant availability"
+          },
+          {
+            "level": 3,
+            "text": "Field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          },
+          {
+            "level": 3,
+            "text": "Public proof contents"
+          }
+        ],
+        "imageCount": 0,
+        "imagesMissingAlt": [],
+        "landmarkCounts": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 4
+        }
+      },
+      "accessibility": {
+        "nodeCount": 798,
+        "actionableNodeCount": 20,
+        "namelessActionableNodes": []
+      },
+      "runtime": {
+        "console": [
+          {
+            "level": "error",
+            "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            "source": "network"
+          }
+        ],
+        "exceptions": [],
+        "networkFailures": [],
+        "httpErrors": [
+          {
+            "status": 404,
+            "url": "http://127.0.0.1:4181/favicon.ico",
+            "type": "Other"
+          }
+        ]
+      }
+    },
+    {
+      "requestedViewport": {
+        "width": 1280,
+        "height": 900,
+        "mobile": false
+      },
+      "dom": {
+        "url": "http://127.0.0.1:4181/demo?audit=1280",
+        "title": "ZecSafe",
+        "language": "en",
+        "viewport": {
+          "width": 1280,
+          "height": 900,
+          "devicePixelRatio": 1
+        },
+        "documentSize": {
+          "clientWidth": 1265,
+          "scrollWidth": 1265,
+          "clientHeight": 900,
+          "scrollHeight": 3204,
+          "bodyScrollWidth": 1265
+        },
+        "horizontalOverflowPixels": 0,
+        "overflowingElementCount": 0,
+        "overflowingElements": [],
+        "interactiveCount": 20,
+        "unnamedInteractives": [],
+        "duplicateIds": [],
+        "h1Count": 2,
+        "headings": [
+          {
+            "level": 1,
+            "text": "Protect ZEC from single-key failure."
+          },
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "Participant availability"
+          },
+          {
+            "level": 3,
+            "text": "Field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          },
+          {
+            "level": 3,
+            "text": "Public proof contents"
+          }
+        ],
+        "imageCount": 0,
+        "imagesMissingAlt": [],
+        "landmarkCounts": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 4
+        }
+      },
+      "accessibility": {
+        "nodeCount": 803,
+        "actionableNodeCount": 20,
+        "namelessActionableNodes": []
+      },
+      "runtime": {
+        "console": [],
+        "exceptions": [],
+        "networkFailures": [],
+        "httpErrors": []
+      }
+    },
+    {
+      "requestedViewport": {
+        "width": 390,
+        "height": 844,
+        "mobile": true
+      },
+      "dom": {
+        "url": "http://127.0.0.1:4181/demo?audit=390",
+        "title": "ZecSafe",
+        "language": "en",
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "devicePixelRatio": 1
+        },
+        "documentSize": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "clientHeight": 844,
+          "scrollHeight": 7126,
+          "bodyScrollWidth": 390
+        },
+        "horizontalOverflowPixels": 0,
+        "overflowingElementCount": 18,
+        "overflowingElements": [
+          {
+            "tag": "div",
+            "id": null,
+            "class": "nav__group",
+            "text": "PROPOSALS Proposal Center Audit Log",
+            "bounds": {
+              "left": 330,
+              "right": 664,
+              "top": 250,
+              "bottom": 291,
+              "width": 334,
+              "height": 41
+            }
+          },
+          {
+            "tag": "span",
+            "id": null,
+            "class": "nav__group-label",
+            "text": "PROPOSALS",
+            "bounds": {
+              "left": 330,
+              "right": 411,
+              "top": 263,
+              "bottom": 278,
+              "width": 81,
+              "height": 15
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Proposal Center",
+            "bounds": {
+              "left": 419,
+              "right": 559,
+              "top": 250,
+              "bottom": 291,
+              "width": 141,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Audit Log",
+            "bounds": {
+              "left": 567,
+              "right": 664,
+              "top": 250,
+              "bottom": 291,
+              "width": 97,
+              "height": 41
+            }
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "nav__group",
+            "text": "GUARDIANS Intent Review Recovery Center",
+            "bounds": {
+              "left": 672,
+              "right": 1036,
+              "top": 250,
+              "bottom": 291,
+              "width": 364,
+              "height": 41
+            }
+          },
+          {
+            "tag": "span",
+            "id": null,
+            "class": "nav__group-label",
+            "text": "GUARDIANS",
+            "bounds": {
+              "left": 672,
+              "right": 755,
+              "top": 263,
+              "bottom": 278,
+              "width": 83,
+              "height": 15
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Intent Review",
+            "bounds": {
+              "left": 763,
+              "right": 886,
+              "top": 250,
+              "bottom": 291,
+              "width": 123,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Recovery Center",
+            "bounds": {
+              "left": 894,
+              "right": 1036,
+              "top": 250,
+              "bottom": 291,
+              "width": 143,
+              "height": 41
+            }
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "nav__group",
+            "text": "EVIDENCE Verified Demo Mainnet Proof Run Evidence Center FROST Live Demo",
+            "bounds": {
+              "left": 1044,
+              "right": 1728,
+              "top": 250,
+              "bottom": 291,
+              "width": 684,
+              "height": 41
+            }
+          },
+          {
+            "tag": "span",
+            "id": null,
+            "class": "nav__group-label",
+            "text": "EVIDENCE",
+            "bounds": {
+              "left": 1044,
+              "right": 1112,
+              "top": 263,
+              "bottom": 278,
+              "width": 68,
+              "height": 15
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Verified Demo",
+            "bounds": {
+              "left": 1120,
+              "right": 1249,
+              "top": 250,
+              "bottom": 291,
+              "width": 129,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Mainnet Proof Run",
+            "bounds": {
+              "left": 1257,
+              "right": 1418,
+              "top": 250,
+              "bottom": 291,
+              "width": 161,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Evidence Center",
+            "bounds": {
+              "left": 1426,
+              "right": 1567,
+              "top": 250,
+              "bottom": 291,
+              "width": 141,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "FROST Live Demo",
+            "bounds": {
+              "left": 1575,
+              "right": 1728,
+              "top": 250,
+              "bottom": 291,
+              "width": 153,
+              "height": 41
+            }
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "nav__group",
+            "text": "DOCS How It Works Threat Model",
+            "bounds": {
+              "left": 1736,
+              "right": 2036,
+              "top": 250,
+              "bottom": 291,
+              "width": 300,
+              "height": 41
+            }
+          },
+          {
+            "tag": "span",
+            "id": null,
+            "class": "nav__group-label",
+            "text": "DOCS",
+            "bounds": {
+              "left": 1736,
+              "right": 1775,
+              "top": 263,
+              "bottom": 278,
+              "width": 39,
+              "height": 15
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "How It Works",
+            "bounds": {
+              "left": 1783,
+              "right": 1906,
+              "top": 250,
+              "bottom": 291,
+              "width": 123,
+              "height": 41
+            }
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "nav__item ",
+            "text": "Threat Model",
+            "bounds": {
+              "left": 1914,
+              "right": 2036,
+              "top": 250,
+              "bottom": 291,
+              "width": 123,
+              "height": 41
+            }
+          }
+        ],
+        "interactiveCount": 20,
+        "unnamedInteractives": [],
+        "duplicateIds": [],
+        "h1Count": 2,
+        "headings": [
+          {
+            "level": 1,
+            "text": "Protect ZEC from single-key failure."
+          },
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "Participant availability"
+          },
+          {
+            "level": 3,
+            "text": "Field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          },
+          {
+            "level": 3,
+            "text": "Public proof contents"
+          }
+        ],
+        "imageCount": 0,
+        "imagesMissingAlt": [],
+        "landmarkCounts": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 4
+        }
+      },
+      "accessibility": {
+        "nodeCount": 805,
+        "actionableNodeCount": 20,
+        "namelessActionableNodes": []
+      },
+      "runtime": {
+        "console": [],
+        "exceptions": [],
+        "networkFailures": [],
+        "httpErrors": []
+      }
+    }
+  ]
+}

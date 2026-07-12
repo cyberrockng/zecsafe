@@ -46,14 +46,18 @@ Prototype controls:
 
 ## Current Prototype Limits
 
-The current prototype does not yet protect real funds.
+The current prototype does not yet protect real funds as production custody software.
 
 - Guardian approval acknowledgements are browser-side signatures over the proposal hash, but they are not Zcash spend signatures and are not produced on separate production guardian devices yet.
-- Broadcast is simulated.
-- FROST threshold signing is not implemented yet.
+- The app does not provide general in-app broadcast custody; the verified mainnet run was a recorded, human-approved proof run.
+- FROST threshold signing exists for the recorded proof path, but the hosted app is not a production wallet.
 - The coordinator/server must not be treated as production secure.
 - Public transparent address monitoring does not make transparent activity private.
 - Viewing-key sync requires a configured local Zcash RPC endpoint.
+
+## ZIP 312 Privacy Boundary
+
+ZecSafe does not claim that the coordinator is blind to transaction details or linkage. In the ZIP 312 model, the coordinator and key-share holders are trusted with transaction privacy and unlinkability. Share holders can link a signing operation to a transaction, and network privacy is outside ZIP 312.
 
 ## Sensitive Data Rules
 
@@ -99,7 +103,7 @@ Guardian device:
 
 Before real funds are supported:
 
-- Integrate audited Zcash FROST signing libraries.
+- Complete audited production Zcash transaction construction and FROST signing integration.
 - Use wallet libraries that correctly build Zcash transactions.
 - Encrypt coordinator messages.
 - Store guardian shares securely.
