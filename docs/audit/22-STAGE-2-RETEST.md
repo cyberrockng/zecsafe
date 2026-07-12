@@ -129,3 +129,86 @@ NO-GO — P0 BLOCKERS REMAIN  (R-05 only; all remaining blockers are external hu
 The repository is now internally truthful and independently verifiable from a fresh public clone. What stands between ZecSafe and `GO` is no longer engineering — it is a demo video, a ZecHub PR, and a Discord post, all of which must be produced by a human before **July 15, 2026 UTC**.
 
 Record the video against commit `2133493` or later. A video of the pre-remediation UI would show a judge "FROST Demo: Not Yet Run" beside a confirmed mainnet transaction.
+
+---
+
+# Stage 2 remediation R-06…R-09 (commit `0af650f`)
+
+Verified from a fresh public clone at `0af650f`: `npm run check`, `make proof-run-dry`, `make judge-proof-mainnet`, `make judge-proof-mainnet-tamper`, `make judge-proof` — all exit 0.
+
+## R-06 — signer review mode is now inside the tamper-evident boundary: **RESOLVED**
+
+`frost.signer_review_mode` and `frost.signer_reviews_completed` are **required** schema fields. A judge reading `proof.json` — the hash-covered artifact — now sees `semantic_pczt_review` directly.
+
+The generator will not record a mode unless every review is bound to that run's group fingerprint, PCZT fingerprint, binding report, SIGHASH fingerprint, and intent commitment; every reviewer is one of the selected signers; every review passed; and the count meets the threshold. Tests assert that a foreign-PCZT review, an unselected reviewer, a failed review, a sub-threshold count, and a mixed-mode claim are each **rejected**.
+
+**The bundle was regenerated from the frozen Level B artifacts, not hand-edited.** Every evidence-bearing field is byte-identical.
+
+```text
+old bundle_hash: sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64
+new bundle_hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
+unchanged: network, txid, block height, confirmations, intent commitment, all four PCZT
+           fingerprints, SIGHASH fingerprint, aggregate signature fingerprint + byte length,
+           group fingerprint, both selected signer fingerprints, all binding checks,
+           all three toolchain commits
+```
+
+## NEW FINDING — bundle reproducibility (found during R-06, now **RESOLVED**)
+
+This was **missed by the original audit** and is worth recording plainly.
+
+The original Level B pass verified that every *artifact* hash matched the public bundle. It did **not** attempt to regenerate the bundle end-to-end. When R-06 forced a regeneration, the recorded bundle turned out to be **irreproducible from its own frozen artifacts at any commit**:
+
+| Attempt | Result |
+|---|---|
+| Regenerate at HEAD | different `completion_report_ref`, `proof_event_ref`, `bundle_hash` |
+| Regenerate at the recorded-run commit `ad83269` | **fails outright** — the completion package does not parse (the run used a newer completion module that was uncommitted at the time) |
+| Regenerate at the freeze commit `0cd8aeb` | still different refs |
+| Regenerate twice at HEAD | **different from each other** |
+
+**Root cause:** `pcztCompletionProofEvent` defaulted `occurred_at` to wall-clock `new Date()`. That event is hashed into `completion_report_ref` and `proof_event_ref`, which are hashed into `bundle_hash`. The bundle therefore captured *generation time*, so no two generations agreed.
+
+**Fix:** `generateZecsafeProofV1` now pins the completion event's `occurred_at` to `recorded_at`. Generation is deterministic; a regression test asserts byte-identical regeneration from identical inputs.
+
+**Honest framing of what this did and did not mean.** Tamper-evidence always held — any edit to the recorded file was still detected, and the verifier was never wrong. What did *not* hold was **reproducibility**: the project could not have re-derived its own published bundle. For a proof artifact whose whole value is independent verification, that is a material weakness, and it is exactly the kind of thing an audit that stops at "the hashes match" will miss. `PROOF_SPEC.md` and the fixture README now state the reproduction command and the hash history.
+
+## R-07 — Binding Firewall vs FROST-key linkage: **RESOLVED**
+
+`PROOF_SPEC.md`, `docs/proof/TRUST_MODEL.md`, and `SECURITY.md` each now state, in a titled section: the Binding Firewall is a **semantic** intent-to-PCZT check; it does **not** prove the FROST group key is the PCZT action's spend-authorization key; that linkage is established by the pinned signer library verifying the aggregate against the action's rerandomized verification key at apply time, and corroborated by Zcash consensus accepting the shielded spend. Previously this rested on one sentence inside `limitations[4]`.
+
+## R-08 — server hardening: **RESOLVED**
+
+| Check | Before | After |
+|---|---|---|
+| Bind address | `LISTEN *:4173` (all interfaces) while logging `127.0.0.1` | `LISTEN 127.0.0.1:4173`; log is now true |
+| `/.git/HEAD`, `/.git/config` | **200** | **404** |
+| `/server.mjs`, `/package.json`, `/HANDOFF.md`, `/Makefile` | **200** | **404** |
+| `/src/*`, `/fixtures/verified-mainnet-run/*`, `/`, `/demo` | 200 | 200 (allowlisted) |
+| Traversal, encoded traversal, `%00` | blocked | blocked |
+| CSP / nosniff / Referrer-Policy / X-Frame-Options | absent | present |
+
+The document root is now an explicit allowlist rather than the repository. The app renders correctly under the new CSP (no inline script or style).
+
+## R-09 — internal context out of the judge path: **RESOLVED**
+
+`HANDOFF.md`, `operator-notepad.md`, and `roadmap.md` moved to `docs/history/` with an index and explicit banners. `operator-notepad.md` is labelled **SUPERSEDED** — its demo path described the old prototype.
+
+HANDOFF was **annotated, not rewritten**: it still records the original bundle hash, with a banner explaining the supersession. Historical records are not edited to match later corrections.
+
+All absolute local machine paths are gone: from HANDOFF (placeholders `<runs>`, `<repo>`, `<plans>`) and, more importantly, from **tracked code** — `scripts/zecsafe.mjs`, `scripts/mainnet-view.mjs`, `scripts/pczt-inspect.mjs`, and `src/fixed-runner-v1.mjs` hardcoded `/home/dell/...` defaults and now resolve from `$HOME` or env vars. The repo no longer only works on the author's machine.
+
+## Status
+
+| ID | Sev | Status |
+|---|---|---|
+| R-01…R-04 | P0 | **RESOLVED** (`2133493`) |
+| R-06…R-09 | P1 | **RESOLVED** (`0af650f`) |
+| Reproducibility defect | P1 (new) | **RESOLVED** (`0af650f`) |
+| R-10 | P2 | Partly done — `docs/screenshots/` still stale; CI Node version unreconciled |
+| **R-05** | **P0** | **OPEN — demo video, ZecHub PR, Discord post** |
+
+```text
+NO-GO — P0 BLOCKERS REMAIN  (R-05 only)
+```
+
+Every engineering finding from the V3 audit is now closed. The sole remaining blocker is the submission package, which requires human action before **July 15, 2026 UTC**. Record the demo video against commit `0af650f` or later.
