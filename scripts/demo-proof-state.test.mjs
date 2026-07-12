@@ -77,19 +77,29 @@ function chainEvent(overrides = {}) {
   const state = reduceDemoProofEvents(createBindingMismatchEvents(events));
   assert.equal(state.binding.status, "FAIL");
   assert.equal(state.readiness.signing_allowed, false);
+  assert.equal(state.readiness.threshold_reached, false);
   assert.equal(state.readiness.combined_pczt, false);
+  assert.equal(state.readiness.has_txid, false);
+  assert.equal(state.readiness.broadcast_success, false);
+  assert.equal(state.frost.threshold_status, "UNKNOWN");
+  assert.equal(state.pczt.combine_status, "UNKNOWN");
 
-  // The mismatch must be visible AT THE FIELD LEVEL, not merely in the aggregate status.
+  // The mismatch must be visible AT THE FIELD LEVEL and in the aggregate binding status.
   // The reducer merges check_statuses across events in time order, so a mismatch applied to only
   // the first signer's review was silently overwritten by the second signer's PASS. The UI then
   // showed "Signing Control Disabled" while every field read PASS - an incoherent state that
   // undermines the exact thing this demo is meant to prove.
   assert.equal(state.binding.check_statuses.recipient, "FAIL");
+  assert.equal(state.binding.check_statuses.binding, "FAIL");
 
   const failing = Object.entries(state.binding.check_statuses)
     .filter(([, status]) => !["PASS", "MATCH", "LIMITED"].includes(status))
     .map(([field]) => field);
-  assert.deepEqual(failing, ["recipient"], "recipient must be the only failing check");
+  assert.deepEqual(failing, ["recipient", "binding"], "only recipient and aggregate binding may fail");
+  assert.equal("threshold" in state.binding.check_statuses, false);
+  assert.equal("pczt_combine" in state.binding.check_statuses, false);
+  assert.equal("final_binding" in state.binding.check_statuses, false);
+  assert.equal("broadcast_gate" in state.binding.check_statuses, false);
 }
 
 {

@@ -8,9 +8,10 @@ import { spawn } from "node:child_process";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../../../..");
-const outputDir = here;
-const serverPort = 4191;
-const debugPort = 9334;
+const outputDir = process.env.AUDIT_OUTPUT_DIR ?? here;
+const targetCommit = process.env.AUDIT_TARGET_COMMIT ?? "c5d1750941e89a146941a9a55455e736a69c35b2";
+const serverPort = Number(process.env.AUDIT_SERVER_PORT ?? 4191);
+const debugPort = Number(process.env.AUDIT_DEBUG_PORT ?? 9334);
 const baseUrl = `http://127.0.0.1:${serverPort}`;
 
 const browserCandidates = [
@@ -140,7 +141,7 @@ const browser = spawn(
     "--hide-scrollbars",
     "--no-first-run",
     `--remote-debugging-port=${debugPort}`,
-    `--user-data-dir=/tmp/zecsafe-closeout-browser-c5d1750-${process.pid}`,
+    `--user-data-dir=/tmp/zecsafe-closeout-browser-${process.pid}`,
     "about:blank",
   ],
   { stdio: "ignore" },
@@ -148,7 +149,7 @@ const browser = spawn(
 
 const report = {
   generated_at: new Date().toISOString(),
-  target_commit: "c5d1750941e89a146941a9a55455e736a69c35b2",
+  target_commit: targetCommit,
   local_only: true,
   browser: null,
   screenshots: [],
@@ -271,6 +272,14 @@ try {
       binding_rows: rows,
       signing_control: document.querySelector(".binding-check-list + button")?.textContent?.replace(/\\s+/g, " ").trim() ?? null,
       evidence_verdict: document.querySelector(".evidence-strip span:last-child")?.textContent?.trim() ?? null,
+      verifier_control: {
+        text: document.querySelector("#verifyPublicProof")?.textContent?.replace(/\\s+/g, " ").trim() ?? null,
+        disabled: document.querySelector("#verifyPublicProof")?.disabled ?? null,
+      },
+      download_control: {
+        text: document.querySelector("#downloadPublicProof")?.textContent?.replace(/\\s+/g, " ").trim() ?? null,
+        disabled: document.querySelector("#downloadPublicProof")?.disabled ?? null,
+      },
       flow,
       proof_facts: facts,
     };

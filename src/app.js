@@ -1,4 +1,5 @@
 import { createBindingMismatchEvents, proofEventsFromPublicLog, reduceDemoProofEvents } from "./demo-proof-state.mjs";
+import { createPublicProofExport, deriveDemoPresentation } from "./demo-presentation.mjs";
 
 const VERIFIED_MAINNET_PROOF_PATH = "fixtures/verified-mainnet-run/proof.json";
 const VERIFIED_MAINNET_EVENTS_PATH = "fixtures/verified-mainnet-run/events.public.json";
@@ -145,13 +146,13 @@ function verifyLoadedPublicProof() {
 }
 
 function downloadPublicProof() {
-  if (!state.demo.proof) return;
-  const payload = {
+  if (!state.demo.proof || state.demo.mode !== "verified") return;
+  const payload = createPublicProofExport({
     proof: state.demo.proof,
-    public_event_log: state.demo.publicEventLog,
-    replay_state: state.demo.reduced,
-    exported_at: new Date().toISOString(),
-  };
+    publicEventLog: state.demo.publicEventLog,
+    replay: state.demo.reduced,
+    mode: state.demo.mode,
+  });
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -216,16 +217,14 @@ function renderApp() {
   const proof = demo.proof;
   const replay = demo.reduced;
   const mismatch = demo.mode === "mismatch";
-  const loaded = demo.status === "success" && proof;
-
-  const threshold = proof?.vault?.threshold ?? replay.frost.threshold ?? 2;
-  const total = proof?.vault?.participants_total ?? replay.frost.participant_total ?? 3;
-  const unavailable = proof?.availability?.unavailable ?? replay.frost.unavailable_participant_count ?? 1;
-  const selectedSigners = proof?.frost?.selected_signers ?? replay.frost.selected_public_fingerprints;
-  const chainStatus = proof?.transaction?.chain_status ?? replay.chain.status;
-  const txid = proof?.transaction?.txid ?? replay.chain.txid;
-  const verifyLabel =
-    demo.verifyStatus === "pass" ? "Proof Verified" : demo.verifyStatus === "fail" ? "Proof Blocked" : "Verify Proof";
+  const presentation = deriveDemoPresentation({
+    mode: demo.mode,
+    proof,
+    replay,
+    verifyStatus: demo.verifyStatus,
+  });
+  const { threshold, total, unavailable } = presentation;
+  const { chainStatus, txid } = presentation.recorded;
 
   return `
     <div class="shell">
@@ -252,23 +251,24 @@ function renderApp() {
                 <button class="primary-action" id="loadVerifiedDemo" type="button">
                   ${demo.status === "loading" ? "Loading..." : "Replay Verified Mainnet Run"}
                 </button>
-                <button class="secondary-action" id="verifyPublicProof" type="button" ${loaded ? "" : "disabled"}>${verifyLabel}</button>
+                <button class="secondary-action" id="verifyPublicProof" type="button" ${presentation.verifier.enabled ? "" : "disabled"}>${presentation.verifier.label}</button>
               </div>
+              ${
+                mismatch
+                  ? `<p class="required-sentence"><strong>Counterfactual safety test active.</strong> The receipt beside it is the immutable recorded-run reference; the synthetic path below stops before FROST and does not reuse its later outcomes.</p>`
+                  : ""
+              }
             </div>
             <dl class="verified-demo__receipt">
-              ${renderProofFact("Run ID", proof?.run_id)}
+              ${renderProofFact(presentation.recorded.receiptLabel, proof?.run_id)}
               ${renderProofFact("UTC timestamp", proof?.recorded_at)}
-              ${renderProofFact("Txid", txid)}
-              ${renderProofFact("Chain status", chainStatus)}
+              ${renderProofFact(presentation.recorded.txidLabel, txid)}
+              ${renderProofFact(presentation.recorded.chainStatusLabel, chainStatus)}
             </dl>
           </div>
 
           <div class="evidence-strip" aria-label="Verified evidence strip">
-            <span>ZCASH MAINNET</span>
-            <span>${escapeHtml(`${threshold} OF ${total}`)}</span>
-            <span>FROST</span>
-            <span>${escapeHtml(`${unavailable} UNAVAILABLE`)}</span>
-            <span>${demo.verifyStatus === "fail" ? "PROOF BLOCKED" : "PROOF VERIFIED"}</span>
+            ${presentation.evidenceStrip.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
           </div>
 
           ${
@@ -304,11 +304,16 @@ function renderApp() {
               <h3>Binding Firewall: field-level safety gate</h3>
             </div>
             <div class="demo-mode-toggle" aria-label="Binding proof mode">
-              <button type="button" class="${mismatch ? "" : "demo-mode-toggle__active"}" data-demo-mode="verified">PASS</button>
-              <button type="button" class="${mismatch ? "demo-mode-toggle__active" : ""}" data-demo-mode="mismatch">Mismatch</button>
+              <button type="button" class="${mismatch ? "" : "demo-mode-toggle__active"}" data-demo-mode="verified" aria-pressed="${mismatch ? "false" : "true"}">PASS</button>
+              <button type="button" class="${mismatch ? "demo-mode-toggle__active" : ""}" data-demo-mode="mismatch" aria-pressed="${mismatch ? "true" : "false"}">Mismatch</button>
             </div>
           </div>
           ${mismatch ? `<div class="safety-test-label">SAFETY TEST &mdash; NOT A BROADCAST TRANSACTION</div>` : ""}
+          ${
+            mismatch
+              ? `<div class="safety-test-summary" role="status"><strong>Binding Firewall: FAIL</strong><span>Signing blocked before FROST. No completion, broadcast, or proof export.</span></div>`
+              : ""
+          }
           <ul class="binding-check-list">
             ${Object.entries(replay.binding.check_statuses)
               .map(([field, status]) => renderBindingCheck(field, status))
@@ -326,21 +331,48 @@ function renderApp() {
           <div class="section-heading section-heading--compact">
             <div>
               <p class="eyebrow">Step 3 &mdash; Authorize</p>
-              <h3>Threshold authorization with one participant unavailable</h3>
+              <h3>${mismatch ? "Authorization blocked before FROST begins" : "Threshold authorization with one participant unavailable"}</h3>
             </div>
             <span>${escapeHtml(`${threshold}-of-${total}`)}</span>
           </div>
           <div class="participant-row">
-            <span class="participant-pill participant-pill--available">Signer A available</span>
-            <span class="participant-pill participant-pill--available">Signer B available</span>
-            <span class="participant-pill participant-pill--unavailable">Signer C unavailable</span>
+            ${
+              mismatch
+                ? `
+                  <span class="participant-pill participant-pill--unavailable">Signer A not contacted</span>
+                  <span class="participant-pill participant-pill--unavailable">Signer B not contacted</span>
+                  <span class="participant-pill participant-pill--unavailable">FROST not started</span>
+                `
+                : `
+                  <span class="participant-pill participant-pill--available">Signer A available</span>
+                  <span class="participant-pill participant-pill--available">Signer B available</span>
+                  <span class="participant-pill participant-pill--unavailable">Signer C unavailable</span>
+                `
+            }
           </div>
-          <p class="required-sentence">One participant is unavailable. The 2-of-3 threshold remains satisfiable.</p>
-          <p class="required-sentence required-sentence--complete">This mainnet proof run completed without the unavailable participant.</p>
+          <p class="required-sentence">
+            ${
+              mismatch
+                ? "The synthetic recipient mismatch blocks signing before either available signer enters a FROST round."
+                : "One participant is unavailable. The 2-of-3 threshold remains satisfiable."
+            }
+          </p>
+          <p class="required-sentence ${mismatch ? "" : "required-sentence--complete"}">
+            ${
+              mismatch
+                ? "No aggregate signature, completed PCZT, or broadcast exists for this counterfactual safety test."
+                : "This mainnet proof run completed without the unavailable participant."
+            }
+          </p>
           <dl class="mainnet-stats">
-            ${renderProofFact("FROST threshold status", replay.frost.threshold_status)}
-            ${renderProofFact("Aggregate signature", proof?.frost?.aggregate_signature_status)}
-            ${renderProofFact("Selected signer fingerprints", selectedSigners?.map((value) => shortHex(value)).join(", "))}
+            ${renderProofFact("FROST threshold status", presentation.authorization.thresholdStatus)}
+            ${renderProofFact("Aggregate signature", presentation.authorization.aggregateStatus)}
+            ${renderProofFact(
+              "Selected signer fingerprints",
+              mismatch
+                ? "NONE — SAFETY TEST BLOCKED"
+                : presentation.authorization.selectedSigners.map((value) => shortHex(value)).join(", "),
+            )}
             ${renderProofFact("Ciphersuite", proof?.vault?.ciphersuite)}
           </dl>
         </section>
@@ -349,39 +381,45 @@ function renderApp() {
           <div class="section-heading">
             <div>
               <p class="eyebrow">Step 4 &mdash; Prove</p>
-              <h3>Run state is derived from recorded events</h3>
+              <h3>${mismatch ? "Synthetic safety-test state stops at the failed review" : "Run state is derived from recorded events"}</h3>
             </div>
-            <span>${escapeHtml(`${replay.events_seen} events`)}</span>
+            <span>${escapeHtml(`${replay.events_seen} ${mismatch ? "synthetic " : ""}events`)}</span>
           </div>
           <ol class="demo-flow">
             ${renderFlowStep("Vault", `${threshold}-of-${total} redpallas-rerandomized FROST group`, Boolean(threshold))}
-            ${renderFlowStep("Failure condition", `${unavailable} participant unavailable; threshold still satisfiable`, replay.frost.unavailable_participant_count !== null)}
+            ${renderFlowStep(
+              "Failure condition",
+              mismatch ? "RECIPIENT MISMATCH — SYNTHETIC SAFETY TEST" : `${unavailable} participant unavailable; threshold still satisfiable`,
+              !mismatch && replay.frost.unavailable_participant_count !== null,
+            )}
             ${renderFlowStep("Intent", proof?.intent?.commitment ?? "Intent commitment recorded", Boolean(proof?.intent?.commitment))}
-            ${renderFlowStep("Binding Firewall", replay.binding.status, replay.readiness.binding_passed)}
-            ${renderFlowStep("FROST authorization", replay.frost.threshold_status, replay.readiness.threshold_reached)}
-            ${renderFlowStep("PCZT completion", replay.pczt.combine_status, replay.readiness.combined_pczt)}
-            ${renderFlowStep("Mainnet", `${chainStatus} / ${proofValue(txid)}`, Boolean(txid))}
-            ${renderFlowStep("Proof", proof?.bundle_hash ?? "Bundle hash pending", Boolean(proof?.bundle_hash))}
+            ${renderFlowStep("Binding Firewall", presentation.flow.binding.detail, presentation.flow.binding.complete)}
+            ${renderFlowStep("FROST authorization", presentation.flow.frost.detail, presentation.flow.frost.complete)}
+            ${renderFlowStep("PCZT completion", presentation.flow.pczt.detail, presentation.flow.pczt.complete)}
+            ${renderFlowStep("Mainnet", presentation.flow.mainnet.detail, presentation.flow.mainnet.complete)}
+            ${renderFlowStep("Proof", presentation.flow.proof.detail, presentation.flow.proof.complete)}
           </ol>
 
           <div class="verified-demo__actions">
-            <button class="secondary-action" id="downloadPublicProof" type="button" ${loaded ? "" : "disabled"}>Download Public Proof</button>
+            <button class="secondary-action" id="downloadPublicProof" type="button" ${presentation.downloadEnabled ? "" : "disabled"}>
+              ${mismatch ? "Proof Download Disabled in Safety Test" : "Download Public Proof"}
+            </button>
           </div>
 
           <dl class="mainnet-stats proof-route-panel__facts">
-            ${renderProofFact("Run ID", proof?.run_id)}
-            ${renderProofFact("Recorded Verified Mainnet Run", demo.publicEventLog?.label)}
-            ${renderProofFact("UTC timestamp", proof?.recorded_at)}
-            ${renderProofFact("Txid", txid)}
-            ${renderProofFact("Recorded chain status", chainStatus)}
-            ${renderProofFact("Block height", proof?.transaction?.observed_block_height)}
-            ${renderProofFact("Binding status", mismatch ? replay.binding.status : proof?.pczt?.binding_status)}
-            ${renderProofFact("Proof bundle hash", proof?.bundle_hash)}
-            ${renderProofFact("Exact ZecSafe commit", proof?.zecsafe_commit)}
-            ${renderProofFact("frost-tools commit", proof?.toolchain?.frost_tools_commit)}
-            ${renderProofFact("zcash-devtool commit", proof?.toolchain?.zcash_devtool_commit)}
-            ${renderProofFact("pczt signer library commit", proof?.toolchain?.pczt_signer_library_commit)}
+            ${presentation.proofFacts.map(([label, value]) => renderProofFact(label, value)).join("")}
           </dl>
+
+          ${
+            mismatch
+              ? `
+                <div class="prototype-note">
+                  <strong>The recorded proof remains unchanged.</strong>
+                  <p>Return to PASS mode to verify or download the immutable recorded mainnet run. This counterfactual state cannot be exported as that proof.</p>
+                </div>
+              `
+              : ""
+          }
 
           <div class="prototype-note">
             <strong>Verify this yourself, without trusting this page.</strong>

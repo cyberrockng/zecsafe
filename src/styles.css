@@ -3678,6 +3678,29 @@ dd {
   letter-spacing: 0;
 }
 
+.safety-test-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 12px;
+  border: 1px solid rgba(216, 92, 67, 0.5);
+  border-radius: 8px;
+  background: rgba(216, 92, 67, 0.1);
+  color: #8c2d1d;
+}
+
+.safety-test-summary strong {
+  flex: 0 0 auto;
+}
+
+.safety-test-summary span {
+  font-size: 0.84rem;
+  font-weight: 750;
+  text-align: right;
+}
+
 .binding-check-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3795,6 +3818,15 @@ dd {
 
   .evidence-strip {
     display: grid;
+  }
+
+  .safety-test-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .safety-test-summary span {
+    text-align: left;
   }
 
   .verified-demo__actions button {
