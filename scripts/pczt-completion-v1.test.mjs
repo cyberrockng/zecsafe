@@ -99,6 +99,64 @@ function checkStatus(result, field) {
 
 {
   const result = completePcztV1({
+    completionPackage: basePackage({
+      broadcast_status: "CONFIRMED",
+      broadcast_approval: {
+        approved: true,
+        approval_statement: "I approve broadcasting this transaction to mainnet.",
+        approved_txid: "0".repeat(64),
+      },
+    }),
+  });
+  assert.equal(result.status, "PASS");
+  assert.equal(result.broadcast_status, "CONFIRMED");
+  assert.equal(checkStatus(result, "broadcast_gate"), "PASS");
+  assert.match(result.proof_event.public_message, /explicit recorded human approval/);
+}
+
+{
+  const result = completePcztV1({
+    completionPackage: basePackage({ broadcast_status: "CONFIRMED" }),
+  });
+  assert.equal(result.status, "FAIL");
+  assert.equal(checkStatus(result, "broadcast_gate"), "FAIL");
+}
+
+{
+  const result = completePcztV1({
+    completionPackage: basePackage({
+      broadcast_status: "REJECTED",
+      broadcast_approval: { approved: true, approval_statement: "approved anyway" },
+    }),
+  });
+  assert.equal(result.status, "FAIL");
+  assert.equal(checkStatus(result, "broadcast_gate"), "FAIL");
+}
+
+assert.throws(
+  () =>
+    completePcztV1({
+      completionPackage: basePackage({
+        broadcast_status: "CONFIRMED",
+        broadcast_approval: { approved: false, approval_statement: "not really approved" },
+      }),
+    }),
+  /broadcast_approval.approved must be true/,
+);
+
+assert.throws(
+  () =>
+    completePcztV1({
+      completionPackage: basePackage({
+        broadcast_status: "CONFIRMED",
+        broadcast_approval: { approved: true, approval_statement: "   " },
+      }),
+    }),
+  /approval_statement must be a non-empty string/,
+);
+
+{
+  const result = completePcztV1({
     completionPackage: basePackage({ signed_pczt: { signature_source: "mock_signature" } }),
   });
   assert.equal(result.status, "FAIL");

@@ -1,0 +1,139 @@
+{
+  "schema_version": "zecsafe-mainnet-view-preflight-v1",
+  "task_id": "ZSAFE-P0-018",
+  "source_env_task_id": "ZSAFE-P0-017",
+  "source_env_run_id": "p0-017-20260711T231314Z",
+  "recorded_at": "2026-07-12T11:24:46.916Z",
+  "status": "WAIT_FUNDING",
+  "network": "main",
+  "wallet_type": "UFVK/view-only",
+  "account": {
+    "account_id": "9b81aa0f-5216-4007-977d-f8e95ac0ace9",
+    "birthday_height": 3408981,
+    "name": "ZecSafeP017View",
+    "source": "imported",
+    "purpose": "view-only"
+  },
+  "address": {
+    "orchard_address": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+    "inspect_network": "main",
+    "inspect_kind": "Unified Address",
+    "receivers": [
+      "Orchard"
+    ]
+  },
+  "sync": {
+    "status": "SYNC_COMMAND_FAILED",
+    "attempted": true,
+    "exit_status": 1,
+    "failure_reason": "unrecognized_shielded_protocol",
+    "observed_tip_height": 3409672
+  },
+  "balance": {
+    "observed": false,
+    "funded_value_observed": false,
+    "total_zatoshis": null,
+    "sapling_spendable_zatoshis": null,
+    "orchard_spendable_zatoshis": null,
+    "ironwood_spendable_zatoshis": null,
+    "transparent_spendable_zatoshis": null
+  },
+  "toolchain": {
+    "zecsafe_commit": "38c2464a8512dade6c5e11511ce81d2864896339",
+    "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+    "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "zf_frost_commit": "2016e44ba4a4757a996300350063b937a2ad33e8",
+    "zcash_sign_network": "main"
+  },
+  "coordinator_workspace": {
+    "scan_scope": "view-only-wallet-dir",
+    "spend_key_absent": true,
+    "participant_share_absent": true
+  },
+  "checks": [
+    {
+      "name": "network_main",
+      "status": "PASS",
+      "evidence": {
+        "fixture_network": "main",
+        "chain_name": "main"
+      }
+    },
+    {
+      "name": "wallet_type_view_only",
+      "status": "PASS",
+      "evidence": {
+        "fixture_wallet_type": "view-only",
+        "account_purpose": "view-only",
+        "account_source": "imported"
+      }
+    },
+    {
+      "name": "birthday_height_recorded",
+      "status": "PASS",
+      "evidence": {
+        "birthday_height": 3408981
+      }
+    },
+    {
+      "name": "observed_tip_recorded",
+      "status": "PASS",
+      "evidence": {
+        "observed_tip_height": 3409672,
+        "source": "mainnet_info"
+      }
+    },
+    {
+      "name": "address_main_orchard",
+      "status": "PASS",
+      "evidence": {
+        "address_type": "orchard-only unified address",
+        "inspect_network": "main",
+        "inspect_kind": "Unified Address",
+        "receivers": [
+          "Orchard"
+        ]
+      }
+    },
+    {
+      "name": "sync_status",
+      "status": "WAIT",
+      "evidence": {
+        "sync_status": "SYNC_COMMAND_FAILED",
+        "failure_reason": "unrecognized_shielded_protocol",
+        "balance_command_status": "WAIT",
+        "reason": "Insufficient information to build a wallet summary."
+      }
+    },
+    {
+      "name": "funded_value_observed",
+      "status": "WAIT",
+      "evidence": {
+        "balance_observed": false,
+        "total_zatoshis": null,
+        "minimum_required_zatoshis": 1
+      }
+    },
+    {
+      "name": "no_spend_key_in_coordinator_workspace",
+      "status": "PASS",
+      "evidence": {
+        "scan_scope": "view-only-wallet-dir"
+      }
+    },
+    {
+      "name": "no_participant_share_in_coordinator_workspace",
+      "status": "PASS",
+      "evidence": {
+        "scan_scope": "view-only-wallet-dir"
+      }
+    }
+  ],
+  "limitations": [
+    "This preflight is allowed to remain WAIT_FUNDING until funded value is observed.",
+    "P0-018 is not complete until funded_value_observed is PASS.",
+    "The public report excludes UFVK, wallet database contents, participant configs, contact tokens, shares, seeds, and spending keys.",
+    "No transaction is created or broadcast by this preflight."
+  ],
+  "preflight_ref": "sha256:414e1683b7d259d89abc0dca1632c5b79fbf2c85b4fda5050be628a71db75adc"
+}

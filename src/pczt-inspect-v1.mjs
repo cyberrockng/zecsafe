@@ -176,12 +176,21 @@ function parseFooter(lines, cursor) {
   if (!versionMatch) invalidPcztReview("missing transaction version.");
   const transactionVersion = versionMatch[1];
   cursor += 1;
+
+  let shieldedSighash = null;
+  const sighashLine = lines[cursor];
+  if (sighashLine !== undefined && sighashLine.startsWith("Sighash for shielded components:")) {
+    const sighashMatch = sighashLine.match(/^Sighash for shielded components: ([0-9a-f]{64})$/);
+    if (!sighashMatch) invalidPcztReview("malformed shielded sighash line.");
+    shieldedSighash = sighashMatch[1];
+    cursor += 1;
+  }
   cursor = skipBlankLines(lines, cursor);
 
   if (cursor !== lines.length) invalidPcztReview("unexpected extra inspect output.");
   if (!HEX_64_PATTERN.test(transactionId)) invalidPcztReview("transaction id must be 64 lowercase hex characters.");
 
-  return { transactionId, transactionVersion };
+  return { transactionId, transactionVersion, shieldedSighash };
 }
 
 function parseTransparentReview(lines, network) {
@@ -212,36 +221,42 @@ function parseTransparentReview(lines, network) {
   };
 }
 
-function parseIronwoodSpend(line) {
+const SHIELDED_ACTION_POOLS = {
+  Ironwood: "ironwood",
+  Orchard: "orchard",
+};
+
+function parseShieldedSpend(line, label) {
   if (line === "  - Spend: Zero value (likely a dummy)") return 0;
   const match = line.match(/^  - Spend: (\d+) zatoshis$/);
-  if (!match) invalidPcztReview("malformed Ironwood spend line.");
+  if (!match) invalidPcztReview(`malformed ${label} spend line.`);
   const amount = Number(match[1]);
-  if (!Number.isSafeInteger(amount)) invalidPcztReview("Ironwood spend amount is not a safe integer.");
+  if (!Number.isSafeInteger(amount)) invalidPcztReview(`${label} spend amount is not a safe integer.`);
   return amount;
 }
 
-function parseIronwoodOutput(line, network, index) {
+function parseShieldedOutput(line, network, index, label, pool) {
   const match = line.match(/^  - Output: (\d+) zatoshis(?: to ([^\s]+))?$/);
-  if (!match) invalidPcztReview("malformed Ironwood output line.");
+  if (!match) invalidPcztReview(`malformed ${label} output line.`);
   const amount = Number(match[1]);
   const recipient = match[2] ?? null;
-  if (!Number.isSafeInteger(amount)) invalidPcztReview("Ironwood output amount is not a safe integer.");
+  if (!Number.isSafeInteger(amount)) invalidPcztReview(`${label} output amount is not a safe integer.`);
   if (recipient) assertRecipientNetwork(recipient, network);
 
   return {
     index,
     amount_zatoshis: amount,
     recipient,
-    pool: "ironwood",
+    pool,
     role: recipient ? "recipient" : "change",
     recipient_status: recipient ? "reported_by_zcash_devtool_inspect" : "not_reported_by_zcash_devtool_inspect",
   };
 }
 
-function parseIronwoodReview(lines, network) {
+function parseShieldedReview(lines, network, label) {
+  const pool = SHIELDED_ACTION_POOLS[label];
   let cursor = 0;
-  const count = parseColonHeader(requireLine(lines, cursor, "Ironwood actions header"), "Ironwood actions");
+  const count = parseColonHeader(requireLine(lines, cursor, `${label} actions header`), `${label} actions`);
   cursor += 1;
 
   let inputTotal = 0;
@@ -250,17 +265,17 @@ function parseIronwoodReview(lines, network) {
   const outputs = [];
 
   for (let expectedIndex = 0; expectedIndex < count; expectedIndex += 1) {
-    const actionLine = requireLine(lines, cursor, "Ironwood action");
+    const actionLine = requireLine(lines, cursor, `${label} action`);
     const actionMatch = actionLine.match(/^- (\d+):$/);
-    if (!actionMatch) invalidPcztReview("malformed Ironwood action line.");
+    if (!actionMatch) invalidPcztReview(`malformed ${label} action line.`);
     const index = Number(actionMatch[1]);
-    if (index !== expectedIndex) invalidPcztReview("Ironwood action indexes must be contiguous.");
+    if (index !== expectedIndex) invalidPcztReview(`${label} action indexes must be contiguous.`);
     cursor += 1;
 
-    const spend = parseIronwoodSpend(requireLine(lines, cursor, "Ironwood spend"));
+    const spend = parseShieldedSpend(requireLine(lines, cursor, `${label} spend`), label);
     cursor += 1;
 
-    const output = parseIronwoodOutput(requireLine(lines, cursor, "Ironwood output"), network, index);
+    const output = parseShieldedOutput(requireLine(lines, cursor, `${label} output`), network, index, label, pool);
     cursor += 1;
 
     inputTotal += spend;
@@ -283,14 +298,16 @@ function parseIronwoodReview(lines, network) {
 
   const reportedOutputs = outputs.filter((output) => output.recipient);
   return {
-    pool: "ironwood",
-    ironwood_action_count: count,
-    ironwood_actions: actions,
+    pool,
+    [`${pool}_action_count`]: count,
+    [`${pool}_actions`]: actions,
+    shielded_action_count: count,
+    shielded_actions: actions,
     outputs,
     recipients: reportedOutputs.map((output) => output.recipient),
     amounts_zatoshis: reportedOutputs.map((output) => output.amount_zatoshis),
     fee_metadata: {
-      status: "computed_from_ironwood_action_values",
+      status: `computed_from_${pool}_action_values`,
       input_total_zatoshis: inputTotal,
       output_total_zatoshis: outputTotal,
       fee_zatoshis: fee,
@@ -298,6 +315,7 @@ function parseIronwoodReview(lines, network) {
     output_count: outputs.length,
     transaction_id: footer.transactionId,
     transaction_version: footer.transactionVersion,
+    shielded_sighash: footer.shieldedSighash,
   };
 }
 
@@ -319,8 +337,9 @@ export function parseZcashDevtoolPcztInspect(rawInspect, options = {}) {
   const fingerprint =
     pcztBytes === undefined ? assertFingerprint(pcztFingerprint, "pczt_fingerprint") : sha256Fingerprint(pcztBytes);
   const lines = rawInspect.replace(/\r\n/g, "\n").trimEnd().split("\n");
-  const parsed = lines[0]?.endsWith(" Ironwood actions:")
-    ? parseIronwoodReview(lines, normalizedNetwork)
+  const shieldedLabel = Object.keys(SHIELDED_ACTION_POOLS).find((label) => lines[0]?.endsWith(` ${label} actions:`));
+  const parsed = shieldedLabel
+    ? parseShieldedReview(lines, normalizedNetwork, shieldedLabel)
     : parseTransparentReview(lines, normalizedNetwork);
 
   return {
@@ -340,11 +359,14 @@ export function parseZcashDevtoolPcztInspect(rawInspect, options = {}) {
     transaction_id: parsed.transaction_id,
     transaction_version: parsed.transaction_version,
     ...(parsed.outputs ? { outputs: parsed.outputs } : {}),
-    ...(parsed.ironwood_action_count === undefined
+    ...(parsed.shielded_action_count === undefined
       ? {}
       : {
-          ironwood_action_count: parsed.ironwood_action_count,
-          ironwood_actions: parsed.ironwood_actions,
+          [`${parsed.pool}_action_count`]: parsed.shielded_action_count,
+          [`${parsed.pool}_actions`]: parsed.shielded_actions,
+          shielded_action_count: parsed.shielded_action_count,
+          shielded_actions: parsed.shielded_actions,
         }),
+    ...(parsed.shielded_sighash ? { shielded_sighash: parsed.shielded_sighash } : {}),
   };
 }

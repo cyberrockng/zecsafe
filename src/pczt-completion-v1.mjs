@@ -9,6 +9,7 @@ export const PCZT_COMPLETION_SCHEMA_VERSION = "zecsafe-pczt-completion-v1";
 
 const HASH_PATTERN = /^sha256:[0-9a-f]{64}$/;
 const RUN_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/;
+const APPROVED_BROADCAST_STATUSES = new Set(["SUBMITTED", "OBSERVED", "MINED", "CONFIRMED"]);
 const CHECK_FIELDS = [
   "source_pczt",
   "signing_context",
@@ -186,6 +187,22 @@ function normalizeFinalBinding(input) {
   };
 }
 
+function normalizeBroadcastApproval(input) {
+  if (input === undefined || input === null) return null;
+  if (!isPlainObject(input)) invalidCompletion("broadcast_approval must be an object when provided.");
+  if (input.approved !== true) invalidCompletion("broadcast_approval.approved must be true when provided.");
+  if (typeof input.approval_statement !== "string" || !input.approval_statement.trim()) {
+    invalidCompletion("broadcast_approval.approval_statement must be a non-empty string.");
+  }
+  return {
+    approved: true,
+    approval_statement: input.approval_statement.trim(),
+    ...(typeof input.approved_txid === "string" && input.approved_txid.trim()
+      ? { approved_txid: input.approved_txid.trim() }
+      : {}),
+  };
+}
+
 function normalizePackage(input) {
   if (!isPlainObject(input)) invalidCompletion("PCZT completion package must be an object.");
   assertNoPrivateFields(input);
@@ -203,6 +220,7 @@ function normalizePackage(input) {
     proven_pczt: normalizeProvenPczt(input.proven_pczt),
     combined_pczt: normalizeCombinedPczt(input.combined_pczt),
     final_binding: normalizeFinalBinding(input.final_binding),
+    broadcast_approval: normalizeBroadcastApproval(input.broadcast_approval),
   };
 }
 
@@ -257,7 +275,14 @@ function evaluateChecks(pkg) {
     makeCheck("proven_pczt", provenMatches, "Proven PCZT was produced separately from the same source PCZT."),
     makeCheck("pczt_combine", combineMatches, "Combined PCZT consumes the signed and proven PCZT fingerprints and emits a new final fingerprint."),
     makeCheck("final_binding", bindingMatches, "Final combined PCZT re-ran binding verification and still matches the reviewed intent."),
-    makeCheck("broadcast_gate", pkg.broadcast_status === "NOT_BROADCAST", "Completion proof stops before broadcast unless a separate human approval is provided."),
+    makeCheck(
+      "broadcast_gate",
+      pkg.broadcast_status === "NOT_BROADCAST" ||
+        (APPROVED_BROADCAST_STATUSES.has(pkg.broadcast_status) && pkg.broadcast_approval !== null),
+      pkg.broadcast_status === "NOT_BROADCAST"
+        ? "Completion proof stops before broadcast unless a separate human approval is provided."
+        : "Broadcast-related status is allowed only with an explicit recorded human approval.",
+    ),
   ];
 }
 
@@ -278,7 +303,9 @@ export function pcztCompletionProofEvent(completion, options = {}) {
     evidence_ref: resultEvidence(completion),
     public_message:
       completion.status === "PASS"
-        ? "Signed, proven, and combined PCZT passed final binding without broadcasting."
+        ? completion.broadcast_status === "NOT_BROADCAST"
+          ? "Signed, proven, and combined PCZT passed final binding without broadcasting."
+          : "Signed, proven, and combined PCZT passed final binding; broadcast occurred under explicit recorded human approval."
         : "PCZT completion did not pass all signing, proving, combine, and binding checks.",
     data: {
       pczt_fingerprint: completion.final_pczt_fingerprint,

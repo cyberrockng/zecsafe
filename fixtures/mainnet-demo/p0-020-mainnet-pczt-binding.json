@@ -1,0 +1,271 @@
+{
+  "schema_version": "zecsafe-mainnet-pczt-binding-v1",
+  "task_id": "ZSAFE-P0-020",
+  "source_intent_task_id": "ZSAFE-P0-019",
+  "source_intent_fixture": "fixtures/mainnet-demo/p0-019-mainnet-proof-intent.json",
+  "recorded_at": "2026-07-12T14:19:39.000Z",
+  "status": "PASS",
+  "network": "main",
+  "external_run": "p0-020-20260712T141448Z",
+  "pczt_creation": {
+    "tool": "zcash-devtool (P0-018 pre-Ironwood compatibility worktree)",
+    "base_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "compatibility_patch_ref": "sha256:4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e",
+    "command": "zcash-devtool pczt -w <frost-view wallet> create --address <vault orchard address> --value 5000 9b81aa0f-5216-4007-977d-f8e95ac0ace9",
+    "wallet_type": "UFVK/view-only",
+    "synced_tip_before_create": 3409805,
+    "pczt_byte_length": 4897,
+    "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931"
+  },
+  "inspect_review": {
+    "network": "main",
+    "source_fingerprint": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14",
+    "source": "zcash-devtool pczt inspect",
+    "tool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "pool": "orchard",
+    "recipients": [
+      "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0"
+    ],
+    "amounts_zatoshis": [
+      5000
+    ],
+    "memo_metadata": {
+      "status": "not_reported_by_zcash_devtool_inspect"
+    },
+    "fee_metadata": {
+      "status": "computed_from_orchard_action_values",
+      "input_total_zatoshis": 20000,
+      "output_total_zatoshis": 10000,
+      "fee_zatoshis": 10000
+    },
+    "output_count": 2,
+    "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+    "transaction_id": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+    "transaction_version": "V5",
+    "outputs": [
+      {
+        "index": 0,
+        "amount_zatoshis": 5000,
+        "recipient": null,
+        "pool": "orchard",
+        "role": "change",
+        "recipient_status": "not_reported_by_zcash_devtool_inspect"
+      },
+      {
+        "index": 1,
+        "amount_zatoshis": 5000,
+        "recipient": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+        "pool": "orchard",
+        "role": "recipient",
+        "recipient_status": "reported_by_zcash_devtool_inspect"
+      }
+    ],
+    "orchard_action_count": 2,
+    "orchard_actions": [
+      {
+        "index": 0,
+        "spend_zatoshis": 20000,
+        "output_zatoshis": 5000,
+        "output_role": "change"
+      },
+      {
+        "index": 1,
+        "spend_zatoshis": 0,
+        "output_zatoshis": 5000,
+        "output_role": "recipient"
+      }
+    ],
+    "shielded_action_count": 2,
+    "shielded_actions": [
+      {
+        "index": 0,
+        "spend_zatoshis": 20000,
+        "output_zatoshis": 5000,
+        "output_role": "change"
+      },
+      {
+        "index": 1,
+        "spend_zatoshis": 0,
+        "output_zatoshis": 5000,
+        "output_role": "recipient"
+      }
+    ],
+    "shielded_sighash_fingerprint": "sha256:aadf4d885fa722b766c4a35563c88464edb43432f411e2460fe56a52d7cb85c8"
+  },
+  "budget": {
+    "project_budget_zatoshis": 20000,
+    "intent_amount_zatoshis": 5000,
+    "max_fee_zatoshis": 15000,
+    "actual_fee_zatoshis": 10000,
+    "amount_plus_actual_fee_zatoshis": 15000,
+    "within_budget": true,
+    "self_send": true,
+    "worst_case_net_debit_zatoshis": 10000,
+    "note": "Both outputs (5000 payment + 5000 change) return to the vault; only the 10000-zatoshi ZIP-317 fee would leave the budget if broadcast is later approved. Nothing has been spent yet."
+  },
+  "binding_firewall_report": {
+    "schema_version": "zecsafe-binding-report-v1",
+    "run_id": "p0-020-20260712T141448Z",
+    "intent_commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+    "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+    "source_fingerprint": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14",
+    "network_check": {
+      "field": "network",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:720265460a5ca97a95b6288faa922725aafcb98d56afc75a41b31cb01a96eee6",
+      "observed_commitment": "sha256:56d83a21a1fbc6d464c715170e61e6d3263835d901c4b21ca63a3bcafbf31df2",
+      "reason": "Intent network matches PCZT review network."
+    },
+    "recipient_check": {
+      "field": "recipient",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:41e12f86358d7d086cf186a91c9f09c8dbdaa56ef710a9c661b6e2cf5c4fdc09",
+      "observed_commitment": "sha256:763cc677f1ad3dae03f01e4a04b428af6bebee850d904b8ba0e52b19e93ec1e6",
+      "reason": "Exactly one non-change recipient matches the reviewed intent."
+    },
+    "amount_check": {
+      "field": "amount",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:dc5ede0367152501542349f814dbb7675747d219d6513da74bb1459edaff38f0",
+      "observed_commitment": "sha256:2b250bc40c72aca2ae6e9d8e922cd1b6c46437a07091d9599635a03057fc736d",
+      "reason": "Exactly one non-change amount matches the reviewed intent."
+    },
+    "fee_policy_check": {
+      "field": "fee_policy",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:158e4224e509fea76276e0744186d06b2415948345131ab78fd8ba5a72181e15",
+      "observed_commitment": "sha256:2ddbe470ee3690ca9ea495d60e9d65ff8c0e89237cf800d0ff8b08fb7bf724a5",
+      "reason": "Observed fee is within the reviewed fee policy."
+    },
+    "memo_policy_check": {
+      "field": "memo_policy",
+      "status": "LIMITED",
+      "allows_signing": true,
+      "expected_commitment": "sha256:895b8fb3e556619b8665d5bcc8f07be7195286881c5a6bfbafba2add1995e3bd",
+      "observed_commitment": "sha256:fea7e8121a0df28e522a0194ff49314d023d73a9ab09a6e406bafa10794ea981",
+      "reason": "PCZT inspect output does not expose memo content; empty-intent memo policy is allowed with this recorded limitation."
+    },
+    "unexpected_output_check": {
+      "field": "unexpected_output",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:0c9cad71f6ad768cb016c61573041092869d2a968cfea115f5029fe7afdae89d",
+      "observed_commitment": "sha256:f24bd9bb2794345ae3cd311892e119d976ddfce0766931b3e6d80591fff68d48",
+      "reason": "No extra non-change outputs are present."
+    },
+    "change_output_check": {
+      "field": "change_output",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:5bf9244acee1473e72bf688e3818bc6f214f634e6000552359513bd46de23d20",
+      "observed_commitment": "sha256:54378849f345c6699adb2b1534f81a47f6eac716452e621141709a0127864ee4",
+      "reason": "All change outputs were explicitly modeled by the PCZT review."
+    },
+    "status": "PASS",
+    "blocked_operations": [],
+    "limitation": [
+      "Memo content was not reported by the current PCZT inspect source; only an empty reviewed memo is allowed under this limitation.",
+      "PCZT review does not expose a FROST group fingerprint; this firewall binds intent to PCZT semantics, not signer group membership."
+    ],
+    "checks": [
+      {
+        "field": "source",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:fc8a7e482db1bc7f494c153d49f2307172aa4415bf8a3786eb77427e82e3580a",
+        "observed_commitment": "sha256:a5640b3f01c3fe97761830fe530b6975146ac37f3bce6bad7bacbe8ae5988277",
+        "reason": "PCZT review came from the expected pinned inspect source or omitted optional source fields."
+      },
+      {
+        "field": "network",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:720265460a5ca97a95b6288faa922725aafcb98d56afc75a41b31cb01a96eee6",
+        "observed_commitment": "sha256:56d83a21a1fbc6d464c715170e61e6d3263835d901c4b21ca63a3bcafbf31df2",
+        "reason": "Intent network matches PCZT review network."
+      },
+      {
+        "field": "recipient",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:41e12f86358d7d086cf186a91c9f09c8dbdaa56ef710a9c661b6e2cf5c4fdc09",
+        "observed_commitment": "sha256:763cc677f1ad3dae03f01e4a04b428af6bebee850d904b8ba0e52b19e93ec1e6",
+        "reason": "Exactly one non-change recipient matches the reviewed intent."
+      },
+      {
+        "field": "amount",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:dc5ede0367152501542349f814dbb7675747d219d6513da74bb1459edaff38f0",
+        "observed_commitment": "sha256:2b250bc40c72aca2ae6e9d8e922cd1b6c46437a07091d9599635a03057fc736d",
+        "reason": "Exactly one non-change amount matches the reviewed intent."
+      },
+      {
+        "field": "fee_policy",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:158e4224e509fea76276e0744186d06b2415948345131ab78fd8ba5a72181e15",
+        "observed_commitment": "sha256:2ddbe470ee3690ca9ea495d60e9d65ff8c0e89237cf800d0ff8b08fb7bf724a5",
+        "reason": "Observed fee is within the reviewed fee policy."
+      },
+      {
+        "field": "memo_policy",
+        "status": "LIMITED",
+        "allows_signing": true,
+        "expected_commitment": "sha256:895b8fb3e556619b8665d5bcc8f07be7195286881c5a6bfbafba2add1995e3bd",
+        "observed_commitment": "sha256:fea7e8121a0df28e522a0194ff49314d023d73a9ab09a6e406bafa10794ea981",
+        "reason": "PCZT inspect output does not expose memo content; empty-intent memo policy is allowed with this recorded limitation."
+      },
+      {
+        "field": "unexpected_output",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:0c9cad71f6ad768cb016c61573041092869d2a968cfea115f5029fe7afdae89d",
+        "observed_commitment": "sha256:f24bd9bb2794345ae3cd311892e119d976ddfce0766931b3e6d80591fff68d48",
+        "reason": "No extra non-change outputs are present."
+      },
+      {
+        "field": "change_output",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:5bf9244acee1473e72bf688e3818bc6f214f634e6000552359513bd46de23d20",
+        "observed_commitment": "sha256:54378849f345c6699adb2b1534f81a47f6eac716452e621141709a0127864ee4",
+        "reason": "All change outputs were explicitly modeled by the PCZT review."
+      }
+    ],
+    "summary": {
+      "intent_pczt": "PASS",
+      "frost_session": "ALLOWED"
+    }
+  },
+  "tamper_probe": {
+    "description": "Live negative probe: the P0-019 intent amount was mutated 5000 -> 6000 and re-bound against the same real mainnet PCZT review.",
+    "run_id": "p0-020-tamper-demo",
+    "status": "FAIL",
+    "amount_check_status": "MISMATCH",
+    "frost_session": "BLOCKED",
+    "blocked_operations": [
+      "signing.prepare",
+      "frost.session.start",
+      "broadcast.preview",
+      "broadcast.execute"
+    ]
+  },
+  "parser_change": {
+    "module": "src/pczt-inspect-v1.mjs",
+    "change": "Extended the pinned inspect adapter to parse mainnet Orchard action output and the 'Sighash for shielded components' footer, generalizing the existing Ironwood parser to one shielded-action format class.",
+    "tests": "scripts/pczt-inspect-v1.test.mjs adds Orchard positive and negative coverage"
+  },
+  "boundaries": {
+    "frost_session_started": false,
+    "signatures_created": false,
+    "broadcast_status": "NOT_BROADCAST",
+    "raw_pczt_location": "external run directory only; not committed",
+    "raw_shielded_sighash": "excluded from this fixture; fingerprint only",
+    "next_gate": "explicit human approval before ZSAFE-P0-021 (A+B FROST session with C unavailable)"
+  }
+}

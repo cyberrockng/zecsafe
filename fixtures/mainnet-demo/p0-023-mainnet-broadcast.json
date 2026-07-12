@@ -1,0 +1,88 @@
+{
+  "schema_version": "zecsafe-mainnet-broadcast-evidence-v1",
+  "task_id": "ZSAFE-P0-023",
+  "source_completion_fixture": "fixtures/mainnet-demo/p0-022-mainnet-pczt-completion.json",
+  "recorded_at": "2026-07-12T15:01:30.000Z",
+  "status": "CONFIRMED",
+  "network": "main",
+  "external_run": "p0-023-20260712T145358Z",
+  "human_approval": {
+    "granted": true,
+    "approval_statement": "I approve broadcasting txid 27d0e850\u20268527 to Zcash mainnet.",
+    "approved_txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527"
+  },
+  "broadcast": {
+    "path": "zcash-devtool pczt send (P0-018 pre-Ironwood compatibility binary, base commit 1b065594d958d1cad2deafe7cd2e2fcc2774c46c)",
+    "server": "zecrocks (https://zec.rocks:443), connection direct",
+    "input_pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+    "process_exit_status": 0,
+    "returned_txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+    "returned_txid_matches_approved_txid": true,
+    "returned_txid_matches_offline_extract": true
+  },
+  "confirmation_rule": {
+    "SUBMITTED": "pinned pczt send exited 0 and echoed the txid",
+    "OBSERVED": "the wallet's own light-client sync via zec.rocks lists the txid in wallet list-tx",
+    "MINED": "wallet list-tx reports a mined height for the txid",
+    "CONFIRMED": "observed chain tip height >= mined height + 2 (three confirmations including the mining block)"
+  },
+  "chronology": [
+    {
+      "status": "SUBMITTED",
+      "at_utc": "2026-07-12T14:53:58Z",
+      "evidence": "send process started 14:53:58.727Z, exited 0 at 14:54:20.033Z echoing the txid"
+    },
+    {
+      "status": "OBSERVED",
+      "at_utc": "2026-07-12T14:56:43Z",
+      "evidence": "first post-broadcast wallet sync listed the txid in wallet list-tx"
+    },
+    {
+      "status": "MINED",
+      "at_utc": "2026-07-12T14:56:43Z",
+      "evidence": "wallet list-tx reported mined height 3409837 (block time 2026-07-12T14:54:27Z)",
+      "mined_height": 3409837
+    },
+    {
+      "status": "CONFIRMED",
+      "at_utc": "2026-07-12T14:59:57Z",
+      "evidence": "observed chain tip 3409840 >= 3409837 + 2 (4 confirmations at observation)",
+      "observed_tip": 3409840
+    }
+  ],
+  "wallet_observed_transaction": {
+    "txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+    "mined_height": 3409837,
+    "block_time_utc": "2026-07-12T14:54:27Z",
+    "fee_paid_zatoshis": 10000,
+    "outputs": [
+      {
+        "index": 0,
+        "pool": "orchard",
+        "value_zatoshis": 5000,
+        "classification": "change back to the vault",
+        "memo": "empty"
+      },
+      {
+        "index": 1,
+        "pool": "orchard",
+        "value_zatoshis": 5000,
+        "classification": "self-send payment back to the vault's own Orchard address",
+        "memo": "empty"
+      }
+    ]
+  },
+  "budget_ledger": {
+    "project_budget_zatoshis": 20000,
+    "fee_debited_zatoshis": 10000,
+    "amount_returned_to_vault_zatoshis": 10000,
+    "cumulative_amount_plus_fees_zatoshis": 15000,
+    "within_budget": true,
+    "remaining_vault_value_zatoshis": 10000,
+    "note": "The two new 5000-zatoshi notes are wallet-observed but reported non-spendable until they reach the wallet's note-maturity confirmation depth; no funds are missing."
+  },
+  "boundaries": {
+    "additional_broadcasts": "none; exactly one transaction was broadcast, matching the approved txid",
+    "next_gate": "explicit human approval before ZSAFE-P0-024 (freeze the verified mainnet run fixture)"
+  }
+}

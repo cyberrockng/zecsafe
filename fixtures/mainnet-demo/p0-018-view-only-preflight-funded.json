@@ -1,0 +1,145 @@
+{
+  "schema_version": "zecsafe-mainnet-view-preflight-v1",
+  "task_id": "ZSAFE-P0-018",
+  "source_env_task_id": "ZSAFE-P0-017",
+  "source_env_run_id": "p0-017-20260711T231314Z",
+  "recorded_at": "2026-07-12T13:45:53.014Z",
+  "status": "PASS",
+  "network": "main",
+  "wallet_type": "UFVK/view-only",
+  "account": {
+    "account_id": "9b81aa0f-5216-4007-977d-f8e95ac0ace9",
+    "birthday_height": 3408981,
+    "name": "ZecSafeP017View",
+    "source": "imported",
+    "purpose": "view-only"
+  },
+  "address": {
+    "orchard_address": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+    "inspect_network": "main",
+    "inspect_kind": "Unified Address",
+    "receivers": [
+      "Orchard"
+    ]
+  },
+  "sync": {
+    "status": "SYNC_COMPLETE",
+    "attempted": true,
+    "exit_status": 0,
+    "failure_reason": null,
+    "observed_tip_height": 3409775
+  },
+  "balance": {
+    "observed": true,
+    "funded_value_observed": true,
+    "total_zatoshis": 20000,
+    "sapling_spendable_zatoshis": 0,
+    "orchard_spendable_zatoshis": 20000,
+    "ironwood_spendable_zatoshis": 0,
+    "transparent_spendable_zatoshis": 0
+  },
+  "toolchain": {
+    "zecsafe_commit": "38c2464a8512dade6c5e11511ce81d2864896339",
+    "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+    "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "zf_frost_commit": "2016e44ba4a4757a996300350063b937a2ad33e8",
+    "zcash_sign_network": "main",
+    "zcash_devtool_runtime": {
+      "mode": "p0-018-pre-ironwood-compat",
+      "base_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+      "compatibility_patch_ref": "sha256:4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e",
+      "binary_ref": "sha256:8e8e2110e80bb5ea92924e7300ddcf57cb58e7e4f2a0439404b5b59f836ba0b9"
+    }
+  },
+  "coordinator_workspace": {
+    "scan_scope": "view-only-wallet-dir",
+    "spend_key_absent": true,
+    "participant_share_absent": true
+  },
+  "checks": [
+    {
+      "name": "network_main",
+      "status": "PASS",
+      "evidence": {
+        "fixture_network": "main",
+        "chain_name": "main"
+      }
+    },
+    {
+      "name": "wallet_type_view_only",
+      "status": "PASS",
+      "evidence": {
+        "fixture_wallet_type": "view-only",
+        "account_purpose": "view-only",
+        "account_source": "imported"
+      }
+    },
+    {
+      "name": "birthday_height_recorded",
+      "status": "PASS",
+      "evidence": {
+        "birthday_height": 3408981
+      }
+    },
+    {
+      "name": "observed_tip_recorded",
+      "status": "PASS",
+      "evidence": {
+        "observed_tip_height": 3409775,
+        "source": "balance_summary"
+      }
+    },
+    {
+      "name": "address_main_orchard",
+      "status": "PASS",
+      "evidence": {
+        "address_type": "orchard-only unified address",
+        "inspect_network": "main",
+        "inspect_kind": "Unified Address",
+        "receivers": [
+          "Orchard"
+        ]
+      }
+    },
+    {
+      "name": "sync_status",
+      "status": "PASS",
+      "evidence": {
+        "sync_status": "SYNC_COMPLETE",
+        "failure_reason": null,
+        "balance_command_status": "PASS",
+        "reason": null
+      }
+    },
+    {
+      "name": "funded_value_observed",
+      "status": "PASS",
+      "evidence": {
+        "balance_observed": true,
+        "total_zatoshis": 20000,
+        "minimum_required_zatoshis": 1
+      }
+    },
+    {
+      "name": "no_spend_key_in_coordinator_workspace",
+      "status": "PASS",
+      "evidence": {
+        "scan_scope": "view-only-wallet-dir"
+      }
+    },
+    {
+      "name": "no_participant_share_in_coordinator_workspace",
+      "status": "PASS",
+      "evidence": {
+        "scan_scope": "view-only-wallet-dir"
+      }
+    }
+  ],
+  "limitations": [
+    "Funded value was observed through the local UFVK/view-only wallet.",
+    "P0-018 completion proves view-only synchronization and balance observation only.",
+    "The public report excludes UFVK, wallet database contents, participant configs, contact tokens, shares, seeds, and spending keys.",
+    "No transaction is created or broadcast by this preflight."
+  ],
+  "preflight_ref": "sha256:112c3b13a12b5760cbc2590771a3ec735e46e5bbd12c78caf5d80f6cd9598eea"
+}

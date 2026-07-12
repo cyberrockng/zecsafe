@@ -5212,3 +5212,119 @@ ZecSafe has not funded the mainnet demo wallet, has not observed a funded mainne
 - [x] Broadcast remains `NOT_BROADCAST`.
 - [x] Dedicated execution doc and `HANDOFF.md` updated.
 - [x] `npm run check` passed.
+
+## ZSAFE-P0-018 - View-Only Mainnet Synchronization and Balance
+
+Status: `COMPLETE`.
+
+Completed UTC: `2026-07-12T13:45:53.014Z`.
+
+### Outcome
+
+The dedicated mainnet UFVK/view-only wallet synchronized and observed the funded Orchard value:
+
+```text
+module: src/mainnet-view-v1.mjs
+CLI: scripts/mainnet-view.mjs
+test: scripts/mainnet-view-v1.test.mjs
+fixture: fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json
+package aliases: npm run mainnet:preflight, npm run mainnet:watch
+make targets: make mainnet-preflight, make mainnet-watch
+schema: zecsafe-mainnet-view-preflight-v1
+status: PASS
+sync_status: SYNC_COMPLETE
+observed_tip: 3409775
+total_zatoshis: 20000
+orchard_spendable_zatoshis: 20000
+funded_value_observed: true
+```
+
+The earlier public explorer check proved only that the sender's shielded transaction was mined in block `3409633`. The completed UFVK scan now proves the missing local fact: this view-only wallet observes `0.00020000 ZEC` in its Orchard pool.
+
+### Compatibility Resolution
+
+The server returned `Unknown: unrecognized shielded protocol` inside the Ironwood subtree stream. A detached worktree at the official base commit applies a narrow patch that treats only that exact pre-Ironwood response as an empty future-pool result. Other errors remain fatal.
+
+```text
+official checkout status: clean
+base commit: 1b065594d958d1cad2deafe7cd2e2fcc2774c46c
+compat worktree: /home/dell/.zecsafe/toolchain/zcash-devtool-p0-018-compat
+patch: patches/zcash-devtool/p0-018-pre-ironwood-subtree-compat.patch
+patch ref: sha256:4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e
+binary ref: sha256:8e8e2110e80bb5ea92924e7300ddcf57cb58e7e4f2a0439404b5b59f836ba0b9
+targeted Rust test: PASS
+live mainnet sync: PASS
+```
+
+### Judge-Proof Impact
+
+P0-018 now provides public-safe wallet-observed funding evidence, rather than relying on sender testimony or a public explorer that cannot disclose shielded recipients and amounts.
+
+### Public-Safe Evidence Emitted
+
+```text
+network
+wallet type
+account id
+birthday height
+account source and purpose
+Orchard-only unified mainnet address
+mainnet address inspection result
+observed tip height
+balance observation status
+funded value observation status
+pool balance in zatoshis
+coordinator workspace scan status
+toolchain base commit, compatibility patch ref, and binary ref
+preflight reference hash
+```
+
+### Private Material Intentionally Excluded
+
+```text
+UFVK value
+UIVK value
+wallet database contents
+FROST participant configs
+FROST shares
+contact tokens
+TLS private keys
+seed phrases
+spending keys
+raw sync logs
+```
+
+### Negative/Tamper Case
+
+```text
+wrong network -> FAIL
+non-view-only account purpose -> FAIL
+missing birthday height -> FAIL
+non-mainnet/non-Orchard address inspection -> FAIL
+spend key detected in coordinator wallet workspace -> FAIL
+participant share detected in coordinator wallet workspace -> FAIL
+unfunded or unobserved balance -> WAIT_FUNDING, not PASS
+different Ironwood server status/message -> sync failure, not compatibility bypass
+```
+
+### Claim Now Allowed
+
+```text
+ZecSafe completed P0-018: the dedicated mainnet UFVK/view-only wallet synchronized and observed 0.00020000 ZEC in its Orchard pool without exposing spending authority.
+```
+
+### Claim Still Forbidden
+
+```text
+ZecSafe has not created, signed, or broadcast the P0-019 mainnet transaction, and P0-018 does not authorize a spend.
+```
+
+### Acceptance Criteria
+
+- [x] Mainnet sync completed above funding block `3409633`.
+- [x] Funded value observed as `20000` Orchard zatoshis.
+- [x] No spend key in coordinator wallet workspace.
+- [x] No participant share in coordinator wallet workspace.
+- [x] Compatibility patch is narrow, tested, fingerprinted, and reproducible.
+- [x] Public fixture excludes private material.
+- [x] No transaction created or broadcast by this task.

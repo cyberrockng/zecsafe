@@ -1,0 +1,110 @@
+{
+  "schema_version": "zecsafe-proof-v1",
+  "project": "ZecSafe",
+  "network": "main",
+  "run_id": "p0-023-20260712T145358Z",
+  "recorded_at": "2026-07-12T15:12:54.000Z",
+  "zecsafe_commit": "ad83269298b73396ac0f4b743c59301de77fe937",
+  "vault": {
+    "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "ciphersuite": "redpallas-rerandomized",
+    "threshold": 2,
+    "participants_total": 3
+  },
+  "availability": {
+    "available": 2,
+    "unavailable": 1
+  },
+  "intent": {
+    "commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7"
+  },
+  "pczt": {
+    "source_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+    "signed_fingerprint": "sha256:df8cf3ad2fa7cfaa09def2756ba1995959fe9b70c0d5d98a9934cfd3e071b162",
+    "proven_fingerprint": "sha256:6b32eaa4f0fbd8abf862943cbabd77a46d2b3ab561038f4a8a617fb908235869",
+    "final_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+    "source_binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+    "final_binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
+    "binding_status": "PASS",
+    "signed_pczt_status": "PASS",
+    "proven_pczt_status": "PASS",
+    "combine_status": "PASS",
+    "checks": [
+      {
+        "field": "source",
+        "status": "PASS"
+      },
+      {
+        "field": "network",
+        "status": "MATCH"
+      },
+      {
+        "field": "recipient",
+        "status": "MATCH"
+      },
+      {
+        "field": "amount",
+        "status": "MATCH"
+      },
+      {
+        "field": "fee_policy",
+        "status": "PASS"
+      },
+      {
+        "field": "memo_policy",
+        "status": "LIMITED"
+      },
+      {
+        "field": "unexpected_output",
+        "status": "PASS"
+      },
+      {
+        "field": "change_output",
+        "status": "PASS"
+      }
+    ]
+  },
+  "frost": {
+    "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+    "binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+    "session_fingerprint": "sha256:cd6d729fcccc48458027b584cbc32363b65c83a9c29e7d2c91e5f1211605d9f8",
+    "selected_signers": [
+      "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+      "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+    ],
+    "unavailable_participants": 1,
+    "threshold_status": "THRESHOLD_REACHED",
+    "aggregate_signature_status": "AGGREGATE_SIGNATURE_VERIFIED",
+    "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+    "signature_byte_length": 64,
+    "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928"
+  },
+  "transaction": {
+    "txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+    "chain_status": "CONFIRMED",
+    "broadcast_status": "CONFIRMED",
+    "observed_block_height": 3409837,
+    "confirmations_at_recording": 4
+  },
+  "toolchain": {
+    "frost_tools_commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+    "zcash_devtool_commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+    "pczt_signer_library_commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+  },
+  "evidence": {
+    "source_binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+    "final_binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
+    "completion_report_ref": "sha256:ac16e9c135ed8360f4b753ec6b3e5854cbf8413b5cecf8f615d2d7cb8751ebae",
+    "proof_event_ref": "sha256:bd2587c0f0057434d4fb4971dce6613ab075816dacf8923228c352bc1d618afa"
+  },
+  "limitations": [
+    "Public zecsafe-proof-v1 contains only fingerprints, statuses, counts, tool commits, limitations, and transaction observation status.",
+    "Raw PCZT bytes, raw SIGHASH, raw aggregate signature, action randomizer, UFVK, wallet database, and FROST shares are excluded from public evidence.",
+    "Broadcast remains gated by separate human approval.",
+    "Raw PCZT bodies, raw SIGHASH bytes, the raw aggregate signature, and the Orchard randomizer remain outside public evidence.",
+    "The signer library verified the aggregate signature against the action's rerandomized verification key when applying it; chain acceptance is proven only by a later approved broadcast.",
+    "Broadcast happened once after explicit human approval; chain truth recorded per the P0-023 documented rule (CONFIRMED at observed tip 3409840, mined height 3409837)."
+  ],
+  "bundle_hash": "sha256:e90c3c46ae1474d848d3cc20ef4157e52b151dddda2015c034f83ad31ee9cb64"
+}

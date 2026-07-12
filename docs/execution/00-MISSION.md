@@ -35,9 +35,9 @@ Every remaining core task must produce, protect, or unblock public-safe evidence
 
 Current active wave: `P0 - Upstream toolchain and headless reproduction`.
 
-Latest completed task: `ZSAFE-P0-017 - Create dedicated mainnet demo wallet/group`.
+Latest completed task: `ZSAFE-P0-024 - Recorded Verified Mainnet Run frozen; make judge-proof-mainnet verifies it and the tamper demo rejects all mutations`.
 
-Current active task: `awaiting approval/funding for ZSAFE-P0-018 - Verify view-only mainnet synchronization and balance`.
+Current gate: `Mainnet proof pipeline COMPLETE. The mission loop (one unavailable participant -> two reviews -> binding proof -> threshold signature -> mainnet acceptance -> one-command judge verification) is closed with real evidence. Commit, ZecHub PR, and Discord submission each remain human-gated.`
 
 The headless proof kernel dry-run gate is now PASS. Primary demo UI work remains deferred until the active plan and human approval select that phase.
 

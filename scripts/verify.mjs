@@ -1,4 +1,7 @@
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
+
+const P0_018_COMPAT_PATCH_REF = "sha256:4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e";
 
 const requiredFiles = [
   "index.html",
@@ -18,6 +21,7 @@ const requiredFiles = [
   "src/pczt-completion-v1.mjs",
   "src/zecsafe-proof-v1.mjs",
   "src/proof-run-v1.mjs",
+  "src/mainnet-view-v1.mjs",
   "src/styles.css",
   "README.md",
   "SUBMISSION.md",
@@ -60,11 +64,16 @@ const requiredFiles = [
   "scripts/zecsafe.mjs",
   "scripts/zecsafe-proof-v1.test.mjs",
   "scripts/proof-run-v1.test.mjs",
+  "scripts/mainnet-view.mjs",
+  "scripts/mainnet-view-v1.test.mjs",
   "scripts/capture-screenshots.mjs",
   "docs/proof/zecsafe-proof-v1.schema.json",
   "docs/proof/TRUST_MODEL.md",
   "fixtures/proof-runs/p0-016-dry-broadcast-proof-run.json",
   "fixtures/mainnet-demo/p0-017-mainnet-demo-env.json",
+  "fixtures/mainnet-demo/p0-018-view-only-preflight-pending.json",
+  "fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json",
+  "patches/zcash-devtool/p0-018-pre-ironwood-subtree-compat.patch",
   "PROOF_SPEC.md",
 ];
 
@@ -75,6 +84,8 @@ for (const file of requiredFiles) {
 const html = await readFile("index.html", "utf8");
 const app = await readFile("src/app.js", "utf8");
 const styles = await readFile("src/styles.css", "utf8");
+const p0_018CompatPatch = await readFile("patches/zcash-devtool/p0-018-pre-ironwood-subtree-compat.patch");
+const p0_018CompatPatchRef = `sha256:${createHash("sha256").update(p0_018CompatPatch).digest("hex")}`;
 
 const checks = [
   [html.includes('<div id="app"></div>'), "index.html mounts #app"],
@@ -119,10 +130,13 @@ const checks = [
   [(await readFile("scripts/create-intent.mjs", "utf8")).includes("Intent commitment:"), "intent CLI emits commitment"],
   [(await readFile("scripts/intent-v1.test.mjs", "utf8")).includes("scientific notation"), "intent tests cover scientific notation rejection"],
   [(await readFile("src/pczt-inspect-v1.mjs", "utf8")).includes("EXPECTED_ZCASH_DEVTOOL_COMMIT"), "PCZT inspect module pins zcash-devtool commit"],
-  [(await readFile("src/pczt-inspect-v1.mjs", "utf8")).includes("parseIronwoodReview"), "PCZT inspect module parses Ironwood inspect output"],
+  [(await readFile("src/pczt-inspect-v1.mjs", "utf8")).includes("parseShieldedReview"), "PCZT inspect module parses shielded action inspect output"],
+  [(await readFile("src/pczt-inspect-v1.mjs", "utf8")).includes("Ironwood: \"ironwood\""), "PCZT inspect module supports Ironwood actions"],
+  [(await readFile("src/pczt-inspect-v1.mjs", "utf8")).includes("Orchard: \"orchard\""), "PCZT inspect module supports Orchard actions"],
   [(await readFile("scripts/pczt-inspect.mjs", "utf8")).includes("PCZT inspect review created"), "PCZT inspect CLI emits structured review"],
   [(await readFile("scripts/pczt-inspect-v1.test.mjs", "utf8")).includes("unexpected extra inspect output"), "PCZT inspect tests cover strict output rejection"],
   [(await readFile("scripts/pczt-inspect-v1.test.mjs", "utf8")).includes("validIronwoodInspect"), "PCZT inspect tests cover Ironwood V6 output"],
+  [(await readFile("scripts/pczt-inspect-v1.test.mjs", "utf8")).includes("validOrchardInspect"), "PCZT inspect tests cover mainnet Orchard V5 output"],
   [(await readFile("src/pczt-bind-v1.mjs", "utf8")).includes("zecsafe-binding-report-v1"), "Binding Firewall module defines report schema version"],
   [(await readFile("src/pczt-bind-v1.mjs", "utf8")).includes("unreported-change-output"), "Binding Firewall models unreported change recipients"],
   [(await readFile("scripts/pczt-bind.mjs", "utf8")).includes("INTENT ↔ PCZT"), "Binding Firewall CLI emits summary proof lines"],
@@ -157,15 +171,29 @@ const checks = [
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes('"pczt.combine": operationPcztCompletion'), "Fixed runner implements PCZT completion"],
   [(await readFile("src/zecsafe-proof-v1.mjs", "utf8")).includes("zecsafe-proof-v1"), "Proof v1 module defines schema version"],
   [(await readFile("src/proof-run-v1.mjs", "utf8")).includes("zecsafe-proof-run-v1"), "Proof-run module defines schema version"],
+  [(await readFile("src/mainnet-view-v1.mjs", "utf8")).includes("zecsafe-mainnet-view-preflight-v1"), "Mainnet view preflight module defines schema version"],
   [(await readFile("scripts/zecsafe.mjs", "utf8")).includes("proof generate"), "ZecSafe CLI supports proof generation"],
   [(await readFile("scripts/zecsafe.mjs", "utf8")).includes("proof-run --dry-broadcast"), "ZecSafe CLI supports dry proof run"],
+  [(await readFile("scripts/mainnet-view.mjs", "utf8")).includes("mainnet-view preflight"), "Mainnet view CLI supports preflight"],
+  [(await readFile("scripts/mainnet-view.mjs", "utf8")).includes("mainnet-view watch"), "Mainnet view CLI supports watch"],
   [(await readFile("scripts/zecsafe-proof-v1.test.mjs", "utf8")).includes("selected_signer"), "Proof v1 tests cover selected signer tampering"],
   [(await readFile("scripts/proof-run-v1.test.mjs", "utf8")).includes("Mainnet broadcast requires human approval"), "Proof-run tests cover broadcast approval wait"],
+  [(await readFile("scripts/mainnet-view-v1.test.mjs", "utf8")).includes("WAIT_FUNDING"), "Mainnet view tests cover funding wait"],
   [(await readFile("fixtures/proof-runs/p0-016-dry-broadcast-proof-run.json", "utf8")).includes('"mode": "dry-broadcast"'), "Dry proof-run fixture exists"],
   [(await readFile("fixtures/mainnet-demo/p0-017-mainnet-demo-env.json", "utf8")).includes('"schema_version": "zecsafe-mainnet-demo-env-v1"'), "Mainnet demo env fixture exists"],
   [(await readFile("fixtures/mainnet-demo/p0-017-mainnet-demo-env.json", "utf8")).includes('"network": "main"'), "Mainnet demo env fixture records main network"],
   [(await readFile("fixtures/mainnet-demo/p0-017-mainnet-demo-env.json", "utf8")).includes('"funding_status": "NOT_FUNDED"'), "Mainnet demo env fixture records funding boundary"],
   [!(await readFile("fixtures/mainnet-demo/p0-017-mainnet-demo-env.json", "utf8")).match(/uview|secret-extended-key|-----BEGIN|zffrost1|contact-token/i), "Mainnet demo env fixture excludes private material values"],
+  [(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-pending.json", "utf8")).includes('"status": "WAIT_FUNDING"'), "Mainnet view preflight fixture records funding wait"],
+  [(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-pending.json", "utf8")).includes('"funded_value_observed": false'), "Mainnet view preflight fixture does not claim funding"],
+  [!(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-pending.json", "utf8")).match(/uview1|uivk1|secret-extended-key|-----BEGIN|zffrost1/i), "Mainnet view preflight fixture excludes private material values"],
+  [(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json", "utf8")).includes('"status": "PASS"'), "Funded mainnet view fixture passes"],
+  [(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json", "utf8")).includes('"total_zatoshis": 20000'), "Funded mainnet view fixture records 20000 observed zatoshis"],
+  [(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json", "utf8")).includes('"funded_value_observed": true'), "Funded mainnet view fixture records wallet-observed funding"],
+  [!(await readFile("fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json", "utf8")).match(/uview1|uivk1|secret-extended-key|-----BEGIN|zffrost1/i), "Funded mainnet view fixture excludes private material values"],
+  [p0_018CompatPatch.toString("utf8").includes("is_pre_ironwood_server"), "P0-018 records the pre-Ironwood server compatibility patch"],
+  [p0_018CompatPatchRef === P0_018_COMPAT_PATCH_REF, "P0-018 compatibility patch fingerprint matches"],
+  [(await readFile("scripts/mainnet-view.mjs", "utf8")).includes(P0_018_COMPAT_PATCH_REF), "Mainnet view CLI pins the P0-018 compatibility patch fingerprint"],
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes('"proof.generate": operationProofGenerate'), "Fixed runner implements proof generation"],
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes('"proof.verify": operationProofVerify'), "Fixed runner implements proof verification"],
   [(await readFile("docs/proof/zecsafe-proof-v1.schema.json", "utf8")).includes('"zecsafe-proof-v1"'), "Proof JSON schema exists"],

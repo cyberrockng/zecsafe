@@ -1,0 +1,228 @@
+{
+  "label": "Recorded Verified Mainnet Run",
+  "schema_version": "zecsafe-public-proof-events-v1",
+  "note": "Each entry is the public-safe ProofEvent v1 projection emitted by the named headless gate during the real mainnet run. Events span two external run IDs (the FROST session run and the broadcast run), so they are annotated per source rather than merged into a single sequence. Raw sighash, signatures, randomizers, keys, shares, and PCZT bodies are excluded by construction.",
+  "entries": [
+    {
+      "source_run": "p0-021-20260712T142858Z",
+      "source_gate": "signer selection gate (A+B selected, C unavailable)",
+      "event_hash": "sha256:db1727da33052593bac9f12440e9602b49419eebf98ee15b3ef6feab14117d77",
+      "event": {
+        "schema_version": "proof-event-v1",
+        "sequence": 1,
+        "run_id": "p0-021-20260712T142858Z",
+        "occurred_at": "2026-07-12T14:35:08.077Z",
+        "stage": "FROST_SESSION",
+        "status": "SATISFIABLE",
+        "evidence_ref": "sha256:fb1e1603e15df838ff7d4f2ada244fed46a9d685c40ac59faccee7b41713cce3",
+        "public_message": "Selected available participants satisfy the threshold.",
+        "data": {
+          "frost_status": "SATISFIABLE",
+          "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+          "limitations": [
+            "Signer selection proves threshold satisfiability only; later FROST tasks must prove selected participants completed signing shares."
+          ],
+          "participant_total": 3,
+          "selected_public_fingerprints": [
+            "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+            "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+          ],
+          "threshold": 2,
+          "threshold_status": "SATISFIABLE",
+          "unavailable_participant_count": 1
+        }
+      }
+    },
+    {
+      "source_run": "p0-021-20260712T142858Z",
+      "source_gate": "signer A semantic PCZT review",
+      "event_hash": "sha256:71508c734c86dd6880e0f05774a2fc530f75d18f7b38a10b7579c2d00e2f5978",
+      "event": {
+        "schema_version": "proof-event-v1",
+        "sequence": 1,
+        "run_id": "p0-021-20260712T142858Z",
+        "occurred_at": "2026-07-12T14:34:58.626Z",
+        "stage": "FROST_SESSION",
+        "status": "PASS",
+        "evidence_ref": "sha256:de96840930e2c6cec53623b73d11792faa2638567612d36456ef5b379e1388b7",
+        "public_message": "Selected signer completed local semantic review before FROST authorization.",
+        "data": {
+          "binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+          "check_statuses": {
+            "source": "PASS",
+            "network": "PASS",
+            "recipient": "PASS",
+            "amount": "PASS",
+            "fee_policy": "PASS",
+            "memo_policy": "PASS",
+            "unexpected_output": "PASS",
+            "change_output": "PASS",
+            "binding": "PASS",
+            "pczt_fingerprint": "PASS",
+            "sighash": "PASS",
+            "group": "PASS",
+            "selected_signer": "PASS",
+            "confirmation": "PASS"
+          },
+          "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+          "limitations": [
+            "Signer review mode is semantic_pczt_review: the signer checks PCZT semantics and compares the prepared pinned-tool SIGHASH fingerprint; it does not claim an independently rerun SIGHASH.",
+            "Raw PCZT bytes, recipient, amount, memo text, randomizers, nonces, keys, and authorization material are excluded from ProofEvents."
+          ],
+          "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+          "reviewer_participant_id": "A",
+          "reviewer_public_fingerprint": "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+          "selected_public_fingerprints": [
+            "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+            "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+          ],
+          "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+          "signer_review_mode": "semantic_pczt_review",
+          "signer_review_status": "PASS",
+          "source_fingerprint": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14"
+        }
+      }
+    },
+    {
+      "source_run": "p0-021-20260712T142858Z",
+      "source_gate": "signer B semantic PCZT review",
+      "event_hash": "sha256:4f6c1b0b77da1a2288966b72273ca403e4003c657d858c671ec1914b0617ffea",
+      "event": {
+        "schema_version": "proof-event-v1",
+        "sequence": 1,
+        "run_id": "p0-021-20260712T142858Z",
+        "occurred_at": "2026-07-12T14:34:58.784Z",
+        "stage": "FROST_SESSION",
+        "status": "PASS",
+        "evidence_ref": "sha256:36379f30f45b85d45d815361db17026f97d5b93812d0acdf65befcaab4a7fe3d",
+        "public_message": "Selected signer completed local semantic review before FROST authorization.",
+        "data": {
+          "binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+          "check_statuses": {
+            "source": "PASS",
+            "network": "PASS",
+            "recipient": "PASS",
+            "amount": "PASS",
+            "fee_policy": "PASS",
+            "memo_policy": "PASS",
+            "unexpected_output": "PASS",
+            "change_output": "PASS",
+            "binding": "PASS",
+            "pczt_fingerprint": "PASS",
+            "sighash": "PASS",
+            "group": "PASS",
+            "selected_signer": "PASS",
+            "confirmation": "PASS"
+          },
+          "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+          "limitations": [
+            "Signer review mode is semantic_pczt_review: the signer checks PCZT semantics and compares the prepared pinned-tool SIGHASH fingerprint; it does not claim an independently rerun SIGHASH.",
+            "Raw PCZT bytes, recipient, amount, memo text, randomizers, nonces, keys, and authorization material are excluded from ProofEvents."
+          ],
+          "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+          "reviewer_participant_id": "B",
+          "reviewer_public_fingerprint": "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5",
+          "selected_public_fingerprints": [
+            "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+            "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+          ],
+          "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+          "signer_review_mode": "semantic_pczt_review",
+          "signer_review_status": "PASS",
+          "source_fingerprint": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14"
+        }
+      }
+    },
+    {
+      "source_run": "p0-021-20260712T142858Z",
+      "source_gate": "live A+B FROST session gate",
+      "event_hash": "sha256:91595ade579a1073a66bf36095d95b6fd18ff3cb4a58a4d7e07244d02396e91c",
+      "event": {
+        "schema_version": "proof-event-v1",
+        "sequence": 1,
+        "run_id": "p0-021-20260712T142858Z",
+        "occurred_at": "2026-07-12T14:40:21.362Z",
+        "stage": "FROST_SESSION",
+        "status": "THRESHOLD_REACHED",
+        "evidence_ref": "sha256:6313d5a4d4f4b35b6294c1904cf50660d528c2968fafe1ff5c70d8550ee68477",
+        "public_message": "Selected A+B FROST session reached threshold and verified an aggregate signature.",
+        "data": {
+          "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+          "aggregate_signature_status": "AGGREGATE_SIGNATURE_VERIFIED",
+          "binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+          "check_statuses": {
+            "threshold": "PASS",
+            "selected_signers": "PASS",
+            "signing_context": "PASS",
+            "signer_review": "PASS",
+            "session": "PASS",
+            "sighash": "PASS",
+            "aggregate_signature": "PASS"
+          },
+          "frost_status": "THRESHOLD_REACHED",
+          "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+          "limitations": [
+            "FROST session evidence emits fingerprints and statuses only; shares, nonces, randomizers, raw SIGHASH, raw signatures, configs, keys, and logs remain outside public evidence.",
+            "The aggregate signature is not a completed PCZT until ZSAFE-P0-014 applies it through the pinned transaction-completion path."
+          ],
+          "participant_total": 3,
+          "pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+          "selected_public_fingerprints": [
+            "sha256:a0c24753e044d224a7e5a9d7b572f6abb14375693b090e4c24b49cd856c52b0b",
+            "sha256:533c516a94d7d1dec4192dd46afb1fe02620ce6bbd974736d0cfe7c36ec14cf5"
+          ],
+          "session_fingerprint": "sha256:cd6d729fcccc48458027b584cbc32363b65c83a9c29e7d2c91e5f1211605d9f8",
+          "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+          "signature_byte_length": 64,
+          "threshold": 2,
+          "threshold_status": "THRESHOLD_REACHED",
+          "unavailable_participant_count": 1
+        }
+      }
+    },
+    {
+      "source_run": "p0-023-20260712T145358Z",
+      "source_gate": "PCZT completion gate re-run with CONFIRMED broadcast status under recorded human approval",
+      "event_hash": "sha256:87d24acc85298320b75e94839638c7da392a3f02ff1599231a293d53b1e00fe1",
+      "event": {
+        "schema_version": "proof-event-v1",
+        "sequence": 1,
+        "run_id": "p0-023-20260712T145358Z",
+        "occurred_at": "2026-07-12T15:12:44.552Z",
+        "stage": "PCZT_COMBINE",
+        "status": "PASS",
+        "evidence_ref": "sha256:c272b25a6cf53d83d1584b8f8a483fcc989f9917a3a64265169522ea201f4dd6",
+        "public_message": "Signed, proven, and combined PCZT passed final binding; broadcast occurred under explicit recorded human approval.",
+        "data": {
+          "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+          "binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
+          "broadcast_status": "CONFIRMED",
+          "check_statuses": {
+            "source_pczt": "PASS",
+            "signing_context": "PASS",
+            "frost_signature": "PASS",
+            "signed_pczt": "PASS",
+            "proven_pczt": "PASS",
+            "pczt_combine": "PASS",
+            "final_binding": "PASS",
+            "broadcast_gate": "PASS"
+          },
+          "final_binding_status": "PASS",
+          "limitations": [
+            "Raw PCZT bytes, raw SIGHASH, raw aggregate signature, action randomizer, UFVK, wallet database, and FROST shares are excluded from public evidence.",
+            "Broadcast remains gated by separate human approval.",
+            "Raw PCZT bodies, raw SIGHASH bytes, the raw aggregate signature, and the Orchard randomizer remain outside public evidence.",
+            "The signer library verified the aggregate signature against the action's rerandomized verification key when applying it; chain acceptance is proven only by a later approved broadcast.",
+            "Broadcast happened once after explicit human approval; chain truth recorded per the P0-023 documented rule (CONFIRMED at observed tip 3409840, mined height 3409837)."
+          ],
+          "pczt_combine_status": "PASS",
+          "pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+          "proven_pczt_status": "PASS",
+          "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+          "signature_byte_length": 64,
+          "signed_pczt_status": "PASS"
+        }
+      }
+    }
+  ]
+}

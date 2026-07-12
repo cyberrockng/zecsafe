@@ -1,0 +1,318 @@
+{
+  "schema_version": "zecsafe-mainnet-pczt-completion-evidence-v1",
+  "task_id": "ZSAFE-P0-022",
+  "source_intent_fixture": "fixtures/mainnet-demo/p0-019-mainnet-proof-intent.json",
+  "source_binding_fixture": "fixtures/mainnet-demo/p0-020-mainnet-pczt-binding.json",
+  "source_frost_fixture": "fixtures/mainnet-demo/p0-021-mainnet-frost-session.json",
+  "recorded_at": "2026-07-12T14:50:32.000Z",
+  "status": "PASS_AWAITING_BROADCAST_APPROVAL",
+  "network": "main",
+  "external_run": "p0-022-20260712T144710Z",
+  "pipeline": {
+    "signed_pczt": {
+      "tool": "zecsafe-pczt-helper apply-orchard (librustzcash rev 8e6864a3c67cab3c64a052dd20f83c553662e8b2)",
+      "note": "apply_orchard_signature verifies the 64-byte FROST aggregate signature against the action's rerandomized verification key and the shielded sighash before accepting it",
+      "input_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+      "output_fingerprint": "sha256:df8cf3ad2fa7cfaa09def2756ba1995959fe9b70c0d5d98a9934cfd3e071b162"
+    },
+    "proven_pczt": {
+      "tool": "zcash-devtool pczt prove (clean checkout, commit 1b065594d958d1cad2deafe7cd2e2fcc2774c46c), offline Halo2 Orchard proofs",
+      "input_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+      "output_fingerprint": "sha256:6b32eaa4f0fbd8abf862943cbabd77a46d2b3ab561038f4a8a617fb908235869"
+    },
+    "combined_pczt": {
+      "tool": "zcash-devtool pczt combine",
+      "output_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+      "inspect_ref": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14",
+      "inspect_note": "the combined PCZT inspect text is byte-identical to the P0-020 source inspect text (same fingerprint), so recipient, amounts, and fee are unchanged through sign/prove/combine"
+    },
+    "offline_extract": {
+      "tool": "zcash-devtool pczt extract (offline; no network)",
+      "result": "fully authorized transaction extracted",
+      "txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "txid_note": "matches the TxID reported by inspect before and after completion"
+    }
+  },
+  "final_binding": {
+    "schema_version": "zecsafe-binding-report-v1",
+    "run_id": "p0-022-20260712T144710Z",
+    "intent_commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+    "pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+    "source_fingerprint": "sha256:84837faef5268e0347ee41267584e98b7b2876c137c507a2380a6e32e979dd14",
+    "network_check": {
+      "field": "network",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:720265460a5ca97a95b6288faa922725aafcb98d56afc75a41b31cb01a96eee6",
+      "observed_commitment": "sha256:56d83a21a1fbc6d464c715170e61e6d3263835d901c4b21ca63a3bcafbf31df2",
+      "reason": "Intent network matches PCZT review network."
+    },
+    "recipient_check": {
+      "field": "recipient",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:41e12f86358d7d086cf186a91c9f09c8dbdaa56ef710a9c661b6e2cf5c4fdc09",
+      "observed_commitment": "sha256:763cc677f1ad3dae03f01e4a04b428af6bebee850d904b8ba0e52b19e93ec1e6",
+      "reason": "Exactly one non-change recipient matches the reviewed intent."
+    },
+    "amount_check": {
+      "field": "amount",
+      "status": "MATCH",
+      "allows_signing": true,
+      "expected_commitment": "sha256:dc5ede0367152501542349f814dbb7675747d219d6513da74bb1459edaff38f0",
+      "observed_commitment": "sha256:2b250bc40c72aca2ae6e9d8e922cd1b6c46437a07091d9599635a03057fc736d",
+      "reason": "Exactly one non-change amount matches the reviewed intent."
+    },
+    "fee_policy_check": {
+      "field": "fee_policy",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:158e4224e509fea76276e0744186d06b2415948345131ab78fd8ba5a72181e15",
+      "observed_commitment": "sha256:2ddbe470ee3690ca9ea495d60e9d65ff8c0e89237cf800d0ff8b08fb7bf724a5",
+      "reason": "Observed fee is within the reviewed fee policy."
+    },
+    "memo_policy_check": {
+      "field": "memo_policy",
+      "status": "LIMITED",
+      "allows_signing": true,
+      "expected_commitment": "sha256:895b8fb3e556619b8665d5bcc8f07be7195286881c5a6bfbafba2add1995e3bd",
+      "observed_commitment": "sha256:fea7e8121a0df28e522a0194ff49314d023d73a9ab09a6e406bafa10794ea981",
+      "reason": "PCZT inspect output does not expose memo content; empty-intent memo policy is allowed with this recorded limitation."
+    },
+    "unexpected_output_check": {
+      "field": "unexpected_output",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:0c9cad71f6ad768cb016c61573041092869d2a968cfea115f5029fe7afdae89d",
+      "observed_commitment": "sha256:f24bd9bb2794345ae3cd311892e119d976ddfce0766931b3e6d80591fff68d48",
+      "reason": "No extra non-change outputs are present."
+    },
+    "change_output_check": {
+      "field": "change_output",
+      "status": "PASS",
+      "allows_signing": true,
+      "expected_commitment": "sha256:5bf9244acee1473e72bf688e3818bc6f214f634e6000552359513bd46de23d20",
+      "observed_commitment": "sha256:54378849f345c6699adb2b1534f81a47f6eac716452e621141709a0127864ee4",
+      "reason": "All change outputs were explicitly modeled by the PCZT review."
+    },
+    "status": "PASS",
+    "blocked_operations": [],
+    "limitation": [
+      "Memo content was not reported by the current PCZT inspect source; only an empty reviewed memo is allowed under this limitation.",
+      "PCZT review does not expose a FROST group fingerprint; this firewall binds intent to PCZT semantics, not signer group membership."
+    ],
+    "checks": [
+      {
+        "field": "source",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:fc8a7e482db1bc7f494c153d49f2307172aa4415bf8a3786eb77427e82e3580a",
+        "observed_commitment": "sha256:a5640b3f01c3fe97761830fe530b6975146ac37f3bce6bad7bacbe8ae5988277",
+        "reason": "PCZT review came from the expected pinned inspect source or omitted optional source fields."
+      },
+      {
+        "field": "network",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:720265460a5ca97a95b6288faa922725aafcb98d56afc75a41b31cb01a96eee6",
+        "observed_commitment": "sha256:56d83a21a1fbc6d464c715170e61e6d3263835d901c4b21ca63a3bcafbf31df2",
+        "reason": "Intent network matches PCZT review network."
+      },
+      {
+        "field": "recipient",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:41e12f86358d7d086cf186a91c9f09c8dbdaa56ef710a9c661b6e2cf5c4fdc09",
+        "observed_commitment": "sha256:763cc677f1ad3dae03f01e4a04b428af6bebee850d904b8ba0e52b19e93ec1e6",
+        "reason": "Exactly one non-change recipient matches the reviewed intent."
+      },
+      {
+        "field": "amount",
+        "status": "MATCH",
+        "allows_signing": true,
+        "expected_commitment": "sha256:dc5ede0367152501542349f814dbb7675747d219d6513da74bb1459edaff38f0",
+        "observed_commitment": "sha256:2b250bc40c72aca2ae6e9d8e922cd1b6c46437a07091d9599635a03057fc736d",
+        "reason": "Exactly one non-change amount matches the reviewed intent."
+      },
+      {
+        "field": "fee_policy",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:158e4224e509fea76276e0744186d06b2415948345131ab78fd8ba5a72181e15",
+        "observed_commitment": "sha256:2ddbe470ee3690ca9ea495d60e9d65ff8c0e89237cf800d0ff8b08fb7bf724a5",
+        "reason": "Observed fee is within the reviewed fee policy."
+      },
+      {
+        "field": "memo_policy",
+        "status": "LIMITED",
+        "allows_signing": true,
+        "expected_commitment": "sha256:895b8fb3e556619b8665d5bcc8f07be7195286881c5a6bfbafba2add1995e3bd",
+        "observed_commitment": "sha256:fea7e8121a0df28e522a0194ff49314d023d73a9ab09a6e406bafa10794ea981",
+        "reason": "PCZT inspect output does not expose memo content; empty-intent memo policy is allowed with this recorded limitation."
+      },
+      {
+        "field": "unexpected_output",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:0c9cad71f6ad768cb016c61573041092869d2a968cfea115f5029fe7afdae89d",
+        "observed_commitment": "sha256:f24bd9bb2794345ae3cd311892e119d976ddfce0766931b3e6d80591fff68d48",
+        "reason": "No extra non-change outputs are present."
+      },
+      {
+        "field": "change_output",
+        "status": "PASS",
+        "allows_signing": true,
+        "expected_commitment": "sha256:5bf9244acee1473e72bf688e3818bc6f214f634e6000552359513bd46de23d20",
+        "observed_commitment": "sha256:54378849f345c6699adb2b1534f81a47f6eac716452e621141709a0127864ee4",
+        "reason": "All change outputs were explicitly modeled by the PCZT review."
+      }
+    ],
+    "summary": {
+      "intent_pczt": "PASS",
+      "frost_session": "ALLOWED"
+    }
+  },
+  "completion_gate": {
+    "schema_version": "zecsafe-pczt-completion-v1",
+    "run_id": "p0-022-20260712T144710Z",
+    "status": "PASS",
+    "source_pczt_fingerprint": "sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+    "signed_pczt_fingerprint": "sha256:df8cf3ad2fa7cfaa09def2756ba1995959fe9b70c0d5d98a9934cfd3e071b162",
+    "proven_pczt_fingerprint": "sha256:6b32eaa4f0fbd8abf862943cbabd77a46d2b3ab561038f4a8a617fb908235869",
+    "final_pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+    "source_binding_report_ref": "sha256:0bd48dfdf1debdbe495f153341e24598bbbd09b79b490a586c218a0eb05cbcb4",
+    "final_binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
+    "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+    "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+    "signature_byte_length": 64,
+    "signed_pczt_status": "PASS",
+    "proven_pczt_status": "PASS",
+    "pczt_combine_status": "PASS",
+    "final_binding_status": "PASS",
+    "broadcast_status": "NOT_BROADCAST",
+    "completion_flow": "pczt-library-signer-apply-orchard-signature",
+    "signing_pool": "orchard",
+    "checks": [
+      {
+        "field": "source_pczt",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Signing context and FROST session both reference the same source PCZT fingerprint."
+      },
+      {
+        "field": "signing_context",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Signing context is ready and includes the PCZT SIGHASH fingerprint."
+      },
+      {
+        "field": "frost_signature",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "FROST threshold session produced a verified 64-byte aggregate signature over the real PCZT SIGHASH."
+      },
+      {
+        "field": "signed_pczt",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Signed PCZT was produced from the source PCZT using the FROST aggregate signature."
+      },
+      {
+        "field": "proven_pczt",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Proven PCZT was produced separately from the same source PCZT."
+      },
+      {
+        "field": "pczt_combine",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Combined PCZT consumes the signed and proven PCZT fingerprints and emits a new final fingerprint."
+      },
+      {
+        "field": "final_binding",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Final combined PCZT re-ran binding verification and still matches the reviewed intent."
+      },
+      {
+        "field": "broadcast_gate",
+        "status": "PASS",
+        "allows_completion": true,
+        "reason": "Completion proof stops before broadcast unless a separate human approval is provided."
+      }
+    ],
+    "limitations": [
+      "Raw PCZT bytes, raw SIGHASH, raw aggregate signature, action randomizer, UFVK, wallet database, and FROST shares are excluded from public evidence.",
+      "Broadcast remains gated by separate human approval.",
+      "Raw PCZT bodies, raw SIGHASH bytes, the raw aggregate signature, and the Orchard randomizer remain outside public evidence.",
+      "The signer library verified the aggregate signature against the action's rerandomized verification key when applying it; chain acceptance is proven only by a later approved broadcast."
+    ],
+    "proof_event": {
+      "schema_version": "proof-event-v1",
+      "sequence": 1,
+      "run_id": "p0-022-20260712T144710Z",
+      "occurred_at": "2026-07-12T14:48:58.124Z",
+      "stage": "PCZT_COMBINE",
+      "status": "PASS",
+      "evidence_ref": "sha256:10c17b6e51ac8f5a179a9a8c3837208182f7145a4484a22212504b3c8ff113e1",
+      "public_message": "Signed, proven, and combined PCZT passed final binding without broadcasting.",
+      "data": {
+        "aggregate_signature_fingerprint": "sha256:c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+        "binding_report_ref": "sha256:d309efc24c613f6d18114239b4534cbb6fda4ef6657dc8c37a839eac4b1145c2",
+        "broadcast_status": "NOT_BROADCAST",
+        "check_statuses": {
+          "source_pczt": "PASS",
+          "signing_context": "PASS",
+          "frost_signature": "PASS",
+          "signed_pczt": "PASS",
+          "proven_pczt": "PASS",
+          "pczt_combine": "PASS",
+          "final_binding": "PASS",
+          "broadcast_gate": "PASS"
+        },
+        "final_binding_status": "PASS",
+        "limitations": [
+          "Raw PCZT bytes, raw SIGHASH, raw aggregate signature, action randomizer, UFVK, wallet database, and FROST shares are excluded from public evidence.",
+          "Broadcast remains gated by separate human approval.",
+          "Raw PCZT bodies, raw SIGHASH bytes, the raw aggregate signature, and the Orchard randomizer remain outside public evidence.",
+          "The signer library verified the aggregate signature against the action's rerandomized verification key when applying it; chain acceptance is proven only by a later approved broadcast."
+        ],
+        "pczt_combine_status": "PASS",
+        "pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+        "proven_pczt_status": "PASS",
+        "sighash_fingerprint": "sha256:cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+        "signature_byte_length": 64,
+        "signed_pczt_status": "PASS"
+      }
+    }
+  },
+  "review_screen": {
+    "banner": "!!! MAINNET BROADCAST APPROVAL REQUIRED !!!",
+    "network": "main",
+    "intent_commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+    "pczt_fingerprint": "sha256:945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184",
+    "intent_pczt": "PASS",
+    "threshold": "2 of 3",
+    "unavailable": 1,
+    "selected_signers": 2,
+    "aggregate_signature": "VERIFIED",
+    "signed_pczt": "PASS",
+    "proven_pczt": "PASS",
+    "combined_pczt": "PASS",
+    "destination_preview": "u1y3untlvq77\u20265u2tz6a0 (vault self-send)",
+    "amount": "0.00005000 ZEC (5000 zatoshis)",
+    "fee": "10000 zatoshis (ZIP-317)"
+  },
+  "budget": {
+    "project_budget_zatoshis": 20000,
+    "spent_so_far_zatoshis": 0,
+    "committed_if_broadcast_zatoshis": 10000,
+    "note": "Self-send: both outputs return to the vault; broadcast would debit only the 10000-zatoshi fee, leaving 10000 in the vault."
+  },
+  "boundaries": {
+    "broadcast_status": "NOT_BROADCAST",
+    "raw_artifacts": "signed/proven/combined PCZT bodies and the extracted txid line stay in the external run directory",
+    "next_gate": "explicit human approval of the exact broadcast action (ZSAFE-P0-023); broadcast must never happen automatically"
+  }
+}

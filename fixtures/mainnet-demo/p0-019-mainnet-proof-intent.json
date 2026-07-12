@@ -1,0 +1,63 @@
+{
+  "schema_version": "zecsafe-mainnet-proof-intent-v1",
+  "task_id": "ZSAFE-P0-019",
+  "source_preflight_task_id": "ZSAFE-P0-018",
+  "source_preflight_fixture": "fixtures/mainnet-demo/p0-018-view-only-preflight-funded.json",
+  "recorded_at": "2026-07-12T14:07:32.000Z",
+  "status": "INTENT_CREATED",
+  "network": "main",
+  "intent": {
+    "schema_version": "zecsafe-intent-v1",
+    "network": "main",
+    "vault_id": "vault_zecsafe_mainnet_demo",
+    "group_fingerprint": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "recipient": "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+    "amount_zatoshis": 5000,
+    "memo_utf8": "",
+    "fee_policy": {
+      "mode": "tool_default",
+      "max_fee_zatoshis": 15000
+    },
+    "created_at": "2026-07-12T14:07:32.000Z",
+    "expires_at": null
+  },
+  "intent_commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+  "recipient_note": "Vault self-send: recipient is the vault's own FROST-controlled Orchard unified address already published in the P0-017/P0-018 fixtures. Only the transaction fee leaves the vault.",
+  "review_screen": {
+    "network": "ZCASH MAINNET",
+    "vault": "sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354",
+    "threshold": "2 OF 3",
+    "destination_preview": "u1y3untlvq77…5u2tz6a0",
+    "amount_zec": "0.00005000",
+    "amount_zatoshis": 5000,
+    "memo": "NONE",
+    "fee_policy": "tool_default max 15000 zatoshis",
+    "intent_commitment": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7"
+  },
+  "budget": {
+    "project_budget_zatoshis": 20000,
+    "wallet_observed_balance_zatoshis": 20000,
+    "intent_amount_zatoshis": 5000,
+    "max_fee_zatoshis": 15000,
+    "amount_plus_max_fee_zatoshis": 20000,
+    "within_budget": true,
+    "self_send": true,
+    "worst_case_net_debit_zatoshis": 15000
+  },
+  "human_approval": {
+    "destination": "user-approved vault self-send",
+    "amount": "user-approved 5000 zatoshis",
+    "memo": "user-approved none",
+    "max_fee": "user-approved 15000 zatoshis",
+    "expiry": "user-approved no expiry"
+  },
+  "reproduce_command": "npm run intent:create -- --network main --vault-id vault_zecsafe_mainnet_demo --group-fingerprint sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354 --recipient u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0 --amount-zatoshis 5000 --memo-utf8 \"\" --fee-mode tool_default --max-fee-zatoshis 15000 --created-at 2026-07-12T14:07:32.000Z --print-json",
+  "boundaries": {
+    "pczt_created": false,
+    "frost_session_started": false,
+    "broadcast_status": "NOT_BROADCAST",
+    "spend_key_in_coordinator_workspace": false,
+    "participant_share_in_coordinator_workspace": false,
+    "next_gate": "explicit human approval before ZSAFE-P0-020 mainnet PCZT creation and Binding Firewall execution"
+  }
+}

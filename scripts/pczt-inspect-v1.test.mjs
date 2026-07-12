@@ -31,6 +31,18 @@ const validIronwoodInspect = `5 Ironwood actions:
 TxID: 1e127fa6628a50b0264debc2288e0dee83350031b4576ba698da35d819b2770b
 Version: V6`;
 
+const validOrchardInspect = `2 Orchard actions:
+- 0:
+  - Spend: 20000 zatoshis
+  - Output: 5000 zatoshis
+- 1:
+  - Spend: Zero value (likely a dummy)
+  - Output: 5000 zatoshis to u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0
+
+TxID: 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
+Version: V5
+Sighash for shielded components: 27855ed5fa07f16c7d3c66fcf1fef9c1aabd80ed0ddeb7372c3f2f2050e8d027`;
+
 const options = {
   network: "test",
   pcztBytes: Buffer.from("fixture pczt bytes"),
@@ -78,6 +90,59 @@ function assertRejected(rawInspect, expectedMessage, overrideOptions = {}) {
   assert.equal(review.fee_metadata.output_total_zatoshis, 99975000);
   assert.equal(review.fee_metadata.fee_zatoshis, 25000);
 }
+
+{
+  const review = parseZcashDevtoolPcztInspect(validOrchardInspect, { ...options, network: "main" });
+  assert.equal(review.network, "main");
+  assert.equal(review.pool, "orchard");
+  assert.equal(review.output_count, 2);
+  assert.equal(review.orchard_action_count, 2);
+  assert.equal(review.shielded_action_count, 2);
+  assert.equal(review.outputs[0].role, "change");
+  assert.equal(review.outputs[1].role, "recipient");
+  assert.equal(
+    review.outputs[1].recipient,
+    "u1y3untlvq77ntuw7f5g93nhtugwajggf4ta47zqcuy3z09y3sz9s336e0xmaxktzpt9fkt5sxeppa3s7q663dtuwa0m9p0wh95u2tz6a0",
+  );
+  assert.deepEqual(review.amounts_zatoshis, [5000]);
+  assert.equal(review.fee_metadata.status, "computed_from_orchard_action_values");
+  assert.equal(review.fee_metadata.input_total_zatoshis, 20000);
+  assert.equal(review.fee_metadata.output_total_zatoshis, 10000);
+  assert.equal(review.fee_metadata.fee_zatoshis, 10000);
+  assert.equal(review.transaction_id, "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527");
+  assert.equal(review.transaction_version, "V5");
+  assert.equal(review.shielded_sighash, "27855ed5fa07f16c7d3c66fcf1fef9c1aabd80ed0ddeb7372c3f2f2050e8d027");
+}
+
+{
+  const review = parseZcashDevtoolPcztInspect(validIronwoodInspect, options);
+  assert.equal(review.shielded_sighash, undefined);
+  assert.equal(review.shielded_action_count, 5);
+}
+
+assertRejected(
+  validOrchardInspect.replace("  - Output: 5000 zatoshis\n", "  - Output: some zatoshis\n"),
+  "malformed Orchard output line.",
+  { network: "main" },
+);
+
+assertRejected(
+  validOrchardInspect.replace(/Sighash for shielded components: [0-9a-f]{64}$/, "Sighash for shielded components: not-hex"),
+  "malformed shielded sighash line.",
+  { network: "main" },
+);
+
+assertRejected(
+  validOrchardInspect.replace("u1y3untlvq77", "utest1y3untlvq77"),
+  "recipient does not match the declared network.",
+  { network: "main" },
+);
+
+assertRejected(
+  `${validOrchardInspect}\nUnexpected: field`,
+  "unexpected extra inspect output.",
+  { network: "main" },
+);
 
 assertRejected(
   validInspect.replace(/\nVersion: V6$/, ""),

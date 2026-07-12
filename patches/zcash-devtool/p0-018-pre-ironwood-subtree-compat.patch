@@ -1,0 +1,98 @@
+diff --git a/src/commands/wallet/sync.rs b/src/commands/wallet/sync.rs
+index f021b36..0755661 100644
+--- a/src/commands/wallet/sync.rs
++++ b/src/commands/wallet/sync.rs
+@@ -382,22 +382,47 @@ async fn update_subtree_roots<P: Parameters>(
+     db_data.put_orchard_subtree_roots(0, &orchard_roots)?;
+ 
+     // Ironwood note commitments are Orchard-shaped, so its subtree roots use the same
+-    // hash type. A server that predates Ironwood activation simply streams none.
++    // hash type. Some servers that predate Ironwood reject the protocol enum instead of
++    // returning an empty stream; that response is equivalent to having no Ironwood roots.
+     let mut request = service::GetSubtreeRootsArg::default();
+     request.set_shielded_protocol(service::ShieldedProtocol::Ironwood);
+-    let ironwood_roots: Vec<CommitmentTreeRoot<MerkleHashOrchard>> = client
+-        .get_subtree_roots(request)
+-        .await?
+-        .into_inner()
+-        .and_then(|root| async move {
+-            let root_hash = MerkleHashOrchard::read(&root.root_hash[..])?;
+-            Ok(CommitmentTreeRoot::from_parts(
+-                BlockHeight::from_u32(root.completing_block_height as u32),
+-                root_hash,
+-            ))
+-        })
+-        .try_collect()
+-        .await?;
++    let ironwood_response = match client.get_subtree_roots(request).await {
++        Ok(response) => Some(response),
++        Err(status) if is_pre_ironwood_server(&status) => {
++            info!(
++                "Server does not recognize Ironwood subtree requests; continuing without Ironwood roots"
++            );
++            None
++        }
++        Err(status) => return Err(status.into()),
++    };
++    let ironwood_roots: Vec<CommitmentTreeRoot<MerkleHashOrchard>> = if let Some(response) =
++        ironwood_response
++    {
++        let roots = response
++            .into_inner()
++            .and_then(|root| async move {
++                let root_hash = MerkleHashOrchard::read(&root.root_hash[..])?;
++                Ok(CommitmentTreeRoot::from_parts(
++                    BlockHeight::from_u32(root.completing_block_height as u32),
++                    root_hash,
++                ))
++            })
++            .try_collect()
++            .await;
++        match roots {
++            Ok(roots) => roots,
++            Err(status) if is_pre_ironwood_server(&status) => {
++                info!(
++                    "Server does not recognize Ironwood subtree requests; continuing without Ironwood roots"
++                );
++                vec![]
++            }
++            Err(status) => return Err(status.into()),
++        }
++    } else {
++        vec![]
++    };
+ 
+     info!("Ironwood tree has {} subtrees", ironwood_roots.len());
+     db_data.put_ironwood_subtree_roots(0, &ironwood_roots)?;
+@@ -405,6 +430,31 @@ async fn update_subtree_roots<P: Parameters>(
+     Ok(())
+ }
+ 
++fn is_pre_ironwood_server(status: &tonic::Status) -> bool {
++    status.code() == tonic::Code::Unknown
++        && status
++            .message()
++            .eq_ignore_ascii_case("unrecognized shielded protocol")
++}
++
++#[cfg(test)]
++mod tests {
++    use super::is_pre_ironwood_server;
++
++    #[test]
++    fn identifies_only_the_known_pre_ironwood_response() {
++        assert!(is_pre_ironwood_server(&tonic::Status::unknown(
++            "unrecognized shielded protocol"
++        )));
++        assert!(!is_pre_ironwood_server(&tonic::Status::invalid_argument(
++            "unrecognized shielded protocol"
++        )));
++        assert!(!is_pre_ironwood_server(&tonic::Status::unknown(
++            "another server error"
++        )));
++    }
++}
++
+ async fn update_chain_tip<P: Parameters>(
+     client: &mut CompactTxStreamerClient<Channel>,
+     db_data: &mut WalletDb<rusqlite::Connection, P, SystemClock, OsRng>,
