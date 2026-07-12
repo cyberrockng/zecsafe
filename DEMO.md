@@ -1,5 +1,7 @@
 # ZecSafe Demo
 
+Hosted demo: <https://zecsafe.vercel.app/demo>
+
 ## Fast path
 
 Open the proof-first route:

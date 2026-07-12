@@ -6,6 +6,8 @@
 
 A 2-of-3 FROST group authorized a real shielded Zcash mainnet transaction **while one participant was unavailable**.
 
+**Live demo:** [https://zecsafe.vercel.app/demo](https://zecsafe.vercel.app/demo)
+
 ```text
 Network:      main
 Txid:         27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
@@ -31,6 +33,14 @@ make judge-proof-mainnet-tamper   # VERDICT: TAMPER DETECTION PASS
 There are no dependencies to install. ZecSafe runs on the Node standard library.
 
 ## The 60-second demo
+
+Hosted:
+
+```text
+https://zecsafe.vercel.app/demo
+```
+
+Local:
 
 ```bash
 npm start        # http://127.0.0.1:4173/

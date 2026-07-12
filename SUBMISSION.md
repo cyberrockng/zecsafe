@@ -70,6 +70,14 @@ ZecSafe public proof data-classification tests passed.
 
 ## 9. Demo
 
+Production:
+
+```text
+https://zecsafe.vercel.app/demo
+```
+
+Local:
+
 ```bash
 npm start        # http://127.0.0.1:4173/
 ```
