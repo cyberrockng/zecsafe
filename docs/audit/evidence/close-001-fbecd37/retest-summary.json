@@ -1,0 +1,54 @@
+{
+  "schema_version": "zecsafe-closeout-retest-v1",
+  "generated_at": "2026-07-12T23:16:38Z",
+  "finding": "CLOSE-001",
+  "status": "RESOLVED",
+  "finding_commit": "c5d1750941e89a146941a9a55455e736a69c35b2",
+  "remediation_commit": "fbecd37de26309c5d2024dcff2b77f26d2ed60b0",
+  "fresh_clone": true,
+  "commands": [
+    {
+      "command": "npm run check",
+      "exit_code": 0
+    },
+    {
+      "command": "make judge-proof-mainnet",
+      "exit_code": 0,
+      "result": "VERDICT: VERIFIED RECORDED ZECSAFE PROOF"
+    },
+    {
+      "command": "make judge-proof-mainnet-tamper",
+      "exit_code": 0,
+      "result": "7 of 7 mutations rejected"
+    },
+    {
+      "command": "make proof-run-dry",
+      "exit_code": 0,
+      "result": "14 PASS and expected human broadcast WAIT"
+    },
+    {
+      "command": "Chromium closeout UI audit",
+      "exit_code": 0,
+      "browser": "Chrome/149.0.7827.55"
+    }
+  ],
+  "mismatch_assertions": {
+    "aggregate_verdict": "BLOCKED",
+    "recipient": "FAIL",
+    "binding": "FAIL",
+    "signing_control": "Signing Control Disabled",
+    "frost_authorization": "NOT STARTED — BLOCKED BY BINDING FIREWALL",
+    "pczt_completion": "NOT RUN — SIGNING WAS BLOCKED",
+    "mainnet": "NOT BROADCAST — SYNTHETIC SAFETY TEST",
+    "proof": "NO EXPORT — SYNTHETIC SAFETY TEST",
+    "verifier_disabled": true,
+    "download_disabled": true,
+    "synthetic_export_rejected": true
+  },
+  "recorded_proof_sha256": "3317b4cecf0cad0b7271a41feb457f4200e65dbc8b240c46d7e1def812033075",
+  "evidence": {
+    "ui_audit_sha256": "b76490c1c1c5c24fb44d02e37a5e187d3644a2816257edb3d7247c467f69ce00",
+    "mobile_mismatch_screenshot_sha256": "5cc31eb97b1c4093d94038e23d7ade393a27855f521e790385b32aff5be5196e",
+    "submission_mismatch_screenshot_sha256": "917fed6a02f51f3f40929af1b5173d0b76a97d6df8ea93ca69ad37994a2b0d4d"
+  }
+}

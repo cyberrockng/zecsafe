@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../../../..");
-const roots = [join(repo, "docs/screenshots"), here];
+const auditScreenshotRoot = process.env.AUDIT_SCREENSHOT_ROOT ?? here;
+const outputFile = process.env.AUDIT_SAFETY_OUTPUT ?? join(auditScreenshotRoot, "screenshot-safety.json");
+const targetCommit = process.env.AUDIT_TARGET_COMMIT ?? "c5d1750941e89a146941a9a55455e736a69c35b2";
+const roots = [join(repo, "docs/screenshots"), auditScreenshotRoot];
 const metadataChunkTypes = new Set(["tEXt", "zTXt", "iTXt", "eXIf"]);
 
 function parsePng(buffer) {
@@ -58,7 +61,7 @@ for (const file of files.sort()) {
 
 const report = {
   generated_at: new Date().toISOString(),
-  target_commit: "c5d1750941e89a146941a9a55455e736a69c35b2",
+  target_commit: targetCommit,
   files: results,
   summary: {
     count: results.length,
@@ -69,5 +72,5 @@ const report = {
   },
 };
 
-await writeFile(join(here, "screenshot-safety.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+await writeFile(outputFile, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(JSON.stringify(report.summary, null, 2));

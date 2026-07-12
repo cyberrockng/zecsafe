@@ -1,0 +1,179 @@
+{
+  "generated_at": "2026-07-12T23:16:28.549Z",
+  "target_commit": "fbecd37de26309c5d2024dcff2b77f26d2ed60b0",
+  "files": [
+    {
+      "file": "docs/audit/evidence/close-001-fbecd37/ui-binding-mismatch-390.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 57601,
+      "sha256": "5cc31eb97b1c4093d94038e23d7ade393a27855f521e790385b32aff5be5196e",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/audit/evidence/close-001-fbecd37/ui-demo-1280.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 128591,
+      "sha256": "2a9e7438ad1b217c5ac554025e8d8a4fb6294b06bd24d020bd23998dc4e51a9c",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/audit/evidence/close-001-fbecd37/ui-demo-1440.png",
+      "width": 1440,
+      "height": 900,
+      "bytes": 149839,
+      "sha256": "fa9dc493e18c2292d834437496a38de217a978fe005166f2c4444d94a122df78",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/audit/evidence/close-001-fbecd37/ui-demo-390.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 69823,
+      "sha256": "0afaad01d4202a70c45af8997caebdd21297819126e6c67c4a62d58f9c942152",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/audit/evidence/close-001-fbecd37/ui-proof-detail-1440.png",
+      "width": 1440,
+      "height": 900,
+      "bytes": 147575,
+      "sha256": "9e50c843d48ac127f29ad8a9649befd9ccad7d731130233e842020fa6a3256c2",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/01-first-glance.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 158048,
+      "sha256": "276f04790466a0f0e19a38e7954f5270c29f5335e05773518c9baf869a23751f",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/02-review.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 123738,
+      "sha256": "86e0c68024d72c17366230eb6c864d74dfa04a0de640e505857b22526980661d",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/03-binding-firewall.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 106174,
+      "sha256": "4cdbb0597755d91466d11e171463510c9d00d6e40bbb8c2472d1e9d102f38327",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/04-binding-mismatch.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 110571,
+      "sha256": "917fed6a02f51f3f40929af1b5173d0b76a97d6df8ea93ca69ad37994a2b0d4d",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/05-authorize-unavailable.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 148160,
+      "sha256": "23fe6287051af6c3469686d5bf6b424000be6c76b5d219a28d3d046ce2fab8f2",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/06-proof-detail.png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 172087,
+      "sha256": "bc6d7480994f96c4b98e224bfbddef98ac75d9f0856162f4d54bdf98d6845e00",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    },
+    {
+      "file": "docs/screenshots/07-mobile-390.png",
+      "width": 390,
+      "height": 844,
+      "bytes": 69823,
+      "sha256": "0afaad01d4202a70c45af8997caebdd21297819126e6c67c4a62d58f9c942152",
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "metadata_chunks": [],
+      "metadata_chunk_count": 0
+    }
+  ],
+  "summary": {
+    "count": 12,
+    "files_with_metadata_chunks": [],
+    "stale_screenshot_names_present": []
+  }
+}
