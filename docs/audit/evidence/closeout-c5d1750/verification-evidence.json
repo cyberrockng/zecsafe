@@ -1,0 +1,122 @@
+{
+  "schema_version": "zecsafe-closeout-evidence-v1",
+  "generated_at": "2026-07-12T22:53:38Z",
+  "scope": "Read-only current-commit audit; audit evidence and report were the only repository writes.",
+  "target": {
+    "repository": "https://github.com/cyberrockng/zecsafe",
+    "branch": "main",
+    "commit": "c5d1750941e89a146941a9a55455e736a69c35b2",
+    "origin_main": "c5d1750941e89a146941a9a55455e736a69c35b2",
+    "fresh_clone": "/tmp/zecsafe-closeout-c5d1750-fresh",
+    "fresh_clone_clean": true
+  },
+  "audit_contract": {
+    "file": "ZECSAFE_REPO_GROUNDED_FINAL_AUDIT_PLAN_V3.md",
+    "sha256": "6aae8c432326fad9282541e1d5b41d6eb4d0f59cbebd5506aae40f1fec1f8ddc"
+  },
+  "environment": {
+    "platform": "WSL2 Linux 6.18.33.2 x86_64",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "rustc": "1.96.0",
+    "cargo": "1.96.0",
+    "browser": "Chrome/149.0.7827.55"
+  },
+  "public_fresh_clone_commands": [
+    {
+      "command": "npm run check",
+      "exit_code": 0,
+      "result": "16 suites, syntax verification, and repository security scan passed"
+    },
+    {
+      "command": "make judge-proof-mainnet",
+      "exit_code": 0,
+      "result": "VERDICT: VERIFIED RECORDED ZECSAFE PROOF"
+    },
+    {
+      "command": "make judge-proof-mainnet-tamper",
+      "exit_code": 0,
+      "result": "7 of 7 mutations rejected"
+    },
+    {
+      "command": "make proof-run-dry",
+      "exit_code": 0,
+      "result": "14 PASS and the expected human broadcast WAIT"
+    },
+    {
+      "command": "make judge-proof",
+      "exit_code": 0,
+      "result": "regression fixture verified"
+    }
+  ],
+  "proof_reproduction": {
+    "tracked_file_sha256": "3317b4cecf0cad0b7271a41feb457f4200e65dbc8b240c46d7e1def812033075",
+    "regenerated_file_sha256": "3317b4cecf0cad0b7271a41feb457f4200e65dbc8b240c46d7e1def812033075",
+    "byte_identical": true,
+    "canonical_bundle_hash": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d"
+  },
+  "level_b": {
+    "manifest_sha256": "002000ab7c0c246b1d3c47bba27054088c3afb560def235d07609b546c417df5",
+    "secret_values_read": false,
+    "artifact_hashes": {
+      "source_pczt": "3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931",
+      "sighash": "cd551487fcc14602d52789ccd77bc3443ec16665ec5792ffa50a943051c99928",
+      "aggregate_signature": "c9b7508cd554dfa8de311cdaabd4518c19093c95da5761474808cf2c277f12ac",
+      "signed_pczt": "df8cf3ad2fa7cfaa09def2756ba1995959fe9b70c0d5d98a9934cfd3e071b162",
+      "proven_pczt": "6b32eaa4f0fbd8abf862943cbabd77a46d2b3ab561038f4a8a617fb908235869",
+      "combined_pczt": "945ffd063dc1921caa5e37cd01564cb0a0ac4e9f801f9214b5b9b1c6d69d7184"
+    }
+  },
+  "pinned_toolchains": {
+    "frost": {
+      "commit": "2016e44ba4a4757a996300350063b937a2ad33e8",
+      "command": "cargo test --locked --workspace",
+      "exit_code": 0
+    },
+    "frost_tools": {
+      "commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+      "command": "cargo test --locked --workspace",
+      "exit_code": 0,
+      "observed_coverage": "14 frost-client unit tests, 5 frostd integration tests, 1 trusted-dealer journey, and 1 doctest passed; zero-test binaries compiled"
+    },
+    "zcash_devtool": {
+      "commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+      "command": "cargo test --locked",
+      "exit_code": 0,
+      "observed_coverage": "workspace compiled; upstream declares zero tests at this pinned commit"
+    },
+    "compatibility_patch_sha256": "4a44cfc533dec72fb4e93bcbf81406260d4b3f6e77344b53035426ab297c7d8e"
+  },
+  "continuous_integration": {
+    "head_sha": "c5d1750941e89a146941a9a55455e736a69c35b2",
+    "conclusion": "success",
+    "url": "https://github.com/cyberrockng/zecsafe/actions/runs/29210798385"
+  },
+  "mainnet": {
+    "txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+    "block_height": 3409837,
+    "block_time": "2026-07-12T14:54:27Z",
+    "transaction_size_bytes": 9165,
+    "transparent_input_count": 0,
+    "transparent_output_count": 0,
+    "independent_lookup": "https://blockchair.com/zcash/transaction/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527"
+  },
+  "browser_and_server_evidence": {
+    "ui": "ui-audit.json",
+    "server": "server-audit.json",
+    "screenshot_safety": "screenshot-safety.json",
+    "screenshots": [
+      "ui-demo-1440.png",
+      "ui-demo-1280.png",
+      "ui-demo-390.png",
+      "ui-binding-mismatch-390.png",
+      "ui-proof-detail-1440.png"
+    ]
+  },
+  "submission_state": {
+    "zecsafe_prs_in_zechub_search": 0,
+    "video": "EXTERNAL_EVIDENCE_REQUIRED",
+    "discord_post": "EXTERNAL_EVIDENCE_REQUIRED",
+    "deadline": "2026-07-15T00:00:00Z"
+  }
+}

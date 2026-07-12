@@ -1,0 +1,688 @@
+{
+  "generated_at": "2026-07-12T22:42:32.989Z",
+  "target_commit": "c5d1750941e89a146941a9a55455e736a69c35b2",
+  "local_only": true,
+  "browser": "Chrome/149.0.7827.55",
+  "screenshots": [
+    {
+      "file": "ui-demo-1440.png",
+      "width": 1440,
+      "height": 900,
+      "mobile": false,
+      "click": null,
+      "scrollTo": null
+    },
+    {
+      "file": "ui-demo-1280.png",
+      "width": 1280,
+      "height": 800,
+      "mobile": false,
+      "click": null,
+      "scrollTo": null
+    },
+    {
+      "file": "ui-demo-390.png",
+      "width": 390,
+      "height": 844,
+      "mobile": true,
+      "click": null,
+      "scrollTo": null
+    },
+    {
+      "file": "ui-binding-mismatch-390.png",
+      "width": 390,
+      "height": 844,
+      "mobile": true,
+      "click": "[data-demo-mode=\"mismatch\"]",
+      "scrollTo": "#verify"
+    },
+    {
+      "file": "ui-proof-detail-1440.png",
+      "width": 1440,
+      "height": 900,
+      "mobile": false,
+      "click": null,
+      "scrollTo": "#prove"
+    }
+  ],
+  "dom_cases": [
+    {
+      "file": "ui-demo-1440.png",
+      "dom": {
+        "url": "http://127.0.0.1:4191/demo?closeout=ui-demo-1440.png",
+        "title": "ZecSafe",
+        "lang": "en",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "document_size": {
+          "client_width": 1440,
+          "scroll_width": 1440,
+          "scroll_height": 3635
+        },
+        "horizontal_overflow_pixels": 0,
+        "overflowing_elements": [],
+        "headings": [
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "The reviewed transaction intent"
+          },
+          {
+            "level": 3,
+            "text": "Binding Firewall: field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Threshold authorization with one participant unavailable"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          }
+        ],
+        "h1_count": 1,
+        "landmarks": {
+          "header": 1,
+          "nav": 1,
+          "main": 1,
+          "footer": 1
+        },
+        "interactive_count": 10,
+        "unnamed_interactives": 0,
+        "mode_buttons": [
+          {
+            "text": "PASS",
+            "aria_pressed": null,
+            "active_class": true
+          },
+          {
+            "text": "Mismatch",
+            "aria_pressed": null,
+            "active_class": false
+          }
+        ],
+        "first_screen_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove RECORDED VERIFIED MAINNET RUN ZECSAFE Lose one key, not your ZEC. A 2-of-3 FROST authorization control plane for shielded Zcash. Replay Verified Mainnet Run Verify Proof RUN ID p0-023-20260712T145358Z UTC TIMESTAMP 2026-07-12T15:12:54.000Z TXID 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 CHAIN STATUS CONFIRMED ZCASH MAINNET 2 OF 3 FROST 1 UNAVAILABLE PROOF VERIFIED STEP 1 — REVIEW The reviewed transaction intent Recorded verified mainnet proof loaded. INTENT COMMITMENT sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7 PCZT FINGERPRINT sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931 NETWORK main THRESHOLD 2-of-3 Recipient, amount, and memo are withhel"
+      },
+      "nameless_ax_action_count": 0
+    },
+    {
+      "file": "ui-demo-1280.png",
+      "dom": {
+        "url": "http://127.0.0.1:4191/demo?closeout=ui-demo-1280.png",
+        "title": "ZecSafe",
+        "lang": "en",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "document_size": {
+          "client_width": 1280,
+          "scroll_width": 1280,
+          "scroll_height": 3635
+        },
+        "horizontal_overflow_pixels": 0,
+        "overflowing_elements": [],
+        "headings": [
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "The reviewed transaction intent"
+          },
+          {
+            "level": 3,
+            "text": "Binding Firewall: field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Threshold authorization with one participant unavailable"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          }
+        ],
+        "h1_count": 1,
+        "landmarks": {
+          "header": 1,
+          "nav": 1,
+          "main": 1,
+          "footer": 1
+        },
+        "interactive_count": 10,
+        "unnamed_interactives": 0,
+        "mode_buttons": [
+          {
+            "text": "PASS",
+            "aria_pressed": null,
+            "active_class": true
+          },
+          {
+            "text": "Mismatch",
+            "aria_pressed": null,
+            "active_class": false
+          }
+        ],
+        "first_screen_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove RECORDED VERIFIED MAINNET RUN ZECSAFE Lose one key, not your ZEC. A 2-of-3 FROST authorization control plane for shielded Zcash. Replay Verified Mainnet Run Verify Proof RUN ID p0-023-20260712T145358Z UTC TIMESTAMP 2026-07-12T15:12:54.000Z TXID 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 CHAIN STATUS CONFIRMED ZCASH MAINNET 2 OF 3 FROST 1 UNAVAILABLE PROOF VERIFIED STEP 1 — REVIEW The reviewed transaction intent Recorded verified mainnet proof loaded. INTENT COMMITMENT sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7 PCZT FINGERPRINT sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931 NETWORK main THRESHOLD 2-of-3 Recipient, amount, and memo are withhel"
+      },
+      "nameless_ax_action_count": 0
+    },
+    {
+      "file": "ui-demo-390.png",
+      "dom": {
+        "url": "http://127.0.0.1:4191/demo?closeout=ui-demo-390.png",
+        "title": "ZecSafe",
+        "lang": "en",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document_size": {
+          "client_width": 390,
+          "scroll_width": 390,
+          "scroll_height": 7496
+        },
+        "horizontal_overflow_pixels": 0,
+        "overflowing_elements": [],
+        "headings": [
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "The reviewed transaction intent"
+          },
+          {
+            "level": 3,
+            "text": "Binding Firewall: field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Threshold authorization with one participant unavailable"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          }
+        ],
+        "h1_count": 1,
+        "landmarks": {
+          "header": 1,
+          "nav": 1,
+          "main": 1,
+          "footer": 1
+        },
+        "interactive_count": 10,
+        "unnamed_interactives": 0,
+        "mode_buttons": [
+          {
+            "text": "PASS",
+            "aria_pressed": null,
+            "active_class": true
+          },
+          {
+            "text": "Mismatch",
+            "aria_pressed": null,
+            "active_class": false
+          }
+        ],
+        "first_screen_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove RECORDED VERIFIED MAINNET RUN ZECSAFE Lose one key, not your ZEC. A 2-of-3 FROST authorization control plane for shielded Zcash. Replay Verified Mainnet Run Verify Proof RUN ID p0-023-20260712T145358Z UTC TIMESTAMP 2026-07-12T15:12:54.000Z TXID 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 CHAIN STATUS CONFIRMED ZCASH MAINNET 2 OF 3 FROST 1 UNAVAILABLE PROOF VERIFIED STEP 1 — REVIEW The reviewed transaction intent Recorded verified mainnet proof loaded. INTENT COMMITMENT sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7 PCZT FINGERPRINT sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931 NETWORK main THRESHOLD 2-of-3 Recipient, amount, and memo are withhel"
+      },
+      "nameless_ax_action_count": 0
+    },
+    {
+      "file": "ui-binding-mismatch-390.png",
+      "dom": {
+        "url": "http://127.0.0.1:4191/demo?closeout=ui-binding-mismatch-390.png",
+        "title": "ZecSafe",
+        "lang": "en",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document_size": {
+          "client_width": 390,
+          "scroll_width": 390,
+          "scroll_height": 7592
+        },
+        "horizontal_overflow_pixels": 0,
+        "overflowing_elements": [],
+        "headings": [
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "The reviewed transaction intent"
+          },
+          {
+            "level": 3,
+            "text": "Binding Firewall: field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Threshold authorization with one participant unavailable"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          }
+        ],
+        "h1_count": 1,
+        "landmarks": {
+          "header": 1,
+          "nav": 1,
+          "main": 1,
+          "footer": 1
+        },
+        "interactive_count": 10,
+        "unnamed_interactives": 0,
+        "mode_buttons": [
+          {
+            "text": "PASS",
+            "aria_pressed": null,
+            "active_class": false
+          },
+          {
+            "text": "Mismatch",
+            "aria_pressed": null,
+            "active_class": true
+          }
+        ],
+        "first_screen_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove RECORDED VERIFIED MAINNET RUN ZECSAFE Lose one key, not your ZEC. A 2-of-3 FROST authorization control plane for shielded Zcash. Replay Verified Mainnet Run Verify Proof RUN ID p0-023-20260712T145358Z UTC TIMESTAMP 2026-07-12T15:12:54.000Z TXID 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 CHAIN STATUS CONFIRMED ZCASH MAINNET 2 OF 3 FROST 1 UNAVAILABLE PROOF VERIFIED STEP 1 — REVIEW The reviewed transaction intent Mismatch fixture active. The Binding Firewall blocks signing. INTENT COMMITMENT sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7 PCZT FINGERPRINT sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931 NETWORK main THRESHOLD 2-of-3 Recipient, amount"
+      },
+      "nameless_ax_action_count": 0
+    },
+    {
+      "file": "ui-proof-detail-1440.png",
+      "dom": {
+        "url": "http://127.0.0.1:4191/demo?closeout=ui-proof-detail-1440.png",
+        "title": "ZecSafe",
+        "lang": "en",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "document_size": {
+          "client_width": 1440,
+          "scroll_width": 1440,
+          "scroll_height": 3635
+        },
+        "horizontal_overflow_pixels": 0,
+        "overflowing_elements": [],
+        "headings": [
+          {
+            "level": 1,
+            "text": "ZECSAFE"
+          },
+          {
+            "level": 2,
+            "text": "Lose one key, not your ZEC."
+          },
+          {
+            "level": 3,
+            "text": "The reviewed transaction intent"
+          },
+          {
+            "level": 3,
+            "text": "Binding Firewall: field-level safety gate"
+          },
+          {
+            "level": 3,
+            "text": "Threshold authorization with one participant unavailable"
+          },
+          {
+            "level": 3,
+            "text": "Run state is derived from recorded events"
+          }
+        ],
+        "h1_count": 1,
+        "landmarks": {
+          "header": 1,
+          "nav": 1,
+          "main": 1,
+          "footer": 1
+        },
+        "interactive_count": 10,
+        "unnamed_interactives": 0,
+        "mode_buttons": [
+          {
+            "text": "PASS",
+            "aria_pressed": null,
+            "active_class": true
+          },
+          {
+            "text": "Mismatch",
+            "aria_pressed": null,
+            "active_class": false
+          }
+        ],
+        "first_screen_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove RECORDED VERIFIED MAINNET RUN ZECSAFE Lose one key, not your ZEC. A 2-of-3 FROST authorization control plane for shielded Zcash. Replay Verified Mainnet Run Verify Proof RUN ID p0-023-20260712T145358Z UTC TIMESTAMP 2026-07-12T15:12:54.000Z TXID 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527 CHAIN STATUS CONFIRMED ZCASH MAINNET 2 OF 3 FROST 1 UNAVAILABLE PROOF VERIFIED STEP 1 — REVIEW The reviewed transaction intent Recorded verified mainnet proof loaded. INTENT COMMITMENT sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7 PCZT FINGERPRINT sha256:3823d5eb24c81262fbb8d7628c40d3b4d36bad8fc105fea2afdbca0b3cd12931 NETWORK main THRESHOLD 2-of-3 Recipient, amount, and memo are withhel"
+      },
+      "nameless_ax_action_count": 0
+    }
+  ],
+  "pass_state": {
+    "mode": "PASS",
+    "safety_label": null,
+    "binding_rows": {
+      "source": "PASS",
+      "network": "PASS",
+      "recipient": "PASS",
+      "amount": "PASS",
+      "fee_policy": "PASS",
+      "memo_policy": "PASS",
+      "unexpected_output": "PASS",
+      "change_output": "PASS",
+      "binding": "PASS",
+      "pczt_fingerprint": "PASS",
+      "sighash": "PASS",
+      "group": "PASS",
+      "selected_signer": "PASS",
+      "confirmation": "PASS",
+      "threshold": "PASS",
+      "selected_signers": "PASS",
+      "signing_context": "PASS",
+      "signer_review": "PASS",
+      "session": "PASS",
+      "aggregate_signature": "PASS",
+      "source_pczt": "PASS",
+      "frost_signature": "PASS",
+      "signed_pczt": "PASS",
+      "proven_pczt": "PASS",
+      "pczt_combine": "PASS",
+      "final_binding": "PASS",
+      "broadcast_gate": "PASS"
+    },
+    "signing_control": "Signing Control Enabled",
+    "evidence_verdict": "PROOF VERIFIED",
+    "flow": {
+      "Vault": "2-of-3 redpallas-rerandomized FROST group",
+      "Failure condition": "1 participant unavailable; threshold still satisfiable",
+      "Intent": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+      "Binding Firewall": "PASS",
+      "FROST authorization": "THRESHOLD_REACHED",
+      "PCZT completion": "PASS",
+      "Mainnet": "CONFIRMED / 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Proof": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d"
+    },
+    "proof_facts": {
+      "Run ID": "p0-023-20260712T145358Z",
+      "Recorded Verified Mainnet Run": "Recorded Verified Mainnet Run",
+      "UTC timestamp": "2026-07-12T15:12:54.000Z",
+      "Txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Recorded chain status": "CONFIRMED",
+      "Block height": "3409837",
+      "Binding status": "PASS",
+      "Proof bundle hash": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d",
+      "Exact ZecSafe commit": "ad83269298b73396ac0f4b743c59301de77fe937",
+      "frost-tools commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+      "zcash-devtool commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+      "pczt signer library commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+    }
+  },
+  "mismatch_state": {
+    "mode": "Mismatch",
+    "safety_label": "SAFETY TEST — NOT A BROADCAST TRANSACTION",
+    "binding_rows": {
+      "source": "PASS",
+      "network": "PASS",
+      "recipient": "FAIL",
+      "amount": "PASS",
+      "fee_policy": "PASS",
+      "memo_policy": "PASS",
+      "unexpected_output": "PASS",
+      "change_output": "PASS",
+      "binding": "PASS",
+      "pczt_fingerprint": "PASS",
+      "sighash": "PASS",
+      "group": "PASS",
+      "selected_signer": "PASS",
+      "confirmation": "PASS",
+      "threshold": "PASS",
+      "selected_signers": "PASS",
+      "signing_context": "PASS",
+      "signer_review": "PASS",
+      "session": "PASS",
+      "aggregate_signature": "PASS",
+      "source_pczt": "PASS",
+      "frost_signature": "PASS",
+      "signed_pczt": "PASS",
+      "proven_pczt": "PASS",
+      "pczt_combine": "PASS",
+      "final_binding": "PASS",
+      "broadcast_gate": "PASS"
+    },
+    "signing_control": "Signing Control Disabled",
+    "evidence_verdict": "PROOF VERIFIED",
+    "flow": {
+      "Vault": "2-of-3 redpallas-rerandomized FROST group",
+      "Failure condition": "1 participant unavailable; threshold still satisfiable",
+      "Intent": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+      "Binding Firewall": "FAIL",
+      "FROST authorization": "THRESHOLD_REACHED",
+      "PCZT completion": "FAIL",
+      "Mainnet": "CONFIRMED / 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Proof": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d"
+    },
+    "proof_facts": {
+      "Run ID": "p0-023-20260712T145358Z",
+      "Recorded Verified Mainnet Run": "Recorded Verified Mainnet Run",
+      "UTC timestamp": "2026-07-12T15:12:54.000Z",
+      "Txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Recorded chain status": "CONFIRMED",
+      "Block height": "3409837",
+      "Binding status": "FAIL",
+      "Proof bundle hash": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d",
+      "Exact ZecSafe commit": "ad83269298b73396ac0f4b743c59301de77fe937",
+      "frost-tools commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+      "zcash-devtool commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+      "pczt signer library commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+    }
+  },
+  "focus_sequence": [
+    {
+      "tag": "A",
+      "id": null,
+      "text": "Review",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "A",
+      "id": null,
+      "text": "Verify",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "A",
+      "id": null,
+      "text": "Authorize",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "A",
+      "id": null,
+      "text": "Prove",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "loadVerifiedDemo",
+      "text": "Replay Verified Mainnet Run",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "verifyPublicProof",
+      "text": "Verify Proof",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BUTTON",
+      "id": null,
+      "text": "PASS",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BUTTON",
+      "id": null,
+      "text": "Mismatch",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "downloadPublicProof",
+      "text": "Download Public Proof",
+      "outline_style": "auto",
+      "outline_width": "1px",
+      "outline_color": "rgb(16, 16, 16)",
+      "box_shadow": "none"
+    },
+    {
+      "tag": "BODY",
+      "id": null,
+      "text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove Recorded Verified Mainnet",
+      "outline_style": "none",
+      "outline_width": "3px",
+      "outline_color": "rgb(21, 35, 30)",
+      "box_shadow": "none"
+    }
+  ],
+  "hash_navigation": {
+    "after_verify_link": {
+      "hash": "#verify",
+      "active_tag": "BODY",
+      "active_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove Recor",
+      "target_top": 88
+    },
+    "after_back": {
+      "hash": "#verify",
+      "active_tag": "BODY",
+      "active_text": "ZS ZecSafe FROST authorization control plane Review Verify Authorize Prove Recor",
+      "target_top": 88
+    }
+  },
+  "reduced_motion": {
+    "media_matches": true,
+    "animated_visible_elements": []
+  },
+  "missing_fixture_state": {
+    "error_panel": "Verified run did not loadFailed to fetch",
+    "body_contains_confirmed": false
+  },
+  "malformed_fixture_state": {
+    "error_panel": "Verified run did not loadFailed to execute 'json' on 'Response': Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+    "body_contains_confirmed": false
+  },
+  "server_output": [
+    "ZecSafe listening on http://127.0.0.1:4191\n"
+  ],
+  "mismatch_state_after_verify": {
+    "mode": "Mismatch",
+    "safety_label": "SAFETY TEST — NOT A BROADCAST TRANSACTION",
+    "binding_rows": {
+      "source": "PASS",
+      "network": "PASS",
+      "recipient": "FAIL",
+      "amount": "PASS",
+      "fee_policy": "PASS",
+      "memo_policy": "PASS",
+      "unexpected_output": "PASS",
+      "change_output": "PASS",
+      "binding": "PASS",
+      "pczt_fingerprint": "PASS",
+      "sighash": "PASS",
+      "group": "PASS",
+      "selected_signer": "PASS",
+      "confirmation": "PASS",
+      "threshold": "PASS",
+      "selected_signers": "PASS",
+      "signing_context": "PASS",
+      "signer_review": "PASS",
+      "session": "PASS",
+      "aggregate_signature": "PASS",
+      "source_pczt": "PASS",
+      "frost_signature": "PASS",
+      "signed_pczt": "PASS",
+      "proven_pczt": "PASS",
+      "pczt_combine": "PASS",
+      "final_binding": "PASS",
+      "broadcast_gate": "PASS"
+    },
+    "signing_control": "Signing Control Disabled",
+    "evidence_verdict": "PROOF BLOCKED",
+    "flow": {
+      "Vault": "2-of-3 redpallas-rerandomized FROST group",
+      "Failure condition": "1 participant unavailable; threshold still satisfiable",
+      "Intent": "sha256:2bc6da1543372f8d7babcd4e7050f5ebf8f889d6a33a3b834602e581fea709d7",
+      "Binding Firewall": "FAIL",
+      "FROST authorization": "THRESHOLD_REACHED",
+      "PCZT completion": "FAIL",
+      "Mainnet": "CONFIRMED / 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Proof": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d"
+    },
+    "proof_facts": {
+      "Run ID": "p0-023-20260712T145358Z",
+      "Recorded Verified Mainnet Run": "Recorded Verified Mainnet Run",
+      "UTC timestamp": "2026-07-12T15:12:54.000Z",
+      "Txid": "27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Recorded chain status": "CONFIRMED",
+      "Block height": "3409837",
+      "Binding status": "FAIL",
+      "Proof bundle hash": "sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d",
+      "Exact ZecSafe commit": "ad83269298b73396ac0f4b743c59301de77fe937",
+      "frost-tools commit": "7d33a95fecc91dacdb1503933e2bee43780d3293",
+      "zcash-devtool commit": "1b065594d958d1cad2deafe7cd2e2fcc2774c46c",
+      "pczt signer library commit": "8e6864a3c67cab3c64a052dd20f83c553662e8b2"
+    }
+  }
+}

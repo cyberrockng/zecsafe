@@ -1,0 +1,468 @@
+{
+  "generated_at": "2026-07-12T22:46:02.609Z",
+  "target_commit": "c5d1750941e89a146941a9a55455e736a69c35b2",
+  "local_only": true,
+  "cases": [
+    {
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 6,
+      "body_preview": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>ZecSafe</title>\n    <link rel=\"stylesheet\" href=\"src/styles.css\" />\n  </head>\n  <body>\n    <div id=\"app\"></div>\n    <script type=\"module\" src=\"src/app.js\"></script>\n  </body>\n</html>\n"
+    },
+    {
+      "method": "GET",
+      "path": "/demo",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 5,
+      "body_preview": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>ZecSafe</title>\n    <link rel=\"stylesheet\" href=\"src/styles.css\" />\n  </head>\n  <body>\n    <div id=\"app\"></div>\n    <script type=\"module\" src=\"src/app.js\"></script>\n  </body>\n</html>\n"
+    },
+    {
+      "method": "GET",
+      "path": "/fixtures/verified-mainnet-run/proof.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 4,
+      "body_preview": "{\n  \"schema_version\": \"zecsafe-proof-v1\",\n  \"project\": \"ZecSafe\",\n  \"network\": \"main\",\n  \"run_id\": \"p0-023-20260712T145358Z\",\n  \"recorded_at\": \"2026-07-12T15:12:54.000Z\",\n  \"zecsafe_commit\": \"ad83269298b73396ac0f4b743c59301de77fe937\",\n  \"vault\": {\n    \"group_fingerprint\": \"sha256:bbdab30a787df9ea12c048e5785aa63b8d7337e67b4b0c4206ce05727d0d0354\",\n    \"ciphersuite\": \"redpallas-rerandomized\",\n    \"th"
+    },
+    {
+      "method": "GET",
+      "path": "/fixtures/verified-mainnet-run/events.public.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 4,
+      "body_preview": "{\n  \"label\": \"Recorded Verified Mainnet Run\",\n  \"schema_version\": \"zecsafe-public-proof-events-v1\",\n  \"note\": \"Each entry is the public-safe ProofEvent v1 projection emitted by the named headless gate during the real mainnet run. Events span two external run IDs (the FROST session run and the broadcast run), so they are annotated per source rather than merged into a single sequence. Raw sighash, s"
+    },
+    {
+      "method": "GET",
+      "path": "/.git/HEAD",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/.git/config",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/server.mjs",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/package.json",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/docs/history/HANDOFF.md",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/../../../etc/passwd",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/..%2f..%2f..%2fetc%2fpasswd",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/%2e%2e/%2e%2e/etc/passwd",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/src/%00app.js",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/src/does-not-exist.mjs",
+      "status": 404,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "Not found"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "{\"status\":\"ok\",\"rpcConfigured\":false,\"transactionProof\":true,\"intentV1\":true,\"proofSource\":\"fixtures/verified-mainnet-run/proof.json\",\"judgeProofCommand\":\"make judge-proof-mainnet\"}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/health",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 3,
+      "body_preview": "{\"status\":\"not_found\"}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/intent/create",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "{\"status\":\"not_found\"}"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/intent/create",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "{\"status\":\"not_found\"}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/transaction-proof",
+      "status": 400,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 3,
+      "body_preview": "{\"status\":\"rejected\",\"message\":\"Enter a 64-character Zcash transaction ID.\"}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/intent/create",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 3,
+      "body_preview": "{\"status\":\"success\",\"message\":\"Intent created\",\"intent\":{\"schema_version\":\"zecsafe-intent-v1\",\"network\":\"main\",\"vault_id\":\"vault_closeout_audit\",\"group_fingerprint\":\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"recipient\":\"t1Lwd1X4RyMo7gXUjHwx4YfTnep7ZGh7ZGn\",\"amount_zatoshis\":10000,\"memo_utf8\":\"bounded local audit fixture\",\"fee_policy\":{\"mode\":\"tool_default\",\"max_fee_"
+    },
+    {
+      "method": "POST",
+      "path": "/api/intent/create",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 2,
+      "body_preview": "{\"status\":\"success\",\"message\":\"Intent created\",\"intent\":{\"schema_version\":\"zecsafe-intent-v1\",\"network\":\"main\",\"vault_id\":\"vault_closeout_audit\",\"group_fingerprint\":\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"recipient\":\"t1Lwd1X4RyMo7gXUjHwx4YfTnep7ZGh7ZGn\",\"amount_zatoshis\":10000,\"memo_utf8\":\"bounded local audit fixture\",\"fee_policy\":{\"mode\":\"tool_default\",\"max_fee_"
+    },
+    {
+      "method": "POST",
+      "path": "/api/intent/create",
+      "status": 400,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 1,
+      "body_preview": "{\"status\":\"bad_request\",\"message\":\"Malformed JSON body.\"}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/intent/create",
+      "status": 400,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 4,
+      "body_preview": "{\"status\":\"bad_request\",\"message\":\"Request body is too large.\"}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "no-referrer",
+        "x-frame-options": "DENY",
+        "date": "Sun, 12 Jul 2026 22:46:02 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "duration_ms": 7,
+      "body_preview": "{\"status\":\"ok\",\"rpcConfigured\":false,\"transactionProof\":true,\"intentV1\":true,\"proofSource\":\"fixtures/verified-mainnet-run/proof.json\",\"judgeProofCommand\":\"make judge-proof-mainnet\"}"
+    }
+  ],
+  "code_inspection": {
+    "origin_header_checked": false,
+    "request_content_type_checked": false,
+    "outbound_fetch_abort_signal_present": false,
+    "static_realpath_check_present": false,
+    "static_allowlist_present": true,
+    "loopback_default_present": true,
+    "request_timeout_ms": 15000,
+    "headers_timeout_ms": 16000
+  },
+  "symlinks_in_current_tree": [],
+  "listener": {
+    "exit_code": 0,
+    "matching_line": "LISTEN 0      511         127.0.0.1:4192      0.0.0.0:*    users:((\"MainThread\",pid=317426,fd=21))",
+    "stderr": null
+  },
+  "server_output": [
+    "ZecSafe listening on http://127.0.0.1:4192\n"
+  ]
+}
