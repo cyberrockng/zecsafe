@@ -20,8 +20,13 @@ export function proofEventsFromPublicLog(publicLog) {
 
 export function createBindingMismatchEvents(events) {
   const cloned = copy(events);
-  const review = cloned.find((event) => event?.data?.check_statuses?.recipient);
-  if (review) {
+
+  // EVERY event that reports a recipient check must fail. The reducer merges check_statuses across
+  // events in time order, so flipping only the first signer's review would be silently overwritten
+  // by the second signer's PASS - leaving the UI showing "signing disabled" while every field reads
+  // PASS, which is exactly the incoherent state this demo exists to disprove.
+  const reviews = cloned.filter((event) => event?.data?.check_statuses?.recipient);
+  for (const review of reviews) {
     review.status = "FAIL";
     review.public_message = "SAFETY TEST - recipient mismatch blocked signing.";
     review.data.check_statuses.recipient = "FAIL";

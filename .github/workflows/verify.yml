@@ -8,14 +8,33 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20 is the minimum supported LTS; 24 is the version ZecSafe is developed and audited
+        # against. Testing both keeps the documented support range honest rather than assumed.
+        node-version: [20, 24]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
+
+      # ZecSafe declares no dependencies and ships no lockfile, so there is nothing to install.
 
       - name: Run repository checks
         run: npm run check
+
+      - name: Verify the recorded mainnet proof
+        run: make judge-proof-mainnet
+
+      - name: Prove the recorded proof is tamper-evident
+        run: make judge-proof-mainnet-tamper
+
+      - name: Reproduce the headless proof kernel
+        run: make proof-run-dry
