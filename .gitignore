@@ -29,3 +29,4 @@ wallet.db
 *.uview
 *frost-share*
 *frost-secret*
+.vercel

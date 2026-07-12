@@ -161,6 +161,7 @@ const checks = [
   [server.includes("X-Content-Type-Options"), "server sets X-Content-Type-Options"],
 
   // Public hosting is a static allowlisted artifact, not the local repository server.
+  [vercelConfig.framework === null, "Vercel uses the framework-neutral static preset"],
   [vercelConfig.outputDirectory === "dist", "Vercel serves only the generated dist directory"],
   [vercelConfig.rewrites?.some((route) => route.source === "/demo" && route.destination === "/index.html"), "Vercel routes /demo to the static proof app"],
   [vercelConfig.headers?.some((route) => route.headers?.some((header) => header.key === "Content-Security-Policy")), "Vercel applies a Content-Security-Policy"],
