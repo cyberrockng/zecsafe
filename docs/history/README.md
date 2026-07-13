@@ -16,8 +16,8 @@ A judge does not need to read anything in this directory. Start at the repositor
 
 ## Related
 
-- [`docs/execution/`](../execution/) — the numbered execution gates (P0-001 … P0-024), each with its own evidence.
-- [`docs/audit/`](../audit/) — the independent V3 audit, its findings, and the remediation record.
+- [`execution/`](execution/) — the numbered execution gates (P0-001 … P0-024), each with its own evidence.
+- [`audit/`](audit/) — the independent V3 audit, its findings, and the remediation record.
 
 ## Bundle-hash note
 
