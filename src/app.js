@@ -25,6 +25,18 @@ const state = {
     verifyStatus: "idle",
     revealCount: Infinity,
   },
+  hero: {
+    revealCount: Infinity,
+  },
+  ui: {
+    txidExpanded: false,
+    txidCopied: false,
+  },
+  story: {
+    active: false,
+    chapter: 0,
+    paused: false,
+  },
   lab: {
     busy: false,
     editing: false,
@@ -32,10 +44,44 @@ const state = {
     proofText: null,
     result: null,
     error: null,
+    resultSeq: 0,
+    animatedSeq: 0,
   },
 };
 
 let replayTimer = null;
+let heroTimer = null;
+let storyTimer = null;
+let copiedTimer = null;
+let revealObserver = null;
+const revealedSections = new Set();
+
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const HERO_ROW_TOTAL = 7;
+
+function animateHeroReveal(total = HERO_ROW_TOTAL) {
+  if (heroTimer) clearInterval(heroTimer);
+  if (prefersReducedMotion()) {
+    state.hero.revealCount = Infinity;
+    render();
+    return;
+  }
+  state.hero.revealCount = 0;
+  render();
+  heroTimer = setInterval(() => {
+    state.hero.revealCount += 1;
+    document.querySelectorAll(".hero-panel__row").forEach((row, index) => {
+      if (index < state.hero.revealCount) row.classList.add("hero-panel__row--on");
+    });
+    if (state.hero.revealCount >= total) {
+      state.hero.revealCount = Infinity;
+      clearInterval(heroTimer);
+      heroTimer = null;
+    }
+  }, 300);
+}
 
 function animateFlowReveal(totalSteps) {
   if (replayTimer) clearInterval(replayTimer);
@@ -119,7 +165,10 @@ async function loadVerifiedProof(mode = state.demo.mode, { animate = false } = {
       reduced,
       verifyStatus: "idle",
     };
-    if (animate && mode !== "mismatch") animateFlowReveal(8);
+    if (animate && mode !== "mismatch") {
+      animateFlowReveal(8);
+      animateHeroReveal();
+    }
   } catch (error) {
     state.demo = {
       ...state.demo,
@@ -194,7 +243,7 @@ async function runLabVerification({ presetId = null, proofText = null } = {}) {
     }
 
     const result = await verifyProofInBrowser(candidate);
-    state.lab = { ...state.lab, busy: false, presetId, result, error: null };
+    state.lab = { ...state.lab, busy: false, presetId, result, error: null, resultSeq: state.lab.resultSeq + 1 };
   } catch (error) {
     state.lab = { ...state.lab, busy: false, presetId, result: null, error: error.message };
   }
@@ -203,14 +252,124 @@ async function runLabVerification({ presetId = null, proofText = null } = {}) {
 }
 
 function resetLab() {
-  state.lab = { busy: false, editing: false, presetId: null, proofText: null, result: null, error: null };
+  state.lab = { ...state.lab, busy: false, editing: false, presetId: null, proofText: null, result: null, error: null };
   render();
 }
 
-function renderLabCheck(check) {
-  const ok = check.status === "PASS";
+// The 60-second guided story drives the real page sections; it is
+// choreography over recorded evidence and the in-browser verifier,
+// never a separate mockup.
+const STORY_CHAPTERS = [
+  {
+    section: "authorize",
+    text: "Signer C is unavailable. Signers A and B satisfy the 2-of-3 threshold.",
+    enter() {
+      if (state.demo.mode !== "verified") setDemoMode("verified");
+    },
+  },
+  {
+    section: "verify",
+    text: "Before signing, ZecSafe checks the transaction field by field against what was reviewed.",
+    enter() {
+      if (state.demo.mode !== "verified") setDemoMode("verified");
+    },
+  },
+  {
+    section: "verify",
+    text: "Now a tampered recipient: signing is blocked before FROST begins. This is a labeled safety test.",
+    enter() {
+      setDemoMode("mismatch");
+    },
+  },
+  {
+    section: "prove",
+    text: "The mainnet proof verifies in your browser, right now. Try to break it.",
+    enter() {
+      if (state.demo.mode !== "verified") setDemoMode("verified");
+      runLabVerification();
+    },
+  },
+];
+
+function scrollToSection(id) {
+  document.querySelector(`#${id}`)?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "start",
+  });
+}
+
+function scheduleStoryAdvance() {
+  if (storyTimer) clearTimeout(storyTimer);
+  storyTimer = null;
+  if (!state.story.active || state.story.paused) return;
+  if (state.story.chapter >= STORY_CHAPTERS.length - 1) return;
+  storyTimer = setTimeout(() => {
+    enterStoryChapter(state.story.chapter + 1);
+  }, 8000);
+}
+
+function enterStoryChapter(index) {
+  const chapter = STORY_CHAPTERS[index];
+  if (!chapter) return;
+  state.story.chapter = index;
+  chapter.enter();
+  render();
+  scrollToSection(chapter.section);
+  scheduleStoryAdvance();
+}
+
+function startStory() {
+  if (!state.demo.proof) return;
+  state.story = { active: true, chapter: 0, paused: false };
+  enterStoryChapter(0);
+}
+
+function pauseStory() {
+  if (!state.story.active || state.story.paused) return;
+  state.story.paused = true;
+  if (storyTimer) clearTimeout(storyTimer);
+  storyTimer = null;
+  render();
+}
+
+function endStory() {
+  state.story = { active: false, chapter: 0, paused: false };
+  if (storyTimer) clearTimeout(storyTimer);
+  storyTimer = null;
+  if (state.demo.mode !== "verified") setDemoMode("verified");
+  else render();
+}
+
+function renderStoryBar() {
+  if (!state.story.active) return "";
+  const chapter = STORY_CHAPTERS[state.story.chapter];
+  const last = state.story.chapter === STORY_CHAPTERS.length - 1;
   return `
-    <li class="${ok ? "binding-check--pass" : "binding-check--fail"}">
+    <div class="story-bar" role="region" aria-label="Guided story">
+      <div class="story-bar__dots" aria-hidden="true">
+        ${STORY_CHAPTERS.map((item, index) => `<span class="${index <= state.story.chapter ? "story-bar__dot--on" : ""}"></span>`).join("")}
+      </div>
+      <p>${escapeHtml(chapter.text)}</p>
+      <div class="story-bar__controls">
+        <button type="button" data-story-action="back" ${state.story.chapter === 0 ? "disabled" : ""}>Back</button>
+        <button type="button" data-story-action="next" ${last ? "disabled" : ""}>Next</button>
+        <button type="button" data-story-action="exit">${last ? "Finish" : "Exit"}</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderLabCheck(check, index = 0, animate = false) {
+  const ok = check.status === "PASS";
+  const classes = [
+    ok ? "binding-check--pass" : "binding-check--fail",
+    animate ? `lab-gate-in stagger-${Math.min(index + 1, 14)}` : "",
+    animate && !ok ? "lab-gate-fail-pulse" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return `
+    <li class="${classes}">
       <strong>${escapeHtml(check.name)}</strong>
       <span>${escapeHtml(check.status)}</span>
     </li>
@@ -222,14 +381,17 @@ function renderTamperLab() {
   if (!state.demo.proof || state.demo.mode === "mismatch") return "";
 
   const result = lab.result;
+  const animate = lab.animatedSeq !== lab.resultSeq && !prefersReducedMotion();
   const verdictBlock = result
     ? `
-      <div class="tamper-lab__verdict ${result.status === "PASS" ? "tamper-lab__verdict--pass" : "tamper-lab__verdict--fail"}" role="status">
+      <div class="tamper-lab__verdict ${result.status === "PASS" ? "tamper-lab__verdict--pass" : "tamper-lab__verdict--fail"} ${animate ? "lab-verdict-in" : ""}" role="status">
         <strong>${escapeHtml(result.verdict)}</strong>
         <span>Recorded bundle hash: ${escapeHtml(shortHex(result.bundle_hash?.slice("sha256:".length)))}</span>
-        <span>Recomputed just now in your browser: ${escapeHtml(shortHex(result.computed_bundle_hash?.slice("sha256:".length)))}</span>
+        <span>Recomputed just now in your browser:
+          <span class="${animate ? "hash-fill" : ""}">${escapeHtml(shortHex(result.computed_bundle_hash?.slice("sha256:".length)))}</span>
+        </span>
       </div>
-      <ul class="binding-check-list">${result.checks.map((check) => renderLabCheck(check)).join("")}</ul>
+      <ul class="binding-check-list">${result.checks.map((check, index) => renderLabCheck(check, index, animate)).join("")}</ul>
     `
     : "";
   const errorBlock = lab.error
@@ -308,6 +470,57 @@ function renderProofFact(label, value) {
   `;
 }
 
+function renderTxidFact(label, txid) {
+  if (!txid || String(txid).length < 16) return renderProofFact(label, txid);
+  const value = String(txid);
+  const preview = `${value.slice(0, 8)}…${value.slice(-4)}`;
+  return `
+    <div>
+      <dt>${escapeHtml(label)}</dt>
+      <dd class="txid-fact">
+        <button type="button" class="txid-fact__value" data-action="toggle-txid" title="${state.ui.txidExpanded ? "Collapse" : "Show the full txid"}">
+          ${escapeHtml(state.ui.txidExpanded ? value : preview)}
+        </button>
+        <button type="button" class="txid-fact__copy" data-action="copy-txid">${state.ui.txidCopied ? "Copied" : "Copy"}</button>
+      </dd>
+    </div>
+  `;
+}
+
+function renderHeroPanel() {
+  if (!state.demo.proof || state.demo.mode === "mismatch") return "";
+  const rows = [
+    ["Signer A", "READY", "hero-panel__row--signer"],
+    ["Signer B", "READY", "hero-panel__row--signer"],
+    ["Signer C", "UNAVAILABLE", "hero-panel__row--unavailable"],
+    ["Transaction check", "VERIFIED", "hero-panel__row--gate"],
+    ["FROST authorization", "COMPLETE", "hero-panel__row--gate"],
+    ["Zcash mainnet", "CONFIRMED", "hero-panel__row--gate"],
+    ["Proof bundle", "VERIFIED", "hero-panel__row--gate"],
+  ];
+  return `
+    <div class="hero-panel" aria-label="Recorded authorization replay">
+      <div class="hero-panel__head">
+        <strong>ZecSafe Vault</strong>
+        <span>2 OF 3 REQUIRED</span>
+      </div>
+      <ul>
+        ${rows
+          .map(
+            ([label, status, kind], index) => `
+              <li class="hero-panel__row ${kind} ${index < state.hero.revealCount ? "hero-panel__row--on" : ""}">
+                <strong>${escapeHtml(label)}</strong>
+                <span>${escapeHtml(status)}</span>
+              </li>
+            `,
+          )
+          .join("")}
+      </ul>
+      <p class="hero-panel__caption">Replaying the recorded verified mainnet run</p>
+    </div>
+  `;
+}
+
 function renderFlowStep(label, detail, complete = true, pending = false) {
   const classes = [complete && !pending ? "demo-flow__step--complete" : "", pending ? "demo-flow__step--pending" : ""]
     .filter(Boolean)
@@ -331,6 +544,56 @@ function renderBindingCheck(field, status) {
       <span>${escapeHtml(status)}</span>
     </li>
   `;
+}
+
+function revealClass(key) {
+  return revealedSections.has(key) ? "reveal-done" : "reveal";
+}
+
+function setupRevealObserver() {
+  if (revealObserver) revealObserver.disconnect();
+  const targets = document.querySelectorAll("[data-reveal]");
+  if (!targets.length) return;
+  if (prefersReducedMotion() || typeof IntersectionObserver !== "function") {
+    targets.forEach((element) => {
+      element.classList.remove("reveal");
+      element.classList.add("reveal-done");
+      revealedSections.add(element.dataset.reveal);
+    });
+    return;
+  }
+  revealObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("reveal--visible");
+        revealedSections.add(entry.target.dataset.reveal);
+        revealObserver.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.15 },
+  );
+  targets.forEach((element) => {
+    if (!revealedSections.has(element.dataset.reveal)) revealObserver.observe(element);
+  });
+}
+
+async function copyTxid() {
+  const txid = state.demo.proof?.transaction?.txid;
+  if (!txid) return;
+  try {
+    await navigator.clipboard.writeText(txid);
+    state.ui.txidCopied = true;
+    render();
+    if (copiedTimer) clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => {
+      state.ui.txidCopied = false;
+      render();
+    }, 2000);
+  } catch {
+    state.ui.txidExpanded = true;
+    render();
+  }
 }
 
 function renderNav() {
@@ -381,10 +644,13 @@ function renderApp() {
         <section class="verified-demo">
           <div class="verified-demo__hero">
             <div>
-              <p class="eyebrow">Recorded Verified Mainnet Run</p>
+              <p class="eyebrow">FROST authorization for shielded Zcash</p>
               <h1>ZECSAFE</h1>
               <h2>Lose one key, not your ZEC.</h2>
-              <p>A 2-of-3 FROST authorization control plane for shielded Zcash.</p>
+              <p>
+                ZecSafe keeps a 2-of-3 shielded wallet usable when one participant is unavailable, verifies the exact
+                transaction before signing, and creates a mainnet proof anyone can check.
+              </p>
               <div class="verified-demo__actions">
                 <button class="primary-action" id="loadVerifiedDemo" type="button">
                   ${demo.status === "loading" ? "Loading..." : "Replay Verified Mainnet Run"}
@@ -392,20 +658,33 @@ function renderApp() {
                 <button class="secondary-action" id="verifyPublicProof" type="button" ${presentation.verifier.enabled ? "" : "disabled"}>${presentation.verifier.label}</button>
               </div>
               ${
+                demo.status === "success" && !mismatch
+                  ? `
+                    <div class="hero-links">
+                      <button type="button" class="link-action" id="startStory">Start the 60-second story</button>
+                      <button type="button" class="link-action" id="jumpTamperLab">Try to break the proof &darr;</button>
+                    </div>
+                  `
+                  : ""
+              }
+              ${
                 mismatch
                   ? `<p class="required-sentence"><strong>Counterfactual safety test active.</strong> The receipt beside it is the immutable recorded-run reference; the synthetic path below stops before FROST and does not reuse its later outcomes.</p>`
                   : ""
               }
             </div>
-            <dl class="verified-demo__receipt">
-              ${renderProofFact(presentation.recorded.receiptLabel, proof?.run_id)}
-              ${renderProofFact("UTC timestamp", proof?.recorded_at)}
-              ${renderProofFact(presentation.recorded.txidLabel, txid)}
-              ${renderProofFact(presentation.recorded.chainStatusLabel, chainStatus)}
-            </dl>
+            <div class="verified-demo__side">
+              ${renderHeroPanel()}
+              <dl class="verified-demo__receipt">
+                ${renderProofFact(presentation.recorded.receiptLabel, proof?.run_id)}
+                ${renderProofFact("UTC timestamp", proof?.recorded_at)}
+                ${renderTxidFact(presentation.recorded.txidLabel, txid)}
+                ${renderProofFact(presentation.recorded.chainStatusLabel, chainStatus)}
+              </dl>
+            </div>
           </div>
 
-          <div class="evidence-strip" aria-label="Verified evidence strip">
+          <div class="evidence-strip ${revealClass("strip")}" data-reveal="strip" aria-label="Verified evidence strip">
             ${presentation.evidenceStrip.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
           </div>
 
@@ -416,7 +695,7 @@ function renderApp() {
           }
         </section>
 
-        <section class="demo-panel" id="review">
+        <section class="demo-panel ${revealClass("review")}" data-reveal="review" id="review">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Step 1 &mdash; Review</p>
@@ -435,7 +714,7 @@ function renderApp() {
           </p>
         </section>
 
-        <section class="demo-panel" id="verify">
+        <section class="demo-panel ${revealClass("verify")}" data-reveal="verify" id="verify">
           <div class="section-heading section-heading--compact">
             <div>
               <p class="eyebrow">Step 2 &mdash; Verify</p>
@@ -465,7 +744,7 @@ function renderApp() {
           </p>
         </section>
 
-        <section class="demo-panel demo-panel--participants" id="authorize">
+        <section class="demo-panel demo-panel--participants ${revealClass("authorize")}" data-reveal="authorize" id="authorize">
           <div class="section-heading section-heading--compact">
             <div>
               <p class="eyebrow">Step 3 &mdash; Authorize</p>
@@ -515,7 +794,7 @@ function renderApp() {
           </dl>
         </section>
 
-        <section class="demo-panel" id="prove">
+        <section class="demo-panel ${revealClass("prove")}" data-reveal="prove" id="prove">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Step 4 &mdash; Prove</p>
@@ -594,6 +873,7 @@ function renderApp() {
           </p>
         </footer>
       </main>
+      ${renderStoryBar()}
     </div>
   `;
 }
@@ -602,9 +882,44 @@ function bindEvents() {
   document.querySelector("#loadVerifiedDemo")?.addEventListener("click", () => {
     if (state.demo.status === "success" && state.demo.mode !== "mismatch") {
       animateFlowReveal(8);
+      animateHeroReveal();
       return;
     }
     loadVerifiedProof(state.demo.mode, { animate: true });
+  });
+
+  document.querySelector("#startStory")?.addEventListener("click", () => {
+    startStory();
+  });
+
+  document.querySelector("#jumpTamperLab")?.addEventListener("click", () => {
+    document.querySelector(".tamper-lab")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+  });
+
+  document.querySelectorAll("[data-story-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.storyAction;
+      state.story.paused = true;
+      if (storyTimer) clearTimeout(storyTimer);
+      storyTimer = null;
+      if (action === "next") enterStoryChapter(state.story.chapter + 1);
+      if (action === "back") enterStoryChapter(state.story.chapter - 1);
+      if (action === "exit") endStory();
+    });
+  });
+
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.action;
+      if (action === "copy-txid") copyTxid();
+      if (action === "toggle-txid") {
+        state.ui.txidExpanded = !state.ui.txidExpanded;
+        render();
+      }
+    });
   });
 
   document.querySelectorAll("[data-lab-preset]").forEach((button) => {
@@ -647,7 +962,17 @@ function bindEvents() {
 function render() {
   app.innerHTML = renderApp();
   bindEvents();
+  state.lab.animatedSeq = state.lab.resultSeq;
+  setupRevealObserver();
 }
+
+// Any manual interaction outside the story bar pauses the guided story's
+// auto-advance; the visitor keeps control of the page at all times.
+app.addEventListener("click", (event) => {
+  if (!state.story.active || state.story.paused) return;
+  if (event.target.closest(".story-bar")) return;
+  pauseStory();
+});
 
 render();
 loadVerifiedProof(state.demo.mode, { animate: true });
