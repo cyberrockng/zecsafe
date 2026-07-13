@@ -1,107 +1,139 @@
 # Demo Script
 
-Target length: 2 to 3 minutes.
+Target length: ~3 minutes.
+Record against commit `ac14904` or later. Two windows on screen: a terminal in
+the repo root and the browser at <https://zecsafe.vercel.app/demo>.
 
-## Opening
+This script matches the current app exactly. Every claim in it is backed by the
+recorded proof bundle. Do not improvise claims — see "Do not claim" in `DEMO.md`.
 
-"ZecSafe is a Zcash mainnet safety vault proof-of-concept for reducing single-key failure. It combines live Zcash mainnet evidence, controlled mainnet transaction proof attachment, local threshold-signing proof, browser-side guardian signature acknowledgements, and hardened recovery in one security interface."
+The spine of the demo: **run the whole process live, then show the one time the
+final gate was opened on mainnet.**
 
-## Best Judge Flow
+## Scene 1 — Hook (0:00–0:15)
 
-1. Start at the Security Command Center.
-2. Point out:
-   - Mainnet status.
-   - FROST Demo status.
-   - Vault Policy: 2-of-3.
-   - Recovery Risk.
-   - Broadcast disabled in prototype.
-3. Open Vault Overview.
-4. Say: "This is a 2-of-3 safety vault. ZecSafe does not custody funds; guardian shares stay local."
-5. Open Evidence Center.
-6. Show Live Mainnet Status:
-   - Block height.
-   - Mempool size.
-   - Connected peers.
-   - Last updated.
-7. In Address Balance, click `Check Mainnet`.
-8. Show:
-   - Address type.
-   - Balance.
-   - Total received.
-   - Source.
-   - Checked time.
-9. In Controlled Mainnet Proof, explain that the tiny ZEC transaction is broadcast externally with a trusted wallet.
-10. In Transaction Proof, paste or check the mainnet txid.
-11. Show:
-   - Transaction found on Zcash mainnet.
-   - Confirmation count.
-   - Block height.
-   - Linked proposal.
-12. In FROST Verified Output, click `Run FROST Live Demo`.
-13. Show:
-   - Active proposal payload hash.
-   - Group public key fingerprint.
-   - Key-share fingerprints.
-   - Commitments.
-   - Partial signatures.
-   - Aggregated signature.
-   - Signature Verified.
-14. Click `Generate Proof Bundle`.
-15. Show the combined bundle status:
-   - Proposal hash.
-   - Linked txid.
-   - Mainnet block.
-   - Transaction confirmations.
-   - FROST verified.
-   - Guardian signatures.
-   - Real-vs-simulated summary.
-16. Open Proposal Center.
-17. Review:
-   - Proposal title.
-   - Amount.
-   - Recipient.
-   - Proposal hash.
-   - Recipient fingerprint.
-   - Locked amount and memo.
-   - Risk level.
-   - Approval progress.
-   - Guardian timeline.
-   - Mainnet evidence badge.
-18. Sign the proposal hash with enough guardians.
-19. Show the verified local signatures and the status moving to FROST readiness.
-20. Open Guardian Center.
-21. Run a guardian health check and tick all three checklist items.
-22. Show the 2-of-3 guardian model and local-share safety note.
-23. Open Recovery Center.
-24. Select Alice Phone as the lost device.
-25. Enter a recovery reason, note, and out-of-band confirmation.
-26. Create the recovery proposal.
-27. Show:
-   - New vault structure.
-   - Removed guardian.
-   - Added guardian.
-   - New vault address.
-   - Fingerprint.
-28. Approve recovery with remaining guardians.
-29. Show the timelock and final broadcast-disabled state.
-30. Open Production Boundary.
-31. Say clearly what is not live yet.
-32. End at the Audit Log and show recorded events.
+Browser: the hero at `https://zecsafe.vercel.app/demo`.
 
-## Closing
+Say:
 
-"ZecSafe proves a mainnet evidence chain: proposal details become a stable hash, guardians sign that hash, a real externally broadcast Zcash mainnet txid is verified and attached, local FROST proof runs against the payload hash, and the final proof bundle exports the evidence. The remaining production work is in-app Zcash transaction construction, real multi-device FROST signing, and audited broadcast."
+> "ZecSafe: lose one key, not your ZEC. A 2-of-3 FROST authorization control
+> plane for shielded Zcash. Let me show you the whole thing running, live."
 
-## Important Disclaimer
+## Scene 2 — The whole process, live (0:15–1:05)
 
-Say clearly in the demo:
+Switch to the terminal. Run, live on camera:
 
-- "Guardian approvals now create real browser-side signatures over the proposal payload hash."
-- "Those guardian signatures are acknowledgement proofs, not Zcash spend signatures."
-- "Mainnet monitoring is read-only."
-- "The FROST Live Demo proves local threshold-signing output, but it is not yet bound to a Zcash spend transaction."
-- "Transaction broadcast is external/manual in this build; ZecSafe verifies and attaches the resulting mainnet txid."
-- "Recovery migration is simulated and does not move real funds."
-- "Viewing-key balance requires local wallet infrastructure."
-- "Never paste seed phrases or spending keys into ZecSafe."
-- "Recovery is high-risk and should require independent owner verification."
+```bash
+make proof-run-dry
+```
+
+Narrate the gates as they print (it takes seconds):
+
+> "This is the full pipeline executing right now — not a recording. It creates
+> a transaction intent, builds the PCZT, and runs the Binding Firewall —
+> a field-level check that the transaction matches what was reviewed. One of
+> our three signers is unavailable; the threshold is still satisfiable, so
+> signers A and B are selected. A real FROST 2-of-3 signing session runs,
+> the aggregate signature verifies, and the PCZT is signed, proven, and
+> combined — ready to broadcast."
+
+Point at the last two lines:
+
+> "And here it stops: **mainnet broadcast requires human approval.** That gate
+> is deliberate — it *is* the product. Software prepares and proves;
+> a human releases funds."
+
+## Scene 3 — The one time the gate was opened (1:05–1:35)
+
+Switch to the browser. Point at the receipt panel: run ID, UTC timestamp,
+txid, `CONFIRMED`.
+
+Open the txid on a public explorer in a new tab, live on camera:
+
+```text
+https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
+```
+
+(Blockchair works as an alternate but sometimes shows a bot-check
+interstitial; zcashexplorer loads clean and shows the live confirmation count
+and the shielded pools.)
+
+Say:
+
+> "We approved that final gate exactly once. This is the result: a real
+> shielded transaction, confirmed on Zcash mainnet at block 3,409,837,
+> authorized by the same 2-of-3 FROST process you just watched — with one
+> signer unavailable. The chain is the witness."
+
+## Scene 4 — What happens to a tampered transaction (1:35–2:05)
+
+Scroll to Step 2 — Verify on the page. Show the field-level PASS grid, then
+click the `Mismatch` toggle. Show:
+
+- the `SAFETY TEST — NOT A BROADCAST TRANSACTION` banner,
+- `Binding Firewall: FAIL — signing blocked before FROST`,
+- the disabled signing control and "not contacted" signer pills.
+
+Say:
+
+> "What if someone swaps the recipient after review? The Binding Firewall
+> catches the mismatch and blocks signing before any FROST round begins.
+> No signer even gets contacted."
+
+Click `PASS` to return.
+
+## Scene 5 — Verify it yourself (2:05–2:35)
+
+Terminal. Run, live on camera:
+
+```bash
+make judge-proof-mainnet
+```
+
+Show `VERDICT: VERIFIED RECORDED ZECSAFE PROOF`. Then:
+
+```bash
+make judge-proof-mainnet-tamper
+```
+
+Show `VERDICT: TAMPER DETECTION PASS`.
+
+Say:
+
+> "The public proof bundle is hash-bound. Clone the repo and run these two
+> commands yourself: the first verifies the recorded mainnet run end to end;
+> the second shows a single edited byte being detected. Don't trust — verify."
+
+## Scene 6 — Honest close (2:35–2:55)
+
+Browser, scrolled to the footer.
+
+Say:
+
+> "ZecSafe is a hackathon proof-of-concept built on re-randomized FROST
+> tooling — not audited production custody software, and it says so on the
+> page. What you saw is the FROST-track claim, live: threshold authorization
+> of shielded ZEC, a safety gate in front of signing, a human gate in front
+> of broadcast, and a mainnet proof anyone can check. Repo and demo links
+> below."
+
+## Recording notes
+
+- 1080p or higher; record scene by scene — cuts between scenes are fine.
+- On WSL2, record with OBS (or any screen recorder) on the Windows host,
+  capturing the browser and the terminal window.
+- Dry-run `make proof-run-dry`, the Mismatch toggle, and the two judge
+  commands once off camera so everything is warm.
+- Upload unlisted to YouTube (or Loom), then link it in the Discord post and
+  the ZecHub PR.
+
+## Recorded mainnet facts (for reference on camera)
+
+```text
+Run ID: p0-023-20260712T145358Z
+Network: main
+Txid: 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
+Recorded status: CONFIRMED
+Recorded height: 3409837
+Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
+```
