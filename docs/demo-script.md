@@ -7,8 +7,8 @@ the repo root and the browser at <https://zecsafe.vercel.app/demo>.
 This script matches the current app exactly. Every claim in it is backed by the
 recorded proof bundle. Do not improvise claims — see "Do not claim" in `DEMO.md`.
 
-The spine of the demo: **run the whole process live, then show the one time the
-final gate was opened on mainnet.**
+The spine of the demo: **re-verify every gate of the process live, then show the
+one time the final gate was opened on mainnet.**
 
 ## Scene 1 — Hook (0:00–0:15)
 
@@ -17,9 +17,10 @@ Browser: the hero at `https://zecsafe.vercel.app/demo`.
 Say:
 
 > "ZecSafe: lose one key, not your ZEC. A 2-of-3 FROST authorization control
-> plane for shielded Zcash. Let me show you the whole thing running, live."
+> plane for shielded Zcash. Let me walk you through every gate of the process
+> and re-verify it live."
 
-## Scene 2 — The whole process, live (0:15–1:05)
+## Scene 2 — Every gate of the process, re-verified live (0:15–1:05)
 
 Switch to the terminal. Run, live on camera:
 
@@ -29,18 +30,19 @@ make proof-run-dry
 
 Narrate the gates as they print (it takes seconds):
 
-> "This is the full pipeline executing right now — not a recording. It creates
-> a transaction intent, builds the PCZT, and runs the Binding Firewall —
-> a field-level check that the transaction matches what was reviewed. One of
-> our three signers is unavailable; the threshold is still satisfiable, so
-> signers A and B are selected. A real FROST 2-of-3 signing session runs,
-> the aggregate signature verifies, and the PCZT is signed, proven, and
-> combined — ready to broadcast."
+> "This re-executes every gate of the pipeline against the recorded run's
+> evidence, recomputing the hashes right now. The transaction intent, the
+> PCZT, the Binding Firewall — a field-level check that the transaction
+> matches what was reviewed. One of the three signers was unavailable; the
+> threshold was still satisfiable, so signers A and B were selected. The
+> FROST 2-of-3 threshold and aggregate signature checks pass, and the PCZT
+> was signed, proven, and combined — ready to broadcast. If any byte of this
+> evidence had been altered, a gate would fail on screen right now."
 
 Point at the last two lines:
 
-> "And here it stops: **mainnet broadcast requires human approval.** That gate
-> is deliberate — it *is* the product. Software prepares and proves;
+> "And the final gate: **mainnet broadcast requires human approval.** That
+> gate is deliberate — it *is* the product. Software prepares and proves;
 > a human releases funds."
 
 ## Scene 3 — The one time the gate was opened (1:05–1:35)
@@ -62,7 +64,8 @@ Say:
 
 > "We approved that final gate exactly once. This is the result: a real
 > shielded transaction, confirmed on Zcash mainnet at block 3,409,837,
-> authorized by the same 2-of-3 FROST process you just watched — with one
+> authorized by the same 2-of-3 FROST process whose gates you just saw
+> re-verified — with one
 > signer unavailable. The chain is the witness."
 
 ## Scene 4 — What happens to a tampered transaction (1:35–2:05)
@@ -112,7 +115,7 @@ Say:
 
 > "ZecSafe is a hackathon proof-of-concept built on re-randomized FROST
 > tooling — not audited production custody software, and it says so on the
-> page. What you saw is the FROST-track claim, live: threshold authorization
+> page. What you saw is the FROST-track claim: threshold authorization
 > of shielded ZEC, a safety gate in front of signing, a human gate in front
 > of broadcast, and a mainnet proof anyone can check. Repo and demo links
 > below."
