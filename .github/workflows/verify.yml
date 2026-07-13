@@ -36,5 +36,5 @@ jobs:
       - name: Prove the recorded proof is tamper-evident
         run: make judge-proof-mainnet-tamper
 
-      - name: Reproduce the headless proof kernel
+      - name: Re-verify the recorded proof-run gates
         run: make proof-run-dry

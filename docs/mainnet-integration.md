@@ -1,75 +1,46 @@
 # Mainnet Integration
 
-ZecSafe uses Zcash mainnet in read-only mode. It does not broadcast transactions or move funds.
+ZecSafe interacts with Zcash mainnet on two surfaces: the recorded proof run (real, human-gated
+broadcast — see the README and `fixtures/verified-mainnet-run/`) and a small read-only
+observation layer described here.
 
-## Backend Adapter
+## Local server routes
 
-The Node server exposes these routes:
+`server.mjs` (loopback-only) exposes exactly four routes:
 
 ```text
-GET /api/mainnet-status
-GET /api/mainnet/status
-POST /api/mainnet/address-balance
+GET  /api/health
+GET  /api/mainnet/status
 POST /api/transaction-proof
-POST /api/viewing-key-balance
+POST /api/intent/create
 ```
 
-The public prototype endpoint is:
+The earlier prototype routes (`/api/mainnet/address-balance`, `/api/viewing-key-balance`,
+`/api/frost-demo`, `/api/proof-bundle`) were removed during audit remediation; a repository
+guard (`scripts/verify.mjs`) fails if they reappear.
 
-```text
-https://docs-demo.zec-mainnet.quiknode.pro/
-```
+## RPC usage
 
-Production should let users choose a trusted node, self-hosted lightwalletd/Zaino path, or private coordinator service.
+- `getblockchaininfo` — network, consensus branch, and chain status for `/api/mainnet/status`.
+- `getrawtransaction` and `getblock` — transaction observation for `/api/transaction-proof`
+  (confirmations, block height, action counts).
 
-## RPC Calls
+The default public endpoint is a documentation RPC endpoint and can be overridden with
+`ZEC_PUBLIC_RPC_URL`, or replaced entirely with a trusted local node via `ZEC_RPC_URL`,
+`ZEC_RPC_USER`, and `ZEC_RPC_PASSWORD`. Production should always use a user-chosen trusted
+node or self-hosted lightwalletd/Zaino infrastructure.
 
-The app currently uses:
+## Wallet observation for real runs
 
-- `getblockchaininfo` for network, headers, difficulty, consensus upgrades, and chain status.
-- `getblockcount` for current block height.
-- `getmempoolinfo` for mempool transaction count and memory usage.
-- `getpeerinfo` for connected peer count.
-- `getaddressbalance` for transparent address balance and total received.
-- `getrawtransaction` for transaction proof lookup.
-- `getblock` for block height and confirmation context on transaction proofs.
-- `z_getbalanceforviewingkey` only when local zcashd wallet RPC is configured.
+Real proof runs observe the funded view-only (UFVK) wallet through the pinned `zcash-devtool`
+(`scripts/mainnet-view.mjs preflight` / `watch`), never through public transparent-address
+explorers. Shielded balances are read only by the local wallet; viewing keys never leave the
+machine and are never accepted over HTTP.
 
-## Transparent Address Monitoring
+## Boundaries
 
-Transparent address balances are public, so the app can validate a `t1` or `t3` address locally and query `getaddressbalance` safely.
-
-The UI shows:
-
-- Address type
-- Balance
-- Total received
-- Source
-- Last checked time
-
-## Transaction Proof
-
-The transaction proof flow accepts a real 64-character Zcash transaction ID. It calls `getrawtransaction`, then `getblock`, and displays:
-
-- Transaction ID
-- Confirmation status
-- Confirmation count
-- Block height
-- Transparent output total
-- Linked ZecSafe proposal
-
-## Viewing-Key Balance
-
-Shielded data is private. ZecSafe never asks for seed phrases or spending keys.
-
-The viewing-key route accepts full viewing keys such as `uview1`, `uvf1`, or `zviews...`. If local zcashd is not configured, it returns:
-
-```json
-{
-  "balance": null,
-  "source": "public-rpc-unavailable",
-  "message": "Viewing key balance requires a local zcashd with z_getbalanceforviewingkey support. Connect a local node via ZEC_RPC_URL to enable this feature."
-}
-```
-
-That fallback is intentional. Public transparent RPC is not enough to safely scan shielded wallet data.
+- The hosted Vercel page performs no RPC at all (CSP `connect-src 'self'`); it serves recorded
+  fixtures and verifies them in the browser.
+- Broadcast is never automatic: the pipeline halts at an explicit human-approval gate.
+- The recorded proof states chain status as of recording time; current chain state is checked
+  on an explorer, not asserted by the bundle.

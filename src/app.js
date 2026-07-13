@@ -196,28 +196,30 @@ function setDemoMode(mode) {
   render();
 }
 
-function verifyLoadedPublicProof() {
+async function verifyLoadedPublicProof() {
   const proof = state.demo.proof;
   const replay = state.demo.reduced;
   if (!proof) return;
 
-  const requiredChecks = [
-    proof.schema_version === "zecsafe-proof-v1",
+  // Real verification, not a status echo: the full verifier mirror recomputes
+  // the canonical bundle hash with WebCrypto in this browser, then the replay
+  // gates are checked against the recorded ProofEvents.
+  const browserVerification = await verifyProofInBrowser(proof);
+
+  const replayChecks = [
     proof.network === "main",
     Boolean(proof.run_id),
-    Boolean(proof.bundle_hash),
     Boolean(proof.transaction?.txid),
-    proof.pczt?.binding_status === "PASS",
     replay.readiness.binding_passed,
     replay.readiness.threshold_reached,
     replay.frost.selected_signer_count >= Number(proof.vault?.threshold ?? 0),
   ];
-  const pass = state.demo.mode !== "mismatch" && requiredChecks.every(Boolean);
+  const pass = state.demo.mode !== "mismatch" && browserVerification.status === "PASS" && replayChecks.every(Boolean);
 
   state.demo.verifyStatus = pass ? "pass" : "fail";
   state.demo.message = pass
-    ? "Public proof structure and ProofEvent replay pass the demo gate."
-    : "Public proof verification failed or the safety-test mismatch is active.";
+    ? "Bundle hash recomputed in this browser; proof integrity and ProofEvent replay pass."
+    : "Proof integrity verification failed or the safety-test mismatch is active.";
   render();
 }
 
@@ -482,6 +484,7 @@ function renderTxidFact(label, txid) {
           ${escapeHtml(state.ui.txidExpanded ? value : preview)}
         </button>
         <button type="button" class="txid-fact__copy" data-action="copy-txid">${state.ui.txidCopied ? "Copied" : "Copy"}</button>
+        <a class="txid-fact__copy" href="https://mainnet.zcashexplorer.app/transactions/${encodeURIComponent(value)}" target="_blank" rel="noopener noreferrer">Explorer</a>
       </dd>
     </div>
   `;
@@ -710,7 +713,8 @@ function renderApp() {
             ${renderProofFact("Threshold", `${threshold}-of-${total}`)}
           </dl>
           <p class="required-sentence">
-            Recipient, amount, and memo are withheld from public evidence. The commitment binds them without disclosing them.
+            Recipient, amount, and memo are withheld from the public proof bundle and this hosted proof UI. The
+            commitment binds them without disclosing them.
           </p>
         </section>
 
@@ -870,6 +874,11 @@ function renderApp() {
             ZecSafe is a hackathon proof-of-concept using re-randomized FROST tooling. The referenced NCC audit of the ZF
             FROST repository did not include rerandomized FROST. ZecSafe is not audited production custody software.
             Recovery is not demonstrated.
+          </p>
+          <p>
+            <a href="https://github.com/cyberrockng/zecsafe" target="_blank" rel="noopener noreferrer">Source and documentation on GitHub</a>
+            &middot;
+            <a href="https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527" target="_blank" rel="noopener noreferrer">Verified transaction on a public explorer</a>
           </p>
         </footer>
       </main>

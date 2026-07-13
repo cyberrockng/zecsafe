@@ -17,7 +17,7 @@ const DEFAULT_PROOF_FIXTURE = "fixtures/proofs/p0-014-zecsafe-proof-v1.json";
 function usage() {
   console.error(`Usage:
   zecsafe proof generate <run-id> [--runs-root DIR] [--out proof.json] [--txid TXID] [--chain-status STATUS] [--network main|test] [--recorded-at ISO] [--zecsafe-commit COMMIT] [--signer-review-dir DIR] [--summary]
-  zecsafe proof verify <proof.json> [--summary]
+  zecsafe proof verify <proof.json> [--summary] [--expect-bundle-hash sha256:HASH]
   zecsafe proof tamper-demo <proof.json> [--summary]
   zecsafe proof-run --dry-broadcast [--proof proof.json] [--out proof-run.json] [--recorded-at ISO] [--summary]`);
 }
@@ -93,11 +93,12 @@ function proofSummary(proof, verification) {
   if (verification) console.log(`Verifier                     ${verification.status}`);
 }
 
-function verifierSummary(result, proof = null) {
+function verifierSummary(result, proof = null, { expectedHash = null } = {}) {
   console.log("ZecSafe Judge Proof v1");
   const status = (name) => result.checks.find((check) => check.name === name)?.status ?? "FAIL";
   console.log(`Schema                       ${status("schema")}`);
   console.log(`Bundle hash                  ${status("bundle_hash")}`);
+  if (expectedHash) console.log(`Anchored bundle hash         ${status("anchored_bundle_hash")}`);
   if (proof) {
     console.log(`Network                      ${proof.network}`);
     console.log(`FROST policy                 ${proof.vault.threshold} of ${proof.vault.participants_total}`);
@@ -172,7 +173,28 @@ async function commandVerify(argv) {
   const flags = parseFlags(argv, 1);
   const proof = await readJson(resolve(proofPath));
   const result = verifyZecsafeProofV1(proof);
-  if (flags.summary) verifierSummary(result, proof);
+
+  // Unkeyed hashing makes the verifier an integrity and internal-consistency
+  // check: an attacker can edit fields and recompute bundle_hash. An expected
+  // hash anchored outside the bundle (Makefile, submission PR, git tag) closes
+  // that hole - a rehashed bundle no longer matches the anchor.
+  if (flags.expect_bundle_hash) {
+    const anchored =
+      proof.bundle_hash === flags.expect_bundle_hash && result.computed_bundle_hash === flags.expect_bundle_hash;
+    result.checks.push({
+      name: "anchored_bundle_hash",
+      status: anchored ? "PASS" : "FAIL",
+      reason: anchored
+        ? "Bundle hash matches the externally anchored expected hash."
+        : `Bundle hash does not match the anchored expected hash ${flags.expect_bundle_hash}.`,
+    });
+    if (!anchored) {
+      result.status = "FAIL";
+      result.verdict = "REJECTED ZECSAFE PROOF";
+    }
+  }
+
+  if (flags.summary) verifierSummary(result, proof, { expectedHash: flags.expect_bundle_hash });
   else console.log(JSON.stringify(result, null, 2));
   process.exitCode = result.status === "PASS" ? 0 : 2;
 }

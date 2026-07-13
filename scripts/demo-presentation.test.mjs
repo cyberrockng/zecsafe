@@ -29,6 +29,18 @@ const mismatchReplay = reduceDemoProofEvents(createBindingMismatchEvents(events)
 
 {
   const presentation = deriveDemoPresentation({
+    mode: "verified",
+    proof,
+    replay: verifiedReplay,
+    verifyStatus: "idle",
+  });
+  // Before the visitor runs verification, the strip claims only that the
+  // proof is recorded - never that it has been verified.
+  assert.equal(presentation.evidenceStrip.at(-1), "PROOF RECORDED");
+}
+
+{
+  const presentation = deriveDemoPresentation({
     mode: "mismatch",
     proof,
     replay: mismatchReplay,

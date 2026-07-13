@@ -1,125 +1,89 @@
 # ZecSafe Architecture
 
-## Product goal
+ZecSafe is a FROST-native threshold authorization control plane for shielded Zcash. One
+participant can be unavailable while a 2-of-3 threshold still authorizes the exact reviewed
+transaction, and every run emits a tamper-evident public proof.
 
-ZecSafe is a Zcash safety vault that protects users and teams from single-device or single-key failure. The target production design is a threshold wallet where multiple guardians hold key shares and a configured threshold must approve a spend.
+This document describes the product as it exists now. The earlier browser-guardian prototype
+(guardian acknowledgement signatures, simulated broadcast, recovery center) was removed during
+the audit remediation; its documentation is archived under `docs/history/`.
 
-## MVP scope
+## The authorization pipeline
 
-The hackathon MVP should prove the full user journey:
+```text
+intent  →  PCZT  →  Binding Firewall  →  signing context / shielded SIGHASH
+        →  FROST session (A+B; C unavailable)  →  aggregate signature
+        →  signed PCZT  →  proven PCZT  →  combined PCZT
+        →  human approval  →  broadcast  →  txid  →  chain observation
+```
 
-1. Create a vault with a threshold policy, such as 2-of-3.
-2. Register guardian devices or trusted contacts.
-3. Receive a small amount of ZEC on mainnet.
-4. Create a transaction proposal.
-5. Show human-readable review information.
-6. Collect threshold approvals.
-7. Sign and broadcast the transaction.
+Each stage is implemented as a schema-versioned module in `src/` with a CLI in `scripts/` and a
+dedicated test suite:
 
-## Frontend modules
+| Stage | Module | Schema |
+|---|---|---|
+| Intent commitment | `src/intent-v1.mjs` | `zecsafe-intent-v1` |
+| PCZT inspection | `src/pczt-inspect-v1.mjs` | pinned `zcash-devtool` output parser |
+| Binding Firewall | `src/pczt-bind-v1.mjs` | `zecsafe-binding-report-v1` |
+| Signer selection | `src/signer-selection-v1.mjs` | `zecsafe-signer-selection-v1` |
+| Signing context | `src/signing-context-v1.mjs` | `zecsafe-signing-context-v1` |
+| Signer review | `src/signer-review-v1.mjs` | `zecsafe-signer-review-v1` (`semantic_pczt_review`) |
+| FROST session | `src/frost-session-v1.mjs` | `zecsafe-frost-session-v1` |
+| PCZT completion | `src/pczt-completion-v1.mjs` | `zecsafe-pczt-completion-v1` |
+| Proof bundle | `src/zecsafe-proof-v1.mjs` | `zecsafe-proof-v1` |
+| Proof-run gates | `src/proof-run-v1.mjs` | `zecsafe-proof-run-v1` |
+| Mainnet observation | `src/mainnet-view-v1.mjs` | `zecsafe-mainnet-view-preflight-v1` |
 
-- Vault dashboard: balance, threshold, approval status, risk level.
-- Proposal review: amount, recipient, memo, fee, and status.
-- Guardian quorum: participant identity, approval state, last-seen state.
-- Recovery flow: guarded migration to a newly created vault.
+ZecSafe implements **no cryptography of its own**. FROST (re-randomized RedPallas), Orchard
+proving, SIGHASH computation, and PCZT handling are delegated to pinned upstream tooling
+(`frost-tools`, `zcash-devtool`, the librustzcash PCZT signer library — exact commits in the
+README and the proof bundle). Real operations run through `src/fixed-runner-v1.mjs`, which
+executes only an allowlisted set of operations with `shell: false`.
 
-## Backend services
+## Execution surfaces
 
-The production app will need a local or hosted coordinator. The coordinator should not hold enough key material to spend funds alone.
+**1. Local CLI (the real workflow).** `scripts/zecsafe.mjs` plus the per-stage CLIs drive real
+runs. This path needs Rust, the pinned toolchain, participant configuration, and a funded
+view-only wallet; private run artifacts live outside the repository (`~/.zecsafe/runs`). This is
+the surface that produced the verified mainnet transaction.
 
-Coordinator responsibilities:
+**2. Local server (`server.mjs`).** A loopback-bound Node server that serves the same static app
+locally and four API routes:
 
-- Store vault metadata.
-- Relay encrypted signing-round messages.
-- Track proposal approval state.
-- Connect to Zcash network services.
-- Broadcast completed transactions.
+```text
+GET  /api/health
+GET  /api/mainnet/status        (public RPC chain status; configurable endpoint)
+POST /api/transaction-proof     (txid → getrawtransaction/getblock observation)
+POST /api/intent/create         (deterministic intent commitment)
+```
 
-The coordinator must not:
+It binds `127.0.0.1` by default, serves an explicit static allowlist (never the repository
+root), and sets CSP/nosniff/referrer/frame headers.
 
-- Store complete spending keys.
-- Approve proposals on behalf of guardians.
-- Leak private wallet metadata beyond what is necessary for coordination.
+**3. Hosted evidence page (Vercel).** `scripts/build-vercel.mjs` emits an exact allowlist of
+static files (app, styles, the two recorded-run fixtures, and the browser verifier). There is no
+backend, no API, and no key material. The page replays the recorded run, and its Tamper Lab
+re-runs the proof verifier in the visitor's browser (`src/verify-browser.mjs`, pinned to the
+authoritative verifier by `scripts/verify-browser.test.mjs`). The hosted page cannot spend funds
+by design.
 
-## Zcash integration path
+## Verification chain
 
-Recommended implementation stack:
+- `make judge-proof-mainnet` verifies the recorded bundle's schema, canonical bundle hash,
+  internal consistency, and — because the unkeyed hash alone cannot prove provenance — an
+  **anchored expected hash** pinned in the Makefile.
+- `make judge-proof-mainnet-tamper` demonstrates that a single edited byte is detected.
+- `make proof-run-dry` re-verifies every recorded gate and halts at the human broadcast gate.
+- `npm run check` runs the full guard: `scripts/verify.mjs` (structural and product-truth
+  checks), all unit suites, syntax checks, the Vercel allowlist build, and a secret scan.
 
-- `librustzcash` crates for wallet and transaction primitives.
-- `zcash_client_backend` for light-client sync and transaction proposal concepts.
-- `frost-rerandomized` or current ZF FROST crates for threshold signing.
-- lightwalletd, Zaino, or Zebra-backed infrastructure for mainnet access.
+## Security boundaries
 
-Relevant implementation areas:
-
-- Orchard or Sapling spend authorization.
-- Unified addresses.
-- Viewing keys for balance and transaction display.
-- Partially constructed transactions if the available libraries support the needed flow.
-- Mainnet fee calculation and broadcast.
-
-## Read-only mainnet status
-
-The current prototype includes a backend Zcash infrastructure adapter. It calls `getblockchaininfo`, `getaddressbalance`, and `getrawtransaction` against Zcash mainnet infrastructure for read-only status, balance, and transaction proof.
-
-The app also includes a local viewing-key balance route that can call `z_getbalanceforviewingkey` against a configured `zcashd` RPC endpoint. This is a narrow read-only bridge, not a complete light-client scanner.
-
-Full shielded/unified sync should use lightwalletd, Zaino, or Zebra-backed compact blocks plus a Zcash scanning library. The browser should not try to infer private shielded balances from public explorer data.
-
-The prototype also adds transaction proof lookup and browser-side guardian acknowledgement signatures. A proposal can be linked to a real mainnet transaction ID, and guardians can sign the stable proposal payload hash locally so the demo shows concrete chain evidence plus verifiable approval acknowledgement without pretending those signatures are Zcash spend signatures.
-
-## Threat model
-
-Intended protections:
-
-- Single stolen guardian device cannot spend alone.
-- Single lost guardian device does not destroy recovery options.
-- Team treasury activity needs threshold approval.
-- Payment details are reviewed before signing.
-
-Current prototype limitations:
-
-- Guardian approval acknowledgements are real browser-side signatures over the proposal payload hash, but not production FROST key-share signatures yet.
-- Broadcast is simulated after threshold approval.
-- Mainnet monitoring is read-only.
-- Viewing-key balance sync requires a configured local Zcash RPC endpoint.
-- Real fund protection requires audited FROST signing integration.
-
-## FROST signing flow
-
-High-level threshold signing sequence:
-
-1. Vault setup creates distributed key shares.
-2. A proposal defines the transaction intent.
-3. Guardians verify the transaction details locally.
-4. Selected guardians participate in a FROST signing round.
-5. Signature shares are aggregated.
-6. The completed transaction is broadcast to Zcash mainnet.
-
-## Risk checks
-
-Initial payment safety checks:
-
-- Recipient address type.
-- New or untrusted recipient warning.
-- Large amount warning.
-- Transparent address warning.
-- Missing memo warning for known workflows.
-- Threshold policy check.
-- Recovery transaction check.
-
-## Privacy model
-
-ZecSafe should reveal as little as possible to the coordinator. Guardian devices should review transaction details locally. Metadata, proposal messages, and signing-round messages should be encrypted where possible.
-
-## Hackathon fallback
-
-If full FROST mainnet signing takes longer than the hackathon window, the fallback prototype should still demonstrate:
-
-- Real mainnet balance reading.
-- Real address validation.
-- Transaction proposal creation.
-- Verifiable local threshold acknowledgement UX.
-- Clear documentation of the remaining signing integration.
-
-The strongest submission should include at least one tiny real mainnet transaction.
+- No single participant can authorize alone; the recorded run completed with one signer absent.
+- The Binding Firewall is a semantic intent-to-PCZT gate; the FROST-key-to-PCZT linkage is
+  established by the signer library at apply time and by consensus, not by the firewall.
+- Broadcast always requires explicit human approval.
+- The public proof bundle is a redacted projection (fingerprints, statuses, counts) — recipient,
+  amount, and memo are withheld from it; it is not a zero-knowledge proof.
+- Full trust model: `docs/proof/TRUST_MODEL.md`, `SECURITY.md`, `PRIVACY.md`,
+  `docs/threat-model.md`.

@@ -4,29 +4,36 @@ Use this before submitting to the ZecHub repository.
 
 ## Repository
 
-- [ ] README explains the problem, solution, setup, usage, limitations, and roadmap.
-- [ ] License file is present.
-- [ ] Mainnet usage is documented.
-- [ ] Prototype limitations are clearly stated.
-- [ ] Threat model is included in README, docs, and visible app UI.
-- [ ] Architecture diagram is included.
-- [ ] Demo script is included.
-- [ ] Screenshots are included.
+- [ ] README explains the problem, solution, verification commands, limitations, and mainnet usage.
+- [ ] MIT license file is present.
+- [ ] The verified mainnet txid and explorer link are stated.
+- [ ] Proof-of-concept limitations are clearly stated (rerandomized-FROST audit scope, recovery
+      not demonstrated, self-send disclosure).
+- [ ] Threat model and trust model are linked.
+- [ ] Architecture document and diagram match the current product.
+- [ ] Demo script matches the current app (no removed surfaces).
+- [ ] Screenshots are current (`npm run screenshots`).
 
-## App
+## Verification (run all; all must pass)
 
-- [ ] Dashboard loads locally.
-- [ ] Mainnet address check works.
-- [ ] Invalid mainnet input shows a visible error.
-- [ ] Transaction proof check works.
-- [ ] Guardian approval changes `1/2` to `2/2`.
-- [ ] Threshold reached state appears.
-- [ ] Broadcast simulation updates the audit log.
-- [ ] Prototype honesty note is visible.
+- [ ] `npm run check`
+- [ ] `make judge-proof-mainnet` → `VERDICT: VERIFIED RECORDED ZECSAFE PROOF` (anchored hash PASS)
+- [ ] `make judge-proof-mainnet-tamper` → `VERDICT: TAMPER DETECTION PASS`
+- [ ] `make proof-run-dry` → all gates PASS, broadcast gate WAIT
+
+## Live page (https://zecsafe.vercel.app/demo)
+
+- [ ] Hero replays the recorded run and is labeled as a recorded replay.
+- [ ] Mismatch toggle shows the SAFETY TEST banner and disables the signing control.
+- [ ] Tamper Lab: `Verify recorded proof` passes; every attack preset is rejected with the
+      failing gate shown.
+- [ ] Explorer and GitHub links work.
+- [ ] No surface claims live signing or spendable funds.
 
 ## Submission
 
-- [ ] Short video demo recorded.
-- [ ] Demo link added to README or PR description.
-- [ ] Pull request opened against ZecHub repository.
-- [ ] Discord `#zechub` message includes repo, PR, and demo video links.
+- [ ] Short video demo recorded against the current commit.
+- [ ] Video link added to the PR description and Discord post.
+- [ ] Pull request opened against the ZecHub repository (`Hackathon/2026/ZecSafe/`).
+- [ ] Discord `#zechub` message includes repo, live demo, explorer, PR, and video links —
+      before July 15, 2026 (UTC).

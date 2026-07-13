@@ -8,6 +8,8 @@ A 2-of-3 FROST group authorized a real shielded Zcash mainnet transaction **whil
 
 **Live demo:** [https://zecsafe.vercel.app/demo](https://zecsafe.vercel.app/demo)
 
+![ZecSafe first glance: animated 2-of-3 vault replay with one signer unavailable](docs/screenshots/01-first-glance.png)
+
 ```text
 Network:      main
 Txid:         27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
@@ -17,7 +19,7 @@ Threshold:    2 of 3, with 1 participant unavailable
 Run ID:       p0-023-20260712T145358Z
 ```
 
-That transaction is on Zcash mainnet right now. Look it up in any Zcash explorer.
+That transaction is on Zcash mainnet right now: [view it on a public explorer](https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527).
 
 ## Verify it yourself in 60 seconds
 
@@ -30,7 +32,7 @@ make judge-proof-mainnet          # VERDICT: VERIFIED RECORDED ZECSAFE PROOF
 make judge-proof-mainnet-tamper   # VERDICT: TAMPER DETECTION PASS
 ```
 
-There are no dependencies to install. ZecSafe runs on the Node standard library.
+There are no dependencies to install for the public viewer and verifier — they run on the Node standard library. Reproducing the full FROST-to-PCZT mainnet workflow is a different matter: it requires Rust, the pinned `frost-tools` and `zcash-devtool` commits, participant configuration, a funded view-only wallet, and private run artifacts that are intentionally excluded from Git. A fresh clone verifies the recorded run; it does not re-execute it.
 
 ## The 60-second demo
 
@@ -98,7 +100,7 @@ Every arrow is backed by an artifact fingerprint recorded in the public proof bu
 ```bash
 npm run check                     # full repository verification (16 suites, syntax, secret scan)
 npm run test:proof-data           # public proof data-classification tests
-make proof-run-dry                # headless proof kernel, halts at the human broadcast gate
+make proof-run-dry                # re-verifies every recorded gate; halts at the human broadcast gate
 make judge-proof-mainnet          # verify the recorded mainnet proof bundle
 make judge-proof-mainnet-tamper   # prove the bundle is tamper-evident
 ```
@@ -111,7 +113,9 @@ make judge-proof-mainnet-tamper   # prove the bundle is tamper-evident
 - The Binding Firewall is a **semantic** intent-to-PCZT check. The FROST-group-to-PCZT-authorization-key linkage is established by the pinned signer library verifying the aggregate signature against the action's rerandomized verification key at apply time, and is corroborated by Zcash consensus accepting the shielded spend — **not** by the Binding Firewall itself.
 - The three participants ran as separate processes and configurations **on one machine**. They are not independent real-world custodians. ZecSafe claims no geographic or organizational distribution.
 - The coordinator can see transaction details. Signers can link the signing operation to a transaction. FROST does not provide network anonymity. The public proof bundle is a redacted projection, **not** a zero-knowledge proof.
-- The proof verifier checks the bundle's schema, canonical integrity, and internal consistency. It does not re-execute FROST or regenerate the PCZT.
+- The proof verifier is an **integrity and internal-consistency checker**, not an independent proof of historical authenticity. Because the bundle hash is unkeyed, `make judge-proof-mainnet` also compares it against an expected hash anchored in the Makefile (and in the submission PR and git tag); a tampered-and-rehashed bundle fails that anchor. The verifier does not re-execute FROST, regenerate the PCZT, or query the chain — chain existence is checked on an explorer, and FROST provenance rests on the recorded signing-session evidence.
+- The demonstrated mainnet transaction is a deliberately small **vault self-send** (5,000 zatoshis, 10,000-zatoshi fee) chosen as a safety budget. It demonstrates threshold-authorization mechanics, not an external payment between organizations.
+- The recorded `zecsafe_commit` (`ad83269`) was the repository HEAD at run time, but the P0-018..024 implementation was still uncommitted in the working tree; the following freeze commit records it. See the commit note in [`fixtures/verified-mainnet-run/README.md`](fixtures/verified-mainnet-run/README.md).
 - **Recovery is not demonstrated.**
 
 Security and privacy boundaries: [`SECURITY.md`](SECURITY.md), [`PRIVACY.md`](PRIVACY.md), [`PROOF_SPEC.md`](PROOF_SPEC.md), [`docs/proof/TRUST_MODEL.md`](docs/proof/TRUST_MODEL.md), [`docs/threat-model.md`](docs/threat-model.md).

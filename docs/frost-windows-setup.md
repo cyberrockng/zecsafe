@@ -1,6 +1,6 @@
 # FROST Windows Setup
 
-ZecSafe can call official local Zcash FROST demo tooling through `scripts/frost-demo.mjs` and `GET /api/frost-demo`.
+ZecSafe's real workflow uses the pinned Zcash Foundation FROST tooling (`frost-client`, `frostd`) together with `zcash-devtool`. This guide sets up that toolchain on Windows. The local helper `scripts/frost-demo.mjs` (backed by `scripts/frost-local-wrapper.mjs`) exercises the installed binaries end to end and prints JSON. It is a local CLI utility only — the server exposes no FROST route.
 
 ## Required Tools
 
@@ -74,19 +74,14 @@ That wrapper runs the installed `trusted-dealer`, `participant`, and `coordinato
 }
 ```
 
-Then start ZecSafe:
+Run the wrapper directly:
 
 ```powershell
-node server.mjs
+node scripts/frost-demo.mjs
 ```
 
-You can still override the built-in wrapper with a custom command:
+A custom wrapper command can be supplied with the `FROST_DEMO_COMMAND` environment variable.
 
-```powershell
-$env:FROST_DEMO_COMMAND="your-local-frost-json-wrapper"
-node server.mjs
-```
-
-## Current Machine Status
-
-On this machine, Rust, the MSVC linker, Windows SDK desktop libraries, `frost-client`, and `zcash-sign` are installed. `kernel32.lib` is available under the Windows SDK `10.0.22621.0` library path.
+The mainnet proof run additionally used `zcash-devtool` (pinned commit in the README) for PCZT
+creation, inspection, proving, and wallet sync; see `docs/frost-integration.md` and
+`docs/mainnet-integration.md`.

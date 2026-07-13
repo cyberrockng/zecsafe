@@ -25,7 +25,8 @@ export function deriveDemoPresentation({ mode = "verified", proof = null, replay
         `${threshold} OF ${total}`,
         "FROST",
         `${unavailable} UNAVAILABLE`,
-        verifyStatus === "fail" ? "PROOF BLOCKED" : "PROOF VERIFIED",
+        // The strip only claims verification after the visitor actually runs it.
+        verifyStatus === "fail" ? "PROOF BLOCKED" : verifyStatus === "pass" ? "PROOF VERIFIED" : "PROOF RECORDED",
       ];
 
   const proofFacts = mismatch

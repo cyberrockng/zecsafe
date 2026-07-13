@@ -98,6 +98,8 @@ MIT. See `LICENSE`.
 
 ## 12. Known limitations
 
+The demonstrated mainnet transaction is a deliberately small vault self-send (5,000 zatoshis, safety-budgeted); it demonstrates threshold-authorization mechanics, not an external payment.
+
 ZecSafe is a hackathon proof-of-concept using re-randomized FROST tooling. The referenced NCC audit of the ZF FROST repository did not include rerandomized FROST. ZecSafe is not presented as audited production custody software.
 
 Coordinator privacy/unlinkability, key-share-holder privacy/unlinkability, signer linkability, and network privacy limits are disclosed in `SECURITY.md`, `PRIVACY.md`, `PROOF_SPEC.md`, and `docs/proof/TRUST_MODEL.md`.

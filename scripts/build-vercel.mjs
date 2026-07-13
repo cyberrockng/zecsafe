@@ -7,6 +7,8 @@ const outputDir = join(rootDir, "dist");
 
 const publicFiles = [
   "index.html",
+  "og.png",
+  "icon.png",
   "src/app.js",
   "src/demo-proof-state.mjs",
   "src/demo-presentation.mjs",
