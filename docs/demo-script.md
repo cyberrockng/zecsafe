@@ -85,6 +85,19 @@ Say:
 
 Click `PASS` to return.
 
+## Scene 4b — Optional: let the judge attack the proof (adds ~20s)
+
+Scroll to the Tamper Lab in Step 4 — Prove. Click `Verify recorded proof`
+(shows `VERIFIED RECORDED ZECSAFE PROOF`, hash recomputed in the browser),
+then click `Alter the txid`.
+
+Say:
+
+> "This page also lets *you* attack the proof. The verifier reruns in your
+> browser — WebCrypto, client-side — over a local copy. One flipped character
+> in the txid and the bundle hash gate fails. Try it yourself on the live
+> page; you can even edit the JSON by hand."
+
 ## Scene 5 — Verify it yourself (2:05–2:35)
 
 Terminal. Run, live on camera:

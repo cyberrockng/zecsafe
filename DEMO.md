@@ -20,11 +20,16 @@ A 2-of-3 FROST authorization control plane for shielded Zcash.
 
 Use these controls:
 
-1. `Replay Verified Mainnet Run`
+1. `Replay Verified Mainnet Run` (animates the recorded gates)
 2. `Verify Proof`
 3. `Download Public Proof`
 4. Binding Firewall mode: `PASS`
 5. Binding Firewall mode: `Mismatch`
+6. Tamper Lab (Prove step): `Verify recorded proof`, the four attack presets,
+   and `Edit the JSON yourself` — the verifier reruns in the visitor's browser
+   over a local copy; attacks must show `REJECTED ZECSAFE PROOF` with the
+   failing gate, and `Verify recorded proof` must show
+   `VERIFIED RECORDED ZECSAFE PROOF`.
 
 The mismatch mode must show:
 

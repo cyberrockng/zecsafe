@@ -1,5 +1,6 @@
 import { createBindingMismatchEvents, proofEventsFromPublicLog, reduceDemoProofEvents } from "./demo-proof-state.mjs";
 import { createPublicProofExport, deriveDemoPresentation } from "./demo-presentation.mjs";
+import { TAMPER_PRESETS, verifyProofInBrowser } from "./verify-browser.mjs";
 
 const VERIFIED_MAINNET_PROOF_PATH = "fixtures/verified-mainnet-run/proof.json";
 const VERIFIED_MAINNET_EVENTS_PATH = "fixtures/verified-mainnet-run/events.public.json";
@@ -22,8 +23,33 @@ const state = {
     events: [],
     reduced: reduceDemoProofEvents([]),
     verifyStatus: "idle",
+    revealCount: Infinity,
+  },
+  lab: {
+    busy: false,
+    editing: false,
+    presetId: null,
+    proofText: null,
+    result: null,
+    error: null,
   },
 };
+
+let replayTimer = null;
+
+function animateFlowReveal(totalSteps) {
+  if (replayTimer) clearInterval(replayTimer);
+  state.demo.revealCount = 0;
+  replayTimer = setInterval(() => {
+    state.demo.revealCount += 1;
+    if (state.demo.revealCount >= totalSteps) {
+      state.demo.revealCount = Infinity;
+      clearInterval(replayTimer);
+      replayTimer = null;
+    }
+    render();
+  }, 340);
+}
 
 const app = document.querySelector("#app");
 
@@ -57,7 +83,7 @@ function updateDemoReduction(mode = state.demo.mode) {
   return reduced;
 }
 
-async function loadVerifiedProof(mode = state.demo.mode) {
+async function loadVerifiedProof(mode = state.demo.mode, { animate = false } = {}) {
   if (state.demo.status === "loading") return;
 
   state.demo = {
@@ -93,6 +119,7 @@ async function loadVerifiedProof(mode = state.demo.mode) {
       reduced,
       verifyStatus: "idle",
     };
+    if (animate && mode !== "mismatch") animateFlowReveal(8);
   } catch (error) {
     state.demo = {
       ...state.demo,
@@ -145,6 +172,114 @@ function verifyLoadedPublicProof() {
   render();
 }
 
+async function runLabVerification({ presetId = null, proofText = null } = {}) {
+  if (!state.demo.proof || state.lab.busy) return;
+
+  state.lab = { ...state.lab, busy: true, error: null, result: null };
+  render();
+
+  try {
+    let candidate;
+    if (proofText !== null) {
+      state.lab.proofText = proofText;
+      candidate = JSON.parse(proofText);
+    } else if (presetId) {
+      const preset = TAMPER_PRESETS.find((item) => item.id === presetId);
+      candidate = structuredClone(state.demo.proof);
+      preset.apply(candidate);
+      state.lab.proofText = JSON.stringify(candidate, null, 2);
+    } else {
+      candidate = structuredClone(state.demo.proof);
+      state.lab.proofText = JSON.stringify(candidate, null, 2);
+    }
+
+    const result = await verifyProofInBrowser(candidate);
+    state.lab = { ...state.lab, busy: false, presetId, result, error: null };
+  } catch (error) {
+    state.lab = { ...state.lab, busy: false, presetId, result: null, error: error.message };
+  }
+
+  render();
+}
+
+function resetLab() {
+  state.lab = { busy: false, editing: false, presetId: null, proofText: null, result: null, error: null };
+  render();
+}
+
+function renderLabCheck(check) {
+  const ok = check.status === "PASS";
+  return `
+    <li class="${ok ? "binding-check--pass" : "binding-check--fail"}">
+      <strong>${escapeHtml(check.name)}</strong>
+      <span>${escapeHtml(check.status)}</span>
+    </li>
+  `;
+}
+
+function renderTamperLab() {
+  const lab = state.lab;
+  if (!state.demo.proof || state.demo.mode === "mismatch") return "";
+
+  const result = lab.result;
+  const verdictBlock = result
+    ? `
+      <div class="tamper-lab__verdict ${result.status === "PASS" ? "tamper-lab__verdict--pass" : "tamper-lab__verdict--fail"}" role="status">
+        <strong>${escapeHtml(result.verdict)}</strong>
+        <span>Recorded bundle hash: ${escapeHtml(shortHex(result.bundle_hash?.slice("sha256:".length)))}</span>
+        <span>Recomputed just now in your browser: ${escapeHtml(shortHex(result.computed_bundle_hash?.slice("sha256:".length)))}</span>
+      </div>
+      <ul class="binding-check-list">${result.checks.map((check) => renderLabCheck(check)).join("")}</ul>
+    `
+    : "";
+  const errorBlock = lab.error
+    ? `<div class="mainnet-empty mainnet-empty--error"><strong>Verifier rejected the input</strong><p>${escapeHtml(lab.error)}</p></div>`
+    : "";
+
+  return `
+    <div class="tamper-lab">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Interactive &mdash; Tamper Lab</p>
+          <h3>Attack this proof in your browser</h3>
+        </div>
+        <span>${lab.busy ? "Verifying..." : "WebCrypto SHA-256, client-side"}</span>
+      </div>
+      <p class="required-sentence">
+        The verifier below runs in your browser and recomputes the bundle hash and every gate over a local copy of the
+        recorded proof. Attack the copy; the recorded run is immutable. The authoritative verifier is
+        make judge-proof-mainnet.
+      </p>
+      <div class="verified-demo__actions tamper-lab__actions">
+        <button class="secondary-action" type="button" data-lab-action="verify" ${lab.busy ? "disabled" : ""}>Verify recorded proof</button>
+        ${TAMPER_PRESETS.map(
+          (preset) => `
+            <button class="secondary-action ${lab.presetId === preset.id ? "tamper-lab__preset--active" : ""}" type="button" data-lab-preset="${preset.id}" ${lab.busy ? "disabled" : ""}>
+              ${escapeHtml(preset.label)}
+            </button>
+          `,
+        ).join("")}
+        <button class="secondary-action" type="button" data-lab-action="edit" ${lab.busy ? "disabled" : ""}>${lab.editing ? "Hide JSON editor" : "Edit the JSON yourself"}</button>
+        <button class="secondary-action" type="button" data-lab-action="reset" ${lab.busy ? "disabled" : ""}>Reset</button>
+      </div>
+      ${
+        lab.editing
+          ? `
+            <textarea class="tamper-lab__editor" id="labEditor" rows="14" spellcheck="false" aria-label="Editable proof JSON">${escapeHtml(
+              lab.proofText ?? JSON.stringify(state.demo.proof, null, 2),
+            )}</textarea>
+            <div class="verified-demo__actions">
+              <button class="primary-action" type="button" data-lab-action="verify-edit" ${lab.busy ? "disabled" : ""}>Verify my edit</button>
+            </div>
+          `
+          : ""
+      }
+      ${errorBlock}
+      ${verdictBlock}
+    </div>
+  `;
+}
+
 function downloadPublicProof() {
   if (!state.demo.proof || state.demo.mode !== "verified") return;
   const payload = createPublicProofExport({
@@ -173,9 +308,12 @@ function renderProofFact(label, value) {
   `;
 }
 
-function renderFlowStep(label, detail, complete = true) {
+function renderFlowStep(label, detail, complete = true, pending = false) {
+  const classes = [complete && !pending ? "demo-flow__step--complete" : "", pending ? "demo-flow__step--pending" : ""]
+    .filter(Boolean)
+    .join(" ");
   return `
-    <li class="${complete ? "demo-flow__step--complete" : ""}">
+    <li class="${classes}">
       <span></span>
       <div>
         <strong>${escapeHtml(label)}</strong>
@@ -386,18 +524,24 @@ function renderApp() {
             <span>${escapeHtml(`${replay.events_seen} ${mismatch ? "synthetic " : ""}events`)}</span>
           </div>
           <ol class="demo-flow">
-            ${renderFlowStep("Vault", `${threshold}-of-${total} redpallas-rerandomized FROST group`, Boolean(threshold))}
-            ${renderFlowStep(
-              "Failure condition",
-              mismatch ? "RECIPIENT MISMATCH — SYNTHETIC SAFETY TEST" : `${unavailable} participant unavailable; threshold still satisfiable`,
-              !mismatch && replay.frost.unavailable_participant_count !== null,
-            )}
-            ${renderFlowStep("Intent", proof?.intent?.commitment ?? "Intent commitment recorded", Boolean(proof?.intent?.commitment))}
-            ${renderFlowStep("Binding Firewall", presentation.flow.binding.detail, presentation.flow.binding.complete)}
-            ${renderFlowStep("FROST authorization", presentation.flow.frost.detail, presentation.flow.frost.complete)}
-            ${renderFlowStep("PCZT completion", presentation.flow.pczt.detail, presentation.flow.pczt.complete)}
-            ${renderFlowStep("Mainnet", presentation.flow.mainnet.detail, presentation.flow.mainnet.complete)}
-            ${renderFlowStep("Proof", presentation.flow.proof.detail, presentation.flow.proof.complete)}
+            ${[
+              ["Vault", `${threshold}-of-${total} redpallas-rerandomized FROST group`, Boolean(threshold)],
+              [
+                "Failure condition",
+                mismatch ? "RECIPIENT MISMATCH — SYNTHETIC SAFETY TEST" : `${unavailable} participant unavailable; threshold still satisfiable`,
+                !mismatch && replay.frost.unavailable_participant_count !== null,
+              ],
+              ["Intent", proof?.intent?.commitment ?? "Intent commitment recorded", Boolean(proof?.intent?.commitment)],
+              ["Binding Firewall", presentation.flow.binding.detail, presentation.flow.binding.complete],
+              ["FROST authorization", presentation.flow.frost.detail, presentation.flow.frost.complete],
+              ["PCZT completion", presentation.flow.pczt.detail, presentation.flow.pczt.complete],
+              ["Mainnet", presentation.flow.mainnet.detail, presentation.flow.mainnet.complete],
+              ["Proof", presentation.flow.proof.detail, presentation.flow.proof.complete],
+            ]
+              .map(([label, detail, complete], index) =>
+                renderFlowStep(label, detail, complete, index >= state.demo.revealCount),
+              )
+              .join("")}
           </ol>
 
           <div class="verified-demo__actions">
@@ -409,6 +553,8 @@ function renderApp() {
           <dl class="mainnet-stats proof-route-panel__facts">
             ${presentation.proofFacts.map(([label, value]) => renderProofFact(label, value)).join("")}
           </dl>
+
+          ${renderTamperLab()}
 
           ${
             mismatch
@@ -454,7 +600,33 @@ function renderApp() {
 
 function bindEvents() {
   document.querySelector("#loadVerifiedDemo")?.addEventListener("click", () => {
-    loadVerifiedProof(state.demo.mode);
+    if (state.demo.status === "success" && state.demo.mode !== "mismatch") {
+      animateFlowReveal(8);
+      return;
+    }
+    loadVerifiedProof(state.demo.mode, { animate: true });
+  });
+
+  document.querySelectorAll("[data-lab-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      runLabVerification({ presetId: button.dataset.labPreset });
+    });
+  });
+
+  document.querySelectorAll("[data-lab-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.labAction;
+      if (action === "verify") runLabVerification();
+      if (action === "reset") resetLab();
+      if (action === "edit") {
+        state.lab.editing = !state.lab.editing;
+        render();
+      }
+      if (action === "verify-edit") {
+        const editor = document.querySelector("#labEditor");
+        if (editor) runLabVerification({ proofText: editor.value });
+      }
+    });
   });
 
   document.querySelector("#verifyPublicProof")?.addEventListener("click", () => {
@@ -478,7 +650,7 @@ function render() {
 }
 
 render();
-loadVerifiedProof();
+loadVerifiedProof(state.demo.mode, { animate: true });
 
 window.addEventListener("hashchange", () => {
   render();

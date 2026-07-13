@@ -10,6 +10,7 @@ const publicFiles = [
   "src/app.js",
   "src/demo-proof-state.mjs",
   "src/demo-presentation.mjs",
+  "src/verify-browser.mjs",
   "src/styles.css",
   "fixtures/verified-mainnet-run/proof.json",
   "fixtures/verified-mainnet-run/events.public.json",

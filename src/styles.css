@@ -3833,3 +3833,69 @@ dd {
     width: 100%;
   }
 }
+
+/* Tamper Lab — in-browser verifier and attack presets */
+.tamper-lab {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  display: grid;
+  gap: 16px;
+}
+
+.tamper-lab__actions {
+  flex-wrap: wrap;
+}
+
+.tamper-lab__preset--active {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.tamper-lab__editor {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 14px;
+  resize: vertical;
+}
+
+.tamper-lab__verdict {
+  display: grid;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.tamper-lab__verdict strong {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.tamper-lab__verdict span {
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.tamper-lab__verdict--pass {
+  border-color: var(--mint);
+  background: rgba(46, 166, 111, 0.08);
+}
+
+.tamper-lab__verdict--fail {
+  border-color: var(--coral);
+  background: rgba(216, 92, 67, 0.08);
+}
+
+.demo-flow__step--pending {
+  opacity: 0.35;
+}
