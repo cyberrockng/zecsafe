@@ -3493,7 +3493,7 @@ dd {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
   gap: 24px;
-  align-items: stretch;
+  align-items: center;
   min-height: 420px;
   padding: 34px;
   background:
