@@ -67,6 +67,7 @@ const state = {
     txidExpanded: false,
     txidCopied: false,
     mobileNavOpen: false,
+    previewMode: "authorization",
   },
   lab: {
     busy: false,
@@ -130,7 +131,7 @@ function navigateTo(path) {
   }
   state.ui.mobileNavOpen = false;
   render();
-  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function demoProofEventsForMode(mode = state.demo.mode) {
@@ -156,8 +157,8 @@ function animateHeroReveal(total = HERO_ROW_TOTAL) {
   render();
   heroTimer = setInterval(() => {
     state.hero.revealCount += 1;
-    document.querySelectorAll(".quorum-node").forEach((node, index) => {
-      if (index < state.hero.revealCount) node.classList.add("quorum-node--on");
+    document.querySelectorAll(".signer-card").forEach((node, index) => {
+      if (index < state.hero.revealCount) node.classList.add("signer-card--on");
     });
     if (state.hero.revealCount >= total) {
       state.hero.revealCount = Infinity;
@@ -482,36 +483,115 @@ function renderTamperLab() {
   `;
 }
 
-function renderQuorumVisual() {
-  const rows = [
-    ["Signer A", "Ready", "quorum-node--available"],
-    ["Signer B", "Ready", "quorum-node--available"],
-    ["Signer C", "Unavailable", "quorum-node--offline"],
-    ["Binding Firewall", "Verified", "quorum-node--verified"],
-    ["Public proof", "Recorded", "quorum-node--verified"],
-  ];
+function renderStatusBadge(label, tone = "verified") {
+  return `<span class="status-badge status-badge--${escapeHtml(tone)}"><i aria-hidden="true"></i>${escapeHtml(label)}</span>`;
+}
+
+function renderMetric(label, value, tone = null) {
   return `
-    <div class="quorum-visual" aria-label="2-of-3 vault proof visual">
-      <div class="vault-orbit">
-        <div class="vault-core">
-          <span>ZEC</span>
-          <strong>2/3</strong>
+    <div class="metric-tile ${tone ? `metric-tile--${escapeHtml(tone)}` : ""}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(proofValue(value))}</strong>
+    </div>
+  `;
+}
+
+function renderHashDisplay(label, value, { full = false } = {}) {
+  const text = proofValue(value);
+  const display = full || text.length <= 22 ? text : `${text.slice(0, 12)}...${text.slice(-8)}`;
+  return `
+    <div class="hash-display">
+      <span>${escapeHtml(label)}</span>
+      <code title="${escapeHtml(text)}">${escapeHtml(display)}</code>
+    </div>
+  `;
+}
+
+function renderHeroAuthorizationPreview({ proof, replay, presentation }) {
+  const txid = presentation.recorded.txid;
+  const blockHeight = proof?.transaction?.observed_block_height ?? replay?.chain?.observed_block_height;
+  const confirmations = proof?.transaction?.confirmations_at_recording ?? replay?.chain?.confirmations;
+  const rows = [
+    ["Signer A", "Ready", "verified", "Selected signer"],
+    ["Signer B", "Ready", "verified", "Selected signer"],
+    ["Signer C", "Offline", "blocked", "Unavailable participant"],
+  ];
+  const checks = [
+    ["Intent", proof?.intent?.commitment ? "Bound" : "Loading", proof?.intent?.commitment ? "verified" : "pending"],
+    [
+      "PCZT",
+      replay?.readiness?.binding_passed ? "PASS" : (proof?.pczt?.binding_status ?? replay?.binding?.status),
+      replay?.readiness?.binding_passed ? "verified" : "pending",
+    ],
+    [
+      "FROST",
+      replay?.readiness?.threshold_reached ? "Reached" : replay?.frost?.threshold_status,
+      replay?.readiness?.threshold_reached ? "verified" : "pending",
+    ],
+    [
+      "Mainnet",
+      replay?.readiness?.chain_confirmed ? "Confirmed" : presentation.recorded.chainStatus,
+      replay?.readiness?.chain_confirmed ? "verified" : "pending",
+    ],
+  ];
+
+  return `
+    <aside class="hero-console" aria-label="ZecSafe recorded authorization preview">
+      <div class="hero-console__topline">
+        <div>
+          <span class="console-kicker">Recorded mainnet session</span>
+          <strong>${escapeHtml(proof?.run_id ?? "Loading verified run")}</strong>
+        </div>
+        ${renderStatusBadge(presentation.recorded.chainStatus ?? "Recorded", replay?.readiness?.chain_confirmed ? "verified" : "pending")}
+      </div>
+
+      <div class="threshold-meter">
+        <div class="threshold-meter__ring" aria-label="${escapeHtml(`${presentation.threshold} of ${presentation.total} threshold`)}">
+          <span>${escapeHtml(`${presentation.threshold}/${presentation.total}`)}</span>
+          <small>threshold</small>
+        </div>
+        <div class="threshold-meter__copy">
+          <h2>Threshold reached with one signer unavailable.</h2>
+          <p>Two selected signers authorize the recorded shielded spend; the public proof stays checkable without exposing private transaction details.</p>
         </div>
       </div>
-      <div class="quorum-list">
+
+      <div class="signer-grid">
         ${rows
           .map(
-            ([label, status, kind], index) => `
-              <div class="quorum-node ${kind} ${index < state.hero.revealCount ? "quorum-node--on" : ""}">
+            ([label, status, tone, detail], index) => `
+              <div class="signer-card ${index < state.hero.revealCount ? "signer-card--on" : ""}">
+                ${renderStatusBadge(status, tone)}
                 <strong>${escapeHtml(label)}</strong>
-                <span>${escapeHtml(status)}</span>
+                <span>${escapeHtml(detail)}</span>
               </div>
             `,
           )
           .join("")}
       </div>
-      <p>One signer unavailable. Two signers authorize. The public proof stays checkable.</p>
-    </div>
+
+      <div class="console-checks" aria-label="Recorded verification gates">
+        ${checks
+          .map(
+            ([label, value, tone]) => `
+              <div>
+                ${renderStatusBadge(value ?? "Pending", tone)}
+                <span>${escapeHtml(label)}</span>
+              </div>
+            `,
+          )
+          .join("")}
+      </div>
+
+      <div class="console-evidence">
+        ${renderMetric("Network", proof?.network ?? "main", "mainnet")}
+        ${renderMetric("Block height", blockHeight)}
+        ${renderMetric("Confirmations", confirmations)}
+      </div>
+
+      ${renderHashDisplay("Txid", txid)}
+      ${renderHashDisplay("Proof bundle hash", proof?.bundle_hash)}
+    </aside>
   `;
 }
 
@@ -548,18 +628,36 @@ function renderGlobalNav(route) {
 function renderFooter() {
   return `
     <footer class="site-footer">
-      <div>
-        <strong>ZecSafe</strong>
+      <div class="footer-brand">
+        <a class="brand brand--footer" href="/" data-route="/">
+          <span class="brand__mark">ZS</span>
+          <span>
+            <strong>ZecSafe</strong>
+            <small>Shielded threshold authorization</small>
+          </span>
+        </a>
         <p>
-          ZecSafe is a hackathon proof-of-concept using re-randomized FROST tooling. The referenced NCC audit of the ZF
-          FROST repository did not include rerandomized FROST. ZecSafe is not audited production custody software.
-          Recovery is not demonstrated.
+          Hackathon proof-of-concept for Zcash FROST authorization. The recorded proof is verifiable; production
+          custody, formal audit status, and recovery guarantees are not claimed. Recovery is not demonstrated.
         </p>
       </div>
-      <div class="footer-links">
-        <a href="/proof" data-route="/proof">Verify proof</a>
-        <a href="/security" data-route="/security">Security model</a>
+      <div class="footer-column">
+        <strong>Product</strong>
+        <a href="/" data-route="/">Product</a>
+        <a href="/proof" data-route="/proof">Proof</a>
+        <a href="/how-it-works" data-route="/how-it-works">How it works</a>
+      </div>
+      <div class="footer-column">
+        <strong>Trust</strong>
+        <a href="/security" data-route="/security">Security</a>
+        <a href="/docs" data-route="/docs">Docs</a>
         <a href="https://github.com/cyberrockng/zecsafe" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-column footer-column--status">
+        <strong>Network evidence</strong>
+        ${renderStatusBadge("Zcash mainnet", "mainnet")}
+        ${renderStatusBadge("Recorded proof", "verified")}
+        ${renderStatusBadge("Prototype", "warning")}
       </div>
     </footer>
   `;
@@ -570,6 +668,329 @@ function renderEvidenceStrip(items) {
     <div class="evidence-strip" aria-label="Verified evidence">
       ${items.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}
     </div>
+  `;
+}
+
+function renderTechnicalTrustStrip({ presentation, proof, replay }) {
+  const items = [
+    ["Zcash mainnet", proof?.network === "main" ? "Recorded" : "Loading", "mainnet"],
+    [`${presentation.threshold}-of-${presentation.total}`, "Threshold policy", "verified"],
+    ["Binding Firewall", replay?.readiness?.binding_passed ? "PASS" : "Loading", "verified"],
+    ["Human approval", "Broadcast gated", "pending"],
+    ["Public proof", proof?.bundle_hash ? "Hash anchored" : "Loading", "verified"],
+    ["Production custody", "Not claimed", "warning"],
+  ];
+
+  return `
+    <section class="trust-strip" aria-label="Technical credibility">
+      ${items
+        .map(
+          ([label, detail, tone]) => `
+            <div>
+              ${renderStatusBadge(detail, tone)}
+              <strong>${escapeHtml(label)}</strong>
+            </div>
+          `,
+        )
+        .join("")}
+    </section>
+  `;
+}
+
+function renderThreatControlMatrix() {
+  const rows = [
+    ["Signer unavailable", "Funds can stall if a single operator is required.", "2-of-3 FROST path remains satisfiable.", "No share repair or migration demo."],
+    ["Transaction tampering", "A signer could be asked to approve different semantics.", "Binding Firewall compares reviewed intent to PCZT fields.", "Semantic review, not independent signer SIGHASH recomputation."],
+    ["Unproven authorization", "Judges cannot inspect private signing material.", "Public proof records safe fingerprints and replay gates.", "The proof is redacted evidence, not zero-knowledge."],
+    ["Overstated custody claim", "A demo can look more mature than it is.", "Limits are visible in product copy and verifier docs.", "Not audited production custody software."],
+  ];
+
+  return `
+    <section class="section-shell threat-section">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">Threat and control model</p>
+          <h2>Availability without pretending the prototype is custody infrastructure.</h2>
+        </div>
+        <p class="section-lede">The homepage shows the security posture as controls and limits, not marketing claims.</p>
+      </div>
+      <div class="threat-matrix">
+        ${rows
+          .map(
+            ([threat, impact, control, limit]) => `
+              <article>
+                <span>Threat</span>
+                <h3>${escapeHtml(threat)}</h3>
+                <p><strong>Impact:</strong> ${escapeHtml(impact)}</p>
+                <p><strong>ZecSafe control:</strong> ${escapeHtml(control)}</p>
+                <p><strong>Limit:</strong> ${escapeHtml(limit)}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderWorkflowPreview() {
+  const stages = [
+    ["Prepare", "Recorded intent", "Create the bounded transaction intent and commit to its private semantics."],
+    ["Validate", "Binding Firewall", "Compare the reviewed intent against PCZT-exposed fields before FROST starts."],
+    ["Authorize", "2-of-3 FROST", "Select the two available signers while one participant remains unavailable."],
+    ["Verify", "Browser and CLI", "Recompute proof integrity and replay the public ProofEvent gates."],
+    ["Prove", "Exportable bundle", "Publish a redacted, tamper-evident evidence package for judges."],
+  ];
+
+  return `
+    <section class="section-shell workflow-preview">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">How ZecSafe works</p>
+          <h2>Five visible stages, one recorded mainnet proof.</h2>
+        </div>
+        <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">Explore workflow</a>
+      </div>
+      <ol class="workflow-rail">
+        ${stages
+          .map(
+            ([label, title, body], index) => `
+              <li>
+                <span>${String(index + 1).padStart(2, "0")}</span>
+                <strong>${escapeHtml(label)}</strong>
+                <h3>${escapeHtml(title)}</h3>
+                <p>${escapeHtml(body)}</p>
+              </li>
+            `,
+          )
+          .join("")}
+      </ol>
+    </section>
+  `;
+}
+
+function renderProductPreview({ proof, replay, presentation }) {
+  const modes = {
+    authorization: {
+      label: "Authorization",
+      title: "2-of-3 threshold stays available.",
+      body: "Signer C is unavailable; signers A and B satisfy the threshold in the recorded run.",
+      facts: [
+        ["Threshold", `${presentation.threshold}-of-${presentation.total}`],
+        ["Unavailable", presentation.unavailable],
+        ["Aggregate signature", presentation.authorization.aggregateStatus],
+      ],
+    },
+    proof: {
+      label: "Proof verification",
+      title: "The browser verifier recomputes the bundle hash.",
+      body: "The homepage previews the proof state; the full verifier and Tamper Lab live on /proof.",
+      facts: [
+        ["Bundle hash", proof?.bundle_hash],
+        ["Replay events", replay?.events_seen],
+        ["Verifier", presentation.verifier.label],
+      ],
+    },
+    mainnet: {
+      label: "Mainnet evidence",
+      title: "The transaction is recorded as confirmed.",
+      body: "Zcash validates the resulting spend authorization normally; FROST provenance comes from the recorded session.",
+      facts: [
+        ["Network", proof?.network],
+        ["Height", proof?.transaction?.observed_block_height],
+        ["Status", presentation.recorded.chainStatus],
+      ],
+    },
+    policy: {
+      label: "Policy check",
+      title: "A mismatch blocks before signing.",
+      body: "The synthetic safety state fails the Binding Firewall and never imports later FROST or broadcast outcomes.",
+      facts: [
+        ["Recipient check", replay?.binding?.check_statuses?.recipient],
+        ["Signing allowed", replay?.binding?.signing_allowed ? "YES" : "NO"],
+        ["Mismatch demo", "Available on /proof"],
+      ],
+    },
+  };
+  const mode = modes[state.ui.previewMode] ? state.ui.previewMode : "authorization";
+  const selected = modes[mode];
+
+  return `
+    <section class="section-shell product-preview-section">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">Product preview</p>
+          <h2>Show the security workflow, not just the pitch.</h2>
+        </div>
+        <a class="button button--primary" href="/proof" data-route="/proof">Open proof application</a>
+      </div>
+      <div class="product-preview">
+        <div class="preview-tabs" role="tablist" aria-label="Homepage product preview mode">
+          ${Object.entries(modes)
+            .map(
+              ([id, item]) => `
+                <button type="button" role="tab" aria-selected="${id === mode ? "true" : "false"}" class="${id === mode ? "preview-tab--active" : ""}" data-preview-mode="${id}">
+                  ${escapeHtml(item.label)}
+                </button>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="preview-surface">
+          <div>
+            ${renderStatusBadge(mode === "policy" ? "Demo safety state" : "Recorded evidence", mode === "policy" ? "demo" : "verified")}
+            <h3>${escapeHtml(selected.title)}</h3>
+            <p>${escapeHtml(selected.body)}</p>
+          </div>
+          <dl class="preview-facts">
+            ${selected.facts.map(([label, value]) => renderProofFact(label, value)).join("")}
+          </dl>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderMainnetProofSection({ proof, presentation }) {
+  return `
+    <section class="mainnet-proof-section">
+      <div class="mainnet-proof-section__copy">
+        <p class="eyebrow">Mainnet proof</p>
+        <h2>The differentiator is inspectable evidence.</h2>
+        <p>
+          ZecSafe records the mainnet transaction, bundle hash, toolchain commits, and replay gates. It does not ask
+          judges to infer FROST from a chain marker that does not exist.
+        </p>
+        <div class="action-row">
+          <a class="button button--primary" href="/proof" data-route="/proof">Verify a proof</a>
+          <a class="button button--secondary" href="https://mainnet.zcashexplorer.app/transactions/${encodeURIComponent(
+            presentation.recorded.txid ?? "",
+          )}" target="_blank" rel="noopener noreferrer">Open explorer</a>
+        </div>
+      </div>
+      <div class="mainnet-evidence-panel">
+        ${renderStatusBadge(presentation.recorded.chainStatus ?? "Recorded", "mainnet")}
+        ${renderHashDisplay("Transaction ID", presentation.recorded.txid, { full: true })}
+        <div class="console-evidence">
+          ${renderMetric("Network", proof?.network)}
+          ${renderMetric("Block height", proof?.transaction?.observed_block_height)}
+          ${renderMetric("Recorded confirmations", proof?.transaction?.confirmations_at_recording)}
+        </div>
+        ${renderHashDisplay("Bundle hash", proof?.bundle_hash)}
+        ${renderHashDisplay("ZecSafe commit at run", proof?.zecsafe_commit)}
+      </div>
+    </section>
+  `;
+}
+
+function renderSecurityArchitecturePreview({ showCta = true } = {}) {
+  const nodes = [
+    ["Intent", "Private semantics committed"],
+    ["Binding Firewall", "PCZT field checks"],
+    ["FROST A+B", "Threshold reached"],
+    ["PCZT complete", "Signed and proven"],
+    ["Human gate", "Broadcast approval"],
+    ["Public proof", "Redacted evidence"],
+  ];
+  return `
+    <section class="section-shell architecture-preview">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">Security architecture</p>
+          <h2>Human approval remains the boundary between proof and broadcast.</h2>
+        </div>
+        ${showCta ? '<a class="button button--secondary" href="/security" data-route="/security">Review security model</a>' : ""}
+      </div>
+      <div class="architecture-map" aria-label="ZecSafe security architecture preview">
+        ${nodes
+          .map(
+            ([title, body]) => `
+              <article>
+                <strong>${escapeHtml(title)}</strong>
+                <span>${escapeHtml(body)}</span>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderImplementationStatus() {
+  const items = [
+    ["Implemented", "Proof verifier, Binding Firewall reducer, proof export, route-aware static app.", "verified"],
+    ["Demonstrated", "Recorded 2-of-3 FROST authorization with one unavailable participant.", "mainnet"],
+    ["Experimental", "Hackathon proof-of-concept using rerandomized FROST tooling.", "warning"],
+    ["Not claimed", "Production custody, formal audit, share repair, refresh, or guaranteed recovery.", "blocked"],
+  ];
+  return `
+    <section class="section-shell implementation-status">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">Implementation status</p>
+          <h2>Serious security UX includes visible limits.</h2>
+        </div>
+      </div>
+      <div class="status-grid">
+        ${items
+          .map(
+            ([title, body, tone]) => `
+              <article>
+                ${renderStatusBadge(title, tone)}
+                <p>${escapeHtml(body)}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderDocsPreview() {
+  const items = [
+    ["Verify a proof", "Run the judge commands and inspect the public fixture."],
+    ["Understand threshold authorization", "Review the recorded FROST path and selected signer evidence."],
+    ["Read proof fields", "See what is public, private, or intentionally excluded."],
+    ["Review limitations", "Understand prototype boundaries and audit caveats."],
+  ];
+  return `
+    <section class="section-shell docs-preview-section">
+      <div class="section-heading section-heading--wide">
+        <div>
+          <p class="eyebrow">Documentation</p>
+          <h2>Everything needed to challenge the claims.</h2>
+        </div>
+        <a class="button button--secondary" href="/docs" data-route="/docs">Read documentation</a>
+      </div>
+      <div class="docs-preview-grid">
+        ${items
+          .map(
+            ([title, body]) => `
+              <article>
+                <h3>${escapeHtml(title)}</h3>
+                <p>${escapeHtml(body)}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderFinalCta() {
+  return `
+    <section class="final-cta">
+      <p class="eyebrow">Ready for inspection</p>
+      <h2>Authorization should remain available, verifiable, and human-controlled.</h2>
+      <div class="action-row">
+        <a class="button button--primary" href="/proof" data-route="/proof">Verify Proof</a>
+        <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">See How It Works</a>
+        <a class="button button--ghost button--ghost-dark" href="/security" data-route="/security">Review Security</a>
+      </div>
+    </section>
   `;
 }
 
@@ -584,115 +1005,39 @@ function renderLandingPage() {
   });
 
   return `
-    <main>
+    <main class="product-home">
       <section class="landing-hero">
         <div class="landing-hero__copy">
-          <p class="eyebrow">2-of-3 FROST authorization for shielded Zcash</p>
+          <p class="eyebrow">2-of-3 threshold authorization for shielded Zcash</p>
           <h1>Lose one key, not your ZEC.</h1>
           <p>
-            ZecSafe keeps a shielded Zcash vault usable when one signer is unavailable, checks the prepared transaction
-            before signing, and leaves a public proof anyone can verify.
+            ZecSafe demonstrates a threshold-controlled Zcash authorization path: one signer can be unavailable, the
+            prepared PCZT is checked before signing, and the recorded mainnet proof can be verified without secret
+            material.
           </p>
           <div class="action-row">
-            <a class="button button--primary" href="/proof" data-route="/proof">Verify the mainnet proof</a>
-            <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">See how it works</a>
-            <a class="text-link" href="/security" data-route="/security">Read the security model</a>
+            <a class="button button--primary" href="/proof" data-route="/proof">Verify Mainnet Proof</a>
+            <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">See How It Works</a>
+            <a class="text-link text-link--light" href="/security" data-route="/security">Read the Security Model</a>
+          </div>
+          <div class="hero-proof-summary" aria-label="Recorded proof summary">
+            ${renderMetric("Recorded status", presentation.recorded.chainStatus ?? "Loading", "mainnet")}
+            ${renderMetric("Threshold", `${presentation.threshold} of ${presentation.total}`)}
+            ${renderMetric("Unavailable", `${presentation.unavailable} signer`)}
           </div>
         </div>
-        ${renderQuorumVisual()}
+        ${renderHeroAuthorizationPreview({ proof, replay, presentation })}
       </section>
 
-      <section class="problem-band">
-        <div>
-          <p class="eyebrow">The coordination problem</p>
-          <h2>Single-key failure and signer downtime should not freeze shielded funds.</h2>
-        </div>
-        <p>
-          ZecSafe is built around a simple product story: a vault needs enough signers to protect funds, but not so many
-          that one unavailable participant stops a reviewed transaction from moving.
-        </p>
-      </section>
-
-      <section class="section-shell">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Product promise</p>
-            <h2>Availability, safety, and proof in one authorization path.</h2>
-          </div>
-        </div>
-        <div class="pillar-grid">
-          <article>
-            <span>01</span>
-            <h3>Availability</h3>
-            <p>A 2-of-3 threshold can proceed when one participant is unavailable.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Safety</h3>
-            <p>The Binding Firewall checks reviewed intent against the prepared PCZT before FROST begins.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Proof</h3>
-            <p>The recorded mainnet run exports public evidence that can be checked without trusting this website.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section-shell process-preview">
-        <div>
-          <p class="eyebrow">How the run works</p>
-          <h2>Four steps, one recorded mainnet proof.</h2>
-        </div>
-        <ol class="process-line">
-          <li><span>Review</span><strong>Intent commitment</strong><p>Private recipient, amount, and memo stay out of the public proof.</p></li>
-          <li><span>Verify</span><strong>Binding Firewall</strong><p>Field-level mismatch blocks signing before any FROST round.</p></li>
-          <li><span>Authorize</span><strong>2-of-3 FROST</strong><p>Two available signers satisfy the threshold.</p></li>
-          <li><span>Prove</span><strong>Browser-verifiable</strong><p>Proof integrity and replay gates can be recomputed.</p></li>
-        </ol>
-        <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">Explore the architecture</a>
-      </section>
-
-      <section class="section-shell evidence-section">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Verified evidence</p>
-            <h2>Enough proof for the homepage. Details stay on the proof route.</h2>
-          </div>
-          <a class="button button--primary" href="/proof" data-route="/proof">Open verifier</a>
-        </div>
-        ${renderEvidenceStrip(presentation.evidenceStrip)}
-      </section>
-
-      <section class="demo-teaser">
-        <div>
-          <p class="eyebrow">Interactive proof</p>
-          <h2>Replay the run, then try to break the proof.</h2>
-          <p>
-            The proof page keeps the dense material where it belongs: verifier gates, mismatch mode, public proof export,
-            and the Tamper Lab.
-          </p>
-        </div>
-        <div class="teaser-actions">
-          <a class="button button--primary" href="/proof" data-route="/proof">Verify proof</a>
-          <a class="button button--ghost" href="/proof#tamper-lab" data-route="/proof">Open Tamper Lab</a>
-        </div>
-      </section>
-
-      <section class="security-band">
-        <div class="security-band__copy">
-          <p class="eyebrow">Honest by design</p>
-          <h2>Strong evidence, clearly scoped.</h2>
-          <p>
-            This is a recorded proof-of-concept, not production custody software. Zcash validates the spend normally.
-            FROST provenance is shown by the recorded ZecSafe/FROST session and artifact fingerprints, not by a special
-            chain marker.
-          </p>
-        </div>
-        <div class="security-band__action">
-          <a class="text-link" href="/security" data-route="/security">Read the full trust model</a>
-        </div>
-      </section>
+      ${renderTechnicalTrustStrip({ presentation, proof, replay })}
+      ${renderThreatControlMatrix()}
+      ${renderWorkflowPreview()}
+      ${renderProductPreview({ proof, replay, presentation })}
+      ${renderMainnetProofSection({ proof, presentation })}
+      ${renderSecurityArchitecturePreview()}
+      ${renderImplementationStatus()}
+      ${renderDocsPreview()}
+      ${renderFinalCta()}
     </main>
   `;
 }
@@ -931,52 +1276,63 @@ function renderProofPage() {
 }
 
 function renderHowItWorksPage() {
+  const stages = [
+    ["01", "Prepare", "Create the reviewed intent and bind private semantics with a canonical commitment."],
+    ["02", "Validate", "Inspect the PCZT and compare exposed fields against the reviewed intent before signing."],
+    ["03", "Authorize", "Select the available signers and run the recorded 2-of-3 FROST threshold path."],
+    ["04", "Complete", "Apply the aggregate signature, prove the PCZT, combine it, and preserve the approval boundary."],
+    ["05", "Prove", "Export public-safe evidence, replay gates, and an anchored proof bundle hash."],
+  ];
+  const artifacts = [
+    ["Intent commitment", "Public hash of reviewed private semantics."],
+    ["PCZT fingerprint", "Prepared transaction fingerprint used by the Binding Firewall."],
+    ["FROST session", "Selected signer fingerprints and threshold status."],
+    ["Mainnet receipt", "Recorded txid, confirmation status, and block height."],
+    ["Proof bundle", "Schema-bound, tamper-evident public evidence package."],
+  ];
+
   return `
-    <main>
-      <section class="page-hero">
+    <main class="route-page route-page--how">
+      <section class="page-hero page-hero--split">
         <div>
           <p class="eyebrow">How it works</p>
-          <h1>A threshold authorization path, explained without the hash wall.</h1>
+          <h1>From reviewed intent to public proof.</h1>
           <p>
-            ZecSafe separates the human product story from the proof console: review the private intent, check the
-            prepared transaction, authorize with enough signers, then publish a bounded proof.
+            ZecSafe separates the human product story from the proof console: review private intent, validate the
+            prepared transaction, authorize with enough signers, and publish a bounded proof.
           </p>
+          <div class="action-row">
+            <a class="button button--primary" href="/proof" data-route="/proof">Open proof application</a>
+            <a class="button button--secondary" href="/security" data-route="/security">Review security model</a>
+          </div>
+        </div>
+        <div class="route-summary-panel">
+          ${renderMetric("Policy", "2-of-3 FROST")}
+          ${renderMetric("Unavailable", "1 signer")}
+          ${renderMetric("Proof mode", "Recorded replay")}
         </div>
       </section>
 
-      <section class="mechanism-grid">
-        <article class="mechanism-card mechanism-card--featured">
-          <span>01</span>
-          <h2>The vault model</h2>
-          <p>
-            A 2-of-3 FROST policy means two selected signers can authorize while one participant is unavailable. The
-            recorded run demonstrates that threshold path with one signer offline.
-          </p>
-        </article>
-        <article class="mechanism-card">
-          <span>02</span>
-          <h2>The transaction safety gate</h2>
-          <p>
-            Before signing, the Binding Firewall compares reviewed intent with the prepared PCZT. If the recipient
-            differs, signing is blocked before FROST begins.
-          </p>
-        </article>
-        <article class="mechanism-card">
-          <span>03</span>
-          <h2>The threshold authorization</h2>
-          <p>
-            The public proof records FROST session provenance and selected signer fingerprints. The Zcash chain does not
-            expose a special FROST marker.
-          </p>
-        </article>
-        <article class="mechanism-card">
-          <span>04</span>
-          <h2>The proof bundle</h2>
-          <p>
-            The bundle includes public-safe commitments, event replay state, toolchain fingerprints, and the confirmed
-            transaction reference. Recipient, amount, memo, keys, shares, and nonces stay private.
-          </p>
-        </article>
+      <section class="route-section">
+        <div class="section-heading section-heading--wide">
+          <div>
+            <p class="eyebrow">Workflow</p>
+            <h2>The implemented path has five inspectable stages.</h2>
+          </div>
+        </div>
+        <ol class="timeline-grid">
+          ${stages
+            .map(
+              ([num, title, body]) => `
+                <li>
+                  <span>${escapeHtml(num)}</span>
+                  <h3>${escapeHtml(title)}</h3>
+                  <p>${escapeHtml(body)}</p>
+                </li>
+              `,
+            )
+            .join("")}
+        </ol>
       </section>
 
       <section class="failure-path">
@@ -987,7 +1343,7 @@ function renderHowItWorksPage() {
             The synthetic safety test is intentionally counterfactual: it proves the review gate blocks a tampered
             recipient and never imports the recorded run's later FROST, PCZT completion, broadcast, or proof export.
           </p>
-          <a class="button button--primary" href="/proof#verify" data-route="/proof">Open mismatch test</a>
+          <a class="button button--primary" href="/proof" data-route="/proof">Open mismatch test</a>
         </div>
         <ol class="failure-steps">
           <li><strong>Reviewed intent</strong><span>Original private commitment</span></li>
@@ -995,6 +1351,28 @@ function renderHowItWorksPage() {
           <li><strong>Binding Firewall</strong><span>FAIL</span></li>
           <li><strong>FROST round</strong><span>Not started</span></li>
         </ol>
+      </section>
+
+      <section class="route-section artifact-section">
+        <div class="section-heading section-heading--wide">
+          <div>
+            <p class="eyebrow">Evidence artifacts</p>
+            <h2>What the proof route and CLI actually inspect.</h2>
+          </div>
+        </div>
+        <div class="artifact-grid">
+          ${artifacts
+            .map(
+              ([title, body]) => `
+                <article>
+                  ${renderStatusBadge("Public-safe", "verified")}
+                  <h3>${escapeHtml(title)}</h3>
+                  <p>${escapeHtml(body)}</p>
+                </article>
+              `,
+            )
+            .join("")}
+        </div>
       </section>
     </main>
   `;
@@ -1035,10 +1413,16 @@ function renderSecurityPage() {
       "ZecSafe is a hackathon proof-of-concept, not audited production custody software.",
     ],
   ];
+  const assumptions = [
+    ["Coordinator visibility", "The coordinator can see transaction details during preparation."],
+    ["Signer review mode", "semantic_pczt_review checks PCZT semantics and pinned-tool SIGHASH fingerprints."],
+    ["Mainnet proof", "Consensus validates the spend; FROST provenance is recorded off-chain."],
+    ["Hosted app", "Static verifier and fixtures only; no wallet, no secret material."],
+  ];
 
   return `
-    <main>
-      <section class="page-hero">
+    <main class="route-page route-page--security">
+      <section class="page-hero page-hero--split">
         <div>
           <p class="eyebrow">Security model</p>
           <h1>Precise claims are part of the product.</h1>
@@ -1046,6 +1430,39 @@ function renderSecurityPage() {
             ZecSafe's strongest evidence is useful because it is bounded. This page states what the proof shows, what it
             excludes, and which limits remain.
           </p>
+          <div class="action-row">
+            <a class="button button--primary" href="/proof" data-route="/proof">Verify proof</a>
+            <a class="button button--secondary" href="/docs" data-route="/docs">Read docs</a>
+          </div>
+        </div>
+        <div class="route-summary-panel route-summary-panel--dark">
+          ${renderStatusBadge("Prototype", "warning")}
+          ${renderStatusBadge("Recorded proof", "verified")}
+          ${renderStatusBadge("No production custody claim", "blocked")}
+        </div>
+      </section>
+
+      ${renderSecurityArchitecturePreview({ showCta: false })}
+
+      <section class="route-section">
+        <div class="section-heading section-heading--wide">
+          <div>
+            <p class="eyebrow">Assumptions</p>
+            <h2>The proof is strong because its trust boundaries are explicit.</h2>
+          </div>
+        </div>
+        <div class="assumption-grid">
+          ${assumptions
+            .map(
+              ([title, body]) => `
+                <article>
+                  ${renderStatusBadge("Assumption", "pending")}
+                  <h3>${escapeHtml(title)}</h3>
+                  <p>${escapeHtml(body)}</p>
+                </article>
+              `,
+            )
+            .join("")}
         </div>
       </section>
 
@@ -1081,36 +1498,44 @@ function renderSecurityPage() {
 function renderDocsPage() {
   const repo = "https://github.com/cyberrockng/zecsafe";
   const docs = [
-    ["README", "Project overview, verified run summary, and setup path.", `${repo}/blob/main/README.md`],
-    ["Proof Spec", "Public proof schema, bundle hash boundary, and verifier expectations.", `${repo}/blob/main/PROOF_SPEC.md`],
-    ["Privacy", "What public evidence reveals and what remains private.", `${repo}/blob/main/PRIVACY.md`],
-    ["Security", "Security policy and trust boundaries.", `${repo}/blob/main/SECURITY.md`],
-    ["GitHub source", "Repository source and documentation.", repo],
+    ["Overview", "Project overview, verified run summary, and setup path.", `${repo}/blob/main/README.md`, "Start here"],
+    ["Proof verification", "Public proof schema, bundle hash boundary, and verifier expectations.", `${repo}/blob/main/PROOF_SPEC.md`, "Verifier"],
+    ["Privacy boundary", "What public evidence reveals and what remains private.", `${repo}/blob/main/PRIVACY.md`, "Data"],
+    ["Security model", "Security policy, trust assumptions, and limitations.", `${repo}/blob/main/SECURITY.md`, "Security"],
+    ["Submission package", "Hackathon submission text, video link, and final gate state.", `${repo}/blob/main/SUBMISSION.md`, "Submission"],
+    ["GitHub source", "Repository source, tests, fixtures, and documentation.", repo, "Source"],
     [
       "Verified transaction",
       "Confirmed transaction on a public Zcash explorer.",
       "https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527",
+      "Mainnet",
     ],
   ];
 
   return `
-    <main>
-      <section class="page-hero">
+    <main class="route-page route-page--docs">
+      <section class="page-hero page-hero--split">
         <div>
           <p class="eyebrow">Documentation</p>
-          <h1>Everything needed to inspect the proof.</h1>
+          <h1>Everything needed to inspect, run, and challenge the proof.</h1>
           <p>
             The website introduces the product, but the repository remains the source of truth for proof verification,
             specs, privacy boundaries, and security caveats.
           </p>
+        </div>
+        <div class="route-summary-panel">
+          ${renderMetric("Verifier", "make judge-proof-mainnet")}
+          ${renderMetric("Tamper demo", "make judge-proof-mainnet-tamper")}
+          ${renderMetric("Full check", "npm run check")}
         </div>
       </section>
 
       <section class="docs-grid">
         ${docs
           .map(
-            ([title, body, href]) => `
+            ([title, body, href, label]) => `
               <a href="${escapeHtml(href)}" ${href.startsWith("http") ? 'target="_blank" rel="noopener noreferrer"' : ""}>
+                ${renderStatusBadge(label, href.includes("mainnet") ? "mainnet" : "verified")}
                 <span>${escapeHtml(title)}</span>
                 <p>${escapeHtml(body)}</p>
               </a>
@@ -1127,6 +1552,33 @@ function renderDocsPage() {
         <pre><code>make judge-proof-mainnet
 make judge-proof-mainnet-tamper
 npm run check</code></pre>
+      </section>
+
+      <section class="route-section docs-faq">
+        <div class="section-heading section-heading--wide">
+          <div>
+            <p class="eyebrow">FAQ</p>
+            <h2>Common reviewer questions.</h2>
+          </div>
+        </div>
+        <div class="faq-grid">
+          <article>
+            <h3>Is this live custody software?</h3>
+            <p>No. It is a recorded proof-of-concept and does not claim production custody readiness.</p>
+          </article>
+          <article>
+            <h3>Does the chain show FROST?</h3>
+            <p>No. Zcash validates the spend normally. FROST provenance comes from the recorded ZecSafe/FROST session.</p>
+          </article>
+          <article>
+            <h3>Can judges verify without a wallet?</h3>
+            <p>Yes. The public verifier uses tracked fixtures and requires no funds, wallet, RPC, or secret material.</p>
+          </article>
+          <article>
+            <h3>What remains private?</h3>
+            <p>Recipient, memo, keys, shares, nonces, and private run artifacts are excluded from the public bundle.</p>
+          </article>
+        </div>
       </section>
     </main>
   `;
@@ -1189,6 +1641,13 @@ function bindEvents() {
   document.querySelectorAll("[data-demo-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       setDemoMode(button.dataset.demoMode);
+    });
+  });
+
+  document.querySelectorAll("[data-preview-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.ui.previewMode = button.dataset.previewMode;
+      render();
     });
   });
 
