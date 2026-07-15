@@ -10,7 +10,7 @@ A 2-of-3 FROST group authorized a real shielded Zcash mainnet transaction **whil
 
 **Proof page:** [https://zecsafe.vercel.app/proof](https://zecsafe.vercel.app/proof)
 
-**Demo video:** [ZecSafe demo recording](https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm)
+**Demo video:** [ZecSafe demo recording](https://youtu.be/B16fPtEGfnY)
 
 ![ZecSafe first glance: animated 2-of-3 vault replay with one signer unavailable](docs/screenshots/01-first-glance.png)
 
