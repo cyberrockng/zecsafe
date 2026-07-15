@@ -476,11 +476,13 @@ async function handleApi(request, response, pathname) {
 
 // The web surface serves the application and the public proof fixtures - NOT the repository.
 // Serving rootDir would expose .git/, server.mjs, HANDOFF.md, and the uncommitted working tree.
+const APP_ROUTES = new Set(["/", "/demo", "/proof", "/how-it-works", "/security", "/docs"]);
 const STATIC_FILES = new Set(["/index.html"]);
 const STATIC_PREFIXES = ["/src/", "/fixtures/verified-mainnet-run/"];
 
 function staticFilePath(pathname) {
-  const requested = pathname === "/" || pathname === "/demo" ? "/index.html" : pathname;
+  const trimmed = pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const requested = APP_ROUTES.has(trimmed) ? "/index.html" : pathname;
 
   let decoded;
   try {

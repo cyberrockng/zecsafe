@@ -1,96 +1,103 @@
 # FROST Integration
 
-FROST is a threshold Schnorr signing protocol. ZecSafe uses the FROST model because a future Zcash vault should not depend on one device or one private key.
+ZecSafe uses FROST as the threshold authorization layer for the recorded shielded
+Zcash proof run. It does not implement custom cryptography; FROST, RedPallas,
+Orchard PCZT signing, proving, combining, and transaction extraction are delegated
+to pinned upstream tools.
 
-## Why ZecSafe Uses FROST
+## Current Integration
 
-ZecSafe is designed around a 2-of-3 guardian policy:
+The recorded mainnet run used:
 
-- Alice Laptop
-- Alice Phone
-- Recovery Contact
+| Component | Value |
+|---|---|
+| Threshold | 2 of 3 |
+| Unavailable participant | C |
+| Selected participants | A and B |
+| Setup mode | DKG |
+| Ciphersuite | `redpallas-rerandomized` |
+| Network | Zcash mainnet |
+| Txid | `27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527` |
 
-In production, each guardian would hold a local encrypted key share. A payment or recovery proposal would become spendable only after enough guardians generate valid partial signatures.
+The public verifier proves the recorded evidence is internally consistent and
+anchored to the expected bundle hash. It does not rerun the historical FROST
+ceremony.
 
-## Current Prototype
+## Pinned Tooling
 
-The app currently implements:
+| Tool | Pinned commit |
+|---|---|
+| ZF `frost-tools` | `7d33a95fecc91dacdb1503933e2bee43780d3293` |
+| `zcash-devtool` | `1b065594d958d1cad2deafe7cd2e2fcc2774c46c` |
+| PCZT signer library (librustzcash) | `8e6864a3c67cab3c64a052dd20f83c553662e8b2` |
 
-- Real read-only Zcash mainnet checks.
-- Real transaction proof lookup.
-- Simulated guardian approval state.
-- Simulated broadcast and recovery migration.
-- A local FROST tooling adapter route that can run official demo binaries.
-
-## Local FROST Adapter
-
-The adapter script is:
-
-```text
-scripts/frost-demo.mjs
-```
-
-The backend route is:
-
-```text
-GET /api/frost-demo
-```
-
-The route runs the script as a child process and caches the JSON response in memory.
-
-When `trusted-dealer`, `participant`, and `coordinator` from `frost-zcash-demo` are installed, `scripts/frost-demo.mjs` runs:
+## Pipeline
 
 ```text
-scripts/frost-local-wrapper.mjs
+reviewed intent
+  -> PCZT
+  -> Binding Firewall
+  -> signing context / shielded SIGHASH
+  -> FROST session with A+B, C unavailable
+  -> aggregate signature
+  -> signed PCZT
+  -> proven PCZT
+  -> combined PCZT
+  -> human-approved broadcast
+  -> confirmed Zcash mainnet txid
+  -> public proof bundle
 ```
 
-The wrapper creates a fresh 2-of-3 FROST demo locally:
+## Binding Boundary
 
-- `trusted-dealer` generates three key packages and the group public key package.
-- Two `participant` processes generate round-1 commitments.
-- `coordinator` creates the signing package.
-- The two participants return round-2 signature shares.
-- `coordinator` aggregates the final signature.
+The Binding Firewall is a semantic intent-to-PCZT check. It verifies the covered
+recipient, amount, network, memo/fee policy, unexpected-output, and change-output
+semantics before signing. It does not itself prove that the FROST group key is
+the PCZT action's spend-authorization key.
 
-The wrapper returns only share fingerprints to the UI, not full secret shares.
+That linkage is established by the pinned signer library verifying the aggregate
+signature against the action's rerandomized verification key at apply time, and
+is corroborated by Zcash consensus accepting the resulting shielded spend.
 
-You can override the built-in wrapper with:
+## Signer Review Mode
 
-```powershell
-$env:FROST_DEMO_COMMAND="your-local-frost-demo-command"
+The recorded proof uses `semantic_pczt_review`: signers check PCZT semantics and
+compare the prepared pinned-tool SIGHASH fingerprint. They do not independently
+recompute the SIGHASH.
+
+## Public Verification
+
+Run:
+
+```bash
+make judge-proof-mainnet
+make judge-proof-mainnet-tamper
 ```
 
-The configured command should return JSON shaped like:
+Expected verdicts:
 
-```json
-{
-  "groupPublicKey": "<hex>",
-  "keyShares": ["<share1_hex>", "<share2_hex>", "<share3_hex>"],
-  "signingRound1": { "commitment1": "<hex>", "commitment2": "<hex>" },
-  "signingRound2": { "partialSig1": "<hex>", "partialSig2": "<hex>" },
-  "aggregatedSignature": "<hex>",
-  "verified": true
-}
+```text
+VERDICT: VERIFIED RECORDED ZECSAFE PROOF
+VERDICT: TAMPER DETECTION PASS
 ```
 
-If the local tooling is missing, ZecSafe returns a safe unavailable state. It does not fake FROST cryptography.
+## Removed Prototype Surfaces
 
-## Production Integration Path
+Earlier browser guardian acknowledgements, simulated broadcast, simulated recovery,
+and the `/api/frost-demo` route are not part of the current product surface. Historical
+references remain only in `docs/history/`.
 
-A production ZecSafe FROST layer would add:
+## Limitations
 
-- Distributed key generation or trusted-dealer setup.
-- Local encrypted guardian share storage.
-- Network communication between guardian devices.
-- Proposal payload hashing and review on each guardian device.
-- Real FROST partial signatures.
-- Aggregated Zcash transaction signature.
-- Mainnet broadcast only after full transaction construction and verification.
+- ZecSafe is not audited production custody software.
+- Re-randomized FROST was not covered by the cited NCC audit of the ZF FROST repository.
+- The pinned upstream tools are work-in-progress.
+- Recovery, share repair, share refresh, and group migration are not demonstrated.
+- The public proof is a redacted evidence bundle, not a zero-knowledge proof.
 
 ## References
 
 - [Zcash Foundation FROST tooling](https://github.com/ZcashFoundation/frost-tools)
-- [Zcash FROST demo CLIs](https://github.com/ZcashFoundation/frost-zcash-demo)
 - [Zcash Foundation FROST book](https://frost.zfnd.org/)
 - [ZecHub developer docs](https://zechub.wiki/developers)
 - [Windows setup](frost-windows-setup.md)

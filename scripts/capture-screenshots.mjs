@@ -47,22 +47,28 @@ const serverPort = Number(process.env.SCREENSHOT_PORT ?? 4190);
 const baseUrl = `http://127.0.0.1:${serverPort}/`;
 
 const DESKTOP = { width: 1440, height: 1000 };
+const TABLET = { width: 768, height: 960 };
 const MOBILE = { width: 390, height: 844 };
 
 const shots = [
-  { file: "01-first-glance.png", viewport: DESKTOP, scrollTo: null },
-  { file: "02-review.png", viewport: DESKTOP, scrollTo: "#review" },
-  { file: "03-binding-firewall.png", viewport: DESKTOP, scrollTo: "#verify" },
+  { file: "01-first-glance.png", viewport: DESKTOP, route: "/", scrollTo: null },
+  { file: "02-review.png", viewport: DESKTOP, route: "/proof", scrollTo: "#review" },
+  { file: "03-binding-firewall.png", viewport: DESKTOP, route: "/proof", scrollTo: "#verify" },
   {
     file: "04-binding-mismatch.png",
     viewport: DESKTOP,
+    route: "/proof",
     scrollTo: "#verify",
     // Prove the Binding Firewall actually blocks signing, not merely that it renders.
     click: '[data-demo-mode="mismatch"]',
   },
-  { file: "05-authorize-unavailable.png", viewport: DESKTOP, scrollTo: "#authorize" },
-  { file: "06-proof-detail.png", viewport: DESKTOP, scrollTo: "#prove" },
-  { file: "07-mobile-390.png", viewport: MOBILE, scrollTo: null },
+  { file: "05-authorize-unavailable.png", viewport: DESKTOP, route: "/proof", scrollTo: "#authorize" },
+  { file: "06-proof-detail.png", viewport: DESKTOP, route: "/proof", scrollTo: "#prove" },
+  { file: "07-mobile-390.png", viewport: MOBILE, route: "/", scrollTo: null },
+  { file: "08-landing-768.png", viewport: TABLET, route: "/", scrollTo: null },
+  { file: "09-how-it-works.png", viewport: DESKTOP, route: "/how-it-works", scrollTo: null },
+  { file: "10-security.png", viewport: DESKTOP, route: "/security", scrollTo: null },
+  { file: "11-docs.png", viewport: DESKTOP, route: "/docs", scrollTo: null },
 ];
 
 function wait(ms) {
@@ -175,7 +181,7 @@ try {
     });
 
     // Reload for every shot so no earlier interaction leaks into the next capture.
-    await cdp.send("Page.navigate", { url: baseUrl });
+    await cdp.send("Page.navigate", { url: new URL(shot.route ?? "/", baseUrl).toString() });
     await wait(1800);
 
     if (shot.click) {

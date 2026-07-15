@@ -2,37 +2,34 @@
 
 ```mermaid
 flowchart TD
-  User["User or team"] --> Vault["ZecSafe vault"]
-  Vault --> Proposal["Transaction proposal"]
-  Proposal --> Review["Local proposal review"]
-  Review --> GuardianA["Guardian 1: Alice Laptop"]
-  Review --> GuardianB["Guardian 2: Alice Phone"]
-  Review --> GuardianC["Guardian 3: Recovery Contact"]
-  GuardianA --> Threshold["2-of-3 threshold approval"]
-  GuardianB --> Threshold
-  GuardianC --> Threshold
-  Threshold --> Frost["Future FROST signing layer"]
-  Frost --> SignedTx["Fully signed Zcash transaction"]
-  SignedTx --> Mainnet["Zcash mainnet broadcast"]
+  Intent["Reviewed intent"] --> Commitment["Canonical intent commitment"]
+  Commitment --> PCZT["Orchard PCZT"]
+  PCZT --> Firewall["Binding Firewall"]
+  Firewall -->|PASS| Sighash["Pinned-tool signing context / shielded SIGHASH"]
+  Firewall -->|FAIL| Blocked["Signing blocked before FROST"]
 
-  Vault --> Monitor["Read-only mainnet monitor"]
-  Monitor --> TransparentRpc["getaddressbalance"]
-  Monitor --> TxProof["getrawtransaction"]
-  Monitor --> ViewingKey["z_getbalanceforviewingkey when configured"]
-  TransparentRpc --> Mainnet
-  TxProof --> Mainnet
-  ViewingKey --> Zcashd["Local zcashd RPC"]
-  Zcashd --> Mainnet
+  Sighash --> Frost["2-of-3 FROST session"]
+  SignerA["Signer A available"] --> Frost
+  SignerB["Signer B available"] --> Frost
+  SignerC["Signer C unavailable"] -. not selected .-> Frost
 
-  Coordinator["Future coordinator"] -. relays encrypted signing messages .-> GuardianA
-  Coordinator -. relays encrypted signing messages .-> GuardianB
-  Coordinator -. relays encrypted signing messages .-> GuardianC
-  Coordinator -. cannot spend alone .-> Vault
+  Frost --> Aggregate["Aggregate RedPallas signature"]
+  Aggregate --> SignedPczt["Signed PCZT"]
+  SignedPczt --> ProvenPczt["Proven PCZT"]
+  ProvenPczt --> CombinedPczt["Combined PCZT"]
+  CombinedPczt --> Txid["Txid extracted before broadcast"]
+  Txid --> HumanGate["Human broadcast approval"]
+  HumanGate --> Mainnet["Zcash mainnet confirmation"]
+  Mainnet --> Proof["zecsafe-proof-v1 public bundle"]
+  Proof --> CliVerifier["make judge-proof-mainnet"]
+  Proof --> BrowserVerifier["Browser verifier / Tamper Lab"]
 ```
 
-## Production Notes
+## Notes
 
-- Guardian devices should review transaction details locally before signing.
-- The coordinator should relay messages but never hold enough material to spend.
-- Viewing-key sync must stay read-only and should be encrypted or local-first.
-- Real fund safety depends on audited Zcash wallet and FROST signing libraries.
+- The hosted app replays a recorded mainnet proof; it is not a live wallet.
+- The public proof excludes private transaction details, wallet material, signing shares,
+  randomizers, UFVK material, and private PCZT internals.
+- Zcash consensus validates the spend normally. It does not expose a special FROST marker.
+- FROST provenance is evidenced by the recorded ZecSafe/FROST session and artifact
+  fingerprints.

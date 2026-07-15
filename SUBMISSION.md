@@ -73,7 +73,8 @@ ZecSafe public proof data-classification tests passed.
 Production:
 
 ```text
-https://zecsafe.vercel.app/demo
+https://zecsafe.vercel.app/
+https://zecsafe.vercel.app/proof
 ```
 
 Local:
@@ -82,7 +83,9 @@ Local:
 npm start        # http://127.0.0.1:4173/
 ```
 
-The proof-first route is the default route. Four steps: Review, Verify, Authorize, Prove.
+The default route is the product landing page. The proof workflow lives at `/proof`.
+The compatibility route `/demo` opens the same proof workflow. Four proof steps:
+Review, Verify, Authorize, Prove.
 
 Demo script: `DEMO.md`
 

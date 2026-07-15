@@ -1,35 +1,45 @@
 # ZecSafe Demo
 
-Hosted demo: <https://zecsafe.vercel.app/demo>
+Deploy the current commit before recording from the hosted URLs. The local app now has a
+product landing page and a dedicated proof page.
 
-## Fast path
-
-Open the proof-first route:
+Hosted routes after deployment:
 
 ```text
+https://zecsafe.vercel.app/        # product landing page
+https://zecsafe.vercel.app/proof   # proof verifier and demo workflow
+https://zecsafe.vercel.app/demo    # compatibility route; opens the proof page
+```
+
+Local routes:
+
+```bash
+npm start
+```
+
+```text
+http://127.0.0.1:4173/
+http://127.0.0.1:4173/proof
 http://127.0.0.1:4173/demo
 ```
 
-The first screen should let a reviewer say the product in 30 seconds:
+## Fast Path
 
-```text
-ZECSAFE
-Lose one key, not your ZEC.
-A 2-of-3 FROST authorization control plane for shielded Zcash.
-```
+Open `/proof` for recording the proof workflow. The page should show four proof steps:
+
+1. **Review** — recorded intent commitment, PCZT fingerprint, network, and redaction boundary.
+2. **Verify** — Binding Firewall checks in PASS mode, plus Mismatch mode.
+3. **Authorize** — signer C unavailable; signers A and B satisfy the 2-of-3 threshold.
+4. **Prove** — mainnet txid, recorded proof facts, proof verifier, public-proof download,
+   and Tamper Lab.
 
 Use these controls:
 
-1. `Replay Verified Mainnet Run` (animates the recorded gates)
-2. `Verify Proof`
-3. `Download Public Proof`
-4. Binding Firewall mode: `PASS`
-5. Binding Firewall mode: `Mismatch`
-6. Tamper Lab (Prove step): `Verify recorded proof`, the four attack presets,
-   and `Edit the JSON yourself` — the verifier reruns in the visitor's browser
-   over a local copy; attacks must show `REJECTED ZECSAFE PROOF` with the
-   failing gate, and `Verify recorded proof` must show
-   `VERIFIED RECORDED ZECSAFE PROOF`.
+1. `PASS` mode in the Binding Firewall.
+2. `Mismatch` mode in the Binding Firewall.
+3. `Verify Proof`.
+4. `Download Public Proof`.
+5. Tamper Lab: `Verify recorded proof`, each attack preset, and `Edit the JSON yourself`.
 
 The mismatch mode must show:
 
@@ -37,29 +47,12 @@ The mismatch mode must show:
 SAFETY TEST - NOT A BROADCAST TRANSACTION
 ```
 
-and the signing control must be disabled.
+and the signing/proof export controls must be blocked.
 
-## Local run
-
-```bash
-npm start
-```
-
-Then open:
-
-```text
-http://127.0.0.1:4173/demo
-```
-
-The server also serves the same app at:
-
-```text
-http://127.0.0.1:4173
-```
-
-## Judge proof commands
+## Judge Proof Commands
 
 ```bash
+make proof-run-dry
 make judge-proof-mainnet
 make judge-proof-mainnet-tamper
 npm run test:demo-proof-state
@@ -69,21 +62,26 @@ npm run security:scan
 
 Expected high-level result:
 
+- `make proof-run-dry` re-verifies the recorded gates and stops at the human broadcast gate.
 - `make judge-proof-mainnet` prints `VERDICT: VERIFIED RECORDED ZECSAFE PROOF`.
 - `make judge-proof-mainnet-tamper` prints `VERDICT: TAMPER DETECTION PASS`.
-- `npm run test:proof-data` confirms the public proof/event fixtures do not include policy-excluded secret or transaction-detail fields except documented status labels.
+- `npm run test:proof-data` confirms the public proof/event fixtures do not include
+  policy-excluded secret or transaction-detail fields except documented status labels.
 
-## What to show
+## What To Show
 
-1. Hero: `Lose one key, not your ZEC.`
-2. Evidence strip: `ZCASH MAINNET`, `2 OF 3`, `FROST`, `1 UNAVAILABLE`, `PROOF VERIFIED`.
-3. Participant panel: signer C unavailable, signers A+B selected.
-4. Binding Firewall: field-level PASS checks.
-5. Mismatch fixture: safety label and disabled signing control.
-6. Proof route: run ID, timestamp, txid, chain status, threshold, signer fingerprints, commit refs, bundle hash.
-7. Provenance note: Zcash validates the spend normally; FROST provenance is evidenced by recorded ZecSafe/FROST session data, not by a special chain marker.
+1. Landing page: `Lose one key, not your ZEC.`
+2. Product overview: 2-of-3 FROST authorization for shielded Zcash.
+3. Proof page receipt: run ID, timestamp, txid, chain status, threshold, signer fingerprints,
+   commit refs, and bundle hash.
+4. Participant panel: signer C unavailable, signers A+B selected.
+5. Binding Firewall: field-level PASS checks.
+6. Mismatch fixture: safety label, blocked signing, no proof export.
+7. Tamper Lab: recorded proof verifies; altered proof is rejected.
+8. Provenance note: Zcash validates the spend normally; FROST provenance is evidenced by
+   recorded ZecSafe/FROST session data, not by a special chain marker.
 
-## Recorded mainnet facts
+## Recorded Mainnet Facts
 
 ```text
 Run ID: p0-023-20260712T145358Z
@@ -95,10 +93,11 @@ Confirmations at recording: 4
 Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
 ```
 
-## Do not claim
+## Do Not Claim
 
 - Do not claim Zcash consensus exposes a special FROST marker.
 - Do not claim the hosted app can spend funds.
 - Do not claim production custody readiness.
 - Do not claim the coordinator is privacy-blind.
-- Do not claim browser guardian acknowledgements are FROST spend signatures.
+- Do not claim browser acknowledgements are FROST spend signatures.
+- Do not claim recovery, share repair, refresh, or group migration was demonstrated.

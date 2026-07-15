@@ -13,7 +13,7 @@ UNKNOWN
 ## C-001
 
 Claim: ZecSafe records a 2-of-3 FROST authorization path with one participant unavailable.
-Where shown: `/demo`, `fixtures/verified-mainnet-run/proof.json`, `events.public.json`.
+Where shown: `/proof` and `/demo` compatibility route, `fixtures/verified-mainnet-run/proof.json`, `events.public.json`.
 Current wording: "2 OF 3 FROST 1 UNAVAILABLE".
 Implementation path: `src/app.js`, `src/demo-proof-state.mjs`, `src/frost-session-v1.mjs`.
 Evidence: `npm run test:frost-session`, `npm run test:demo-proof-state`, `make judge-proof-mainnet`.
@@ -24,7 +24,7 @@ Task required: Keep route labeled recorded/replay, not live ceremony.
 ## C-002
 
 Claim: Binding Firewall blocks mismatched transaction semantics.
-Where shown: `/demo` Binding Firewall panel.
+Where shown: `/proof` Binding Firewall panel.
 Current wording: "SAFETY TEST - NOT A BROADCAST TRANSACTION".
 Implementation path: `src/pczt-bind-v1.mjs`, `src/demo-proof-state.mjs`.
 Evidence: `npm run test:bind`, `npm run test:demo-proof-state`.
@@ -35,7 +35,7 @@ Task required: Do not imply every possible Zcash wallet policy is covered.
 ## C-003
 
 Claim: A public proof can be verified offline.
-Where shown: `/demo`, `DEMO.md`, `SUBMISSION.md`.
+Where shown: `/proof`, `DEMO.md`, `SUBMISSION.md`.
 Current wording: "Download Public Proof", "Verify Proof".
 Implementation path: `src/zecsafe-proof-v1.mjs`, `scripts/zecsafe.mjs`, `Makefile`.
 Evidence: `make judge-proof-mainnet`.
@@ -90,7 +90,7 @@ Task required: Do not claim privacy-blind or zero-knowledge coordinator.
 ## C-008
 
 Claim: Zcash mainnet confirmed the transaction.
-Where shown: verified fixture, `/demo` proof route.
+Where shown: verified fixture, `/proof` proof route.
 Current wording: "Recorded status: CONFIRMED".
 Implementation path: `fixtures/verified-mainnet-run/proof.json`, `docs/history/execution/30-VERIFIED-MAINNET-RUN.md`.
 Evidence: txid `27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527`, height `3409837`, 4 confirmations at recording.
@@ -100,14 +100,14 @@ Task required: Do not claim the recorded bundle updates to current chain state.
 
 ## C-009
 
-Claim: Browser guardian acknowledgements are FROST signatures.
-Where shown: legacy proposal/guardian UI must avoid this.
-Current wording: browser acknowledgements are local ECDSA proposal-hash signatures.
-Implementation path: `src/app.js`.
-Evidence: UI copy and README boundary.
+Claim: Browser acknowledgements or hosted UI actions are FROST signatures.
+Where shown: no current route should claim this.
+Current wording: recorded FROST provenance comes from the ZecSafe/FROST session, not browser UI actions.
+Implementation path: `src/app.js`, `DEMO.md`, `README.md`.
+Evidence: UI copy, README boundary, `npm run verify`.
 Status: FALSE if phrased as FROST.
-Allowed final wording: "Browser acknowledgements are local proposal-hash signatures; recorded FROST provenance comes from the ZecSafe/FROST session."
-Task required: Keep Intent Review wording.
+Allowed final wording: "Recorded FROST provenance comes from the ZecSafe/FROST session."
+Task required: Keep hosted UI actions separate from FROST spend signatures.
 
 ## C-010
 

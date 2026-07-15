@@ -6,6 +6,22 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/proof",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/how-it-works",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/security",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/docs",
+      "destination": "/index.html"
+    },
+    {
       "source": "/demo",
       "destination": "/index.html"
     }

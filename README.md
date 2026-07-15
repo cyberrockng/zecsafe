@@ -6,7 +6,9 @@
 
 A 2-of-3 FROST group authorized a real shielded Zcash mainnet transaction **while one participant was unavailable**.
 
-**Live demo:** [https://zecsafe.vercel.app/demo](https://zecsafe.vercel.app/demo)
+**Live demo:** [https://zecsafe.vercel.app/](https://zecsafe.vercel.app/)
+
+**Proof page:** [https://zecsafe.vercel.app/proof](https://zecsafe.vercel.app/proof)
 
 ![ZecSafe first glance: animated 2-of-3 vault replay with one signer unavailable](docs/screenshots/01-first-glance.png)
 
@@ -39,7 +41,8 @@ There are no dependencies to install for the public viewer and verifier — they
 Hosted:
 
 ```text
-https://zecsafe.vercel.app/demo
+https://zecsafe.vercel.app/
+https://zecsafe.vercel.app/proof
 ```
 
 Local:

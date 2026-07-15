@@ -1,6 +1,19 @@
 # Submission Gate
 
-Generated for W5 on 2026-07-12.
+Updated for the route-aware submission build on 2026-07-15.
+
+## Current Verdict
+
+```text
+ENGINEERING / PROOF: PASS
+LOCAL ROUTE BUILD:   PASS
+HOSTED DEPLOYMENT:   PENDING APPROVAL
+EXTERNAL SUBMISSION: PENDING HUMAN ACTION
+```
+
+The recorded FROST/PCZT/mainnet proof is verified. The remaining gates are not
+cryptographic blockers; they are deployment, video, ZecHub PR, and Discord submission
+actions.
 
 ## Rule Compliance
 
@@ -12,11 +25,13 @@ Generated for W5 on 2026-07-12.
 - [x] usage docs
 - [x] mainnet explanation
 - [x] working prototype
-- [ ] short demo video
+- [x] current screenshots regenerated
+- [ ] current commit deployed to production
+- [ ] short demo video recorded against the deployed current commit
 - [ ] ZecHub PR prepared/created
 - [ ] Discord package prepared/posted
 
-## Differentiator 1
+## Differentiator 1 — Unavailable Signer
 
 - [x] threshold 2-of-3
 - [x] three distinct participant profiles
@@ -28,7 +43,7 @@ Generated for W5 on 2026-07-12.
 - [x] aggregate signature verified
 - [x] signature used in transaction completion
 
-## Differentiator 2
+## Differentiator 2 — Binding Firewall
 
 - [x] canonical reviewed intent
 - [x] intent commitment
@@ -41,7 +56,7 @@ Generated for W5 on 2026-07-12.
 - [x] mismatch blocks signing
 - [x] signer review mode truthfully recorded
 
-## Differentiator 3
+## Differentiator 3 — Public Proof
 
 - [x] `zecsafe-proof-v1`
 - [x] JSON Schema
@@ -54,121 +69,64 @@ Generated for W5 on 2026-07-12.
 - [x] verified recorded mainnet fixture
 - [x] replay labeled recorded, not live
 
-## Mainnet
+## Route Gate
 
-- [x] dedicated tiny-value proof wallet
-- [x] network main
-- [x] current toolchain compatible for recorded run
-- [x] real mainnet txid
-- [x] submitted state recorded
-- [x] observed state recorded
-- [x] mined state recorded when true
-- [x] confirmed state recorded only when true
-- [x] proof run linked to txid
+Local source routes:
 
-## Truth / Security
+- [x] `/` product landing page
+- [x] `/proof` proof workflow
+- [x] `/how-it-works` architecture explanation
+- [x] `/security` trust and limitation summary
+- [x] `/docs` documentation hub
+- [x] `/demo` compatibility route for the proof workflow
 
-- [x] browser attestations not called FROST
-- [x] coordinator privacy trust disclosed
-- [x] signer privacy/linkability limit disclosed
-- [x] network privacy limit disclosed
-- [x] rerandomized FROST audit-scope caveat disclosed
-- [x] group setup method disclosed
-- [x] recovery status truthful
-- [x] chain does not claim FROST provenance
-- [x] no production custody claim
-- [x] no secret in Git/build/fixtures
-- [x] no arbitrary-command runner
-- [x] no path traversal found
-- [x] session substitution tests pass
+Hosted route gate:
 
-## Judge Experience
+- [ ] deploy current commit
+- [ ] verify `https://zecsafe.vercel.app/`
+- [ ] verify `https://zecsafe.vercel.app/proof`
+- [ ] verify `https://zecsafe.vercel.app/demo`
 
-- [x] product understandable in 30 seconds
-- [x] 60-second judge proof works
-- [x] unavailable signer visible
-- [x] Binding Firewall visible
-- [x] mainnet tx visible
-- [x] proof verifier visible
-- [x] tamper climax visible
-- [x] exact code paths listed in README/DEMO
-- [ ] desktop visual recording pass
-- [ ] 390px visual recording pass
+Do not record the hosted multi-page flow until those hosted checks pass.
 
-## Quality Results
+## Verification Results
 
-Command:
-`npm run check`
-Result:
-PASS
-Exit code:
-0
-Passed:
-static verification, unit tests, proof tests, W4/W5 tests, syntax checks, security scan
-Failed:
-none
-Warnings:
-none
-Evidence/log path:
-terminal output in W5 execution session
+Run before deployment and again before recording:
 
-Command:
-`make judge-proof-mainnet`
-Result:
-`VERDICT: VERIFIED RECORDED ZECSAFE PROOF`
-Exit code:
-0
-Passed:
-schema, bundle hash, network main, 2-of-3 FROST policy, one unavailable participant, two selected signers, intent-PCZT binding, threshold reached, txid present, recorded run integrity
-Failed:
-none
-Warnings:
-none
-Evidence/log path:
-terminal output in W5 execution session
+```bash
+npm run check
+make proof-run-dry
+make judge-proof-mainnet
+make judge-proof-mainnet-tamper
+npm run screenshots
+```
 
-Command:
-`make judge-proof-mainnet-tamper`
-Result:
-`VERDICT: TAMPER DETECTION PASS`
-Exit code:
-0
-Passed:
-txid, threshold, group_fingerprint, selected_signer, intent_commitment, pczt_fingerprint, and binding_status mutations rejected
-Failed:
-none
-Warnings:
-none
-Evidence/log path:
-terminal output in W5 execution session
+Expected proof verdicts:
+
+```text
+VERDICT: VERIFIED RECORDED ZECSAFE PROOF
+VERDICT: TAMPER DETECTION PASS
+```
 
 ## Manual Mainnet Proof
 
-Run ID:
-`p0-023-20260712T145358Z`
-Network:
-`main`
-Result:
-`CONFIRMED` at recording
-Txid:
-`27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527`
-Submitted:
-recorded in `fixtures/mainnet-demo/p0-023-mainnet-broadcast.json`
-Observed:
-recorded
-Mined:
-height `3409837`
-Confirmed:
-4 confirmations at recording
-Proof bundle:
-`fixtures/verified-mainnet-run/proof.json`
-Bundle verify:
-`make judge-proof-mainnet`
-ZecSafe commit:
-`ad83269298b73396ac0f4b743c59301de77fe937` in recorded proof
+```text
+Run ID: p0-023-20260712T145358Z
+Network: main
+Txid: 27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527
+Recorded status: CONFIRMED
+Recorded height: 3409837
+Confirmations at recording: 4
+Proof bundle: fixtures/verified-mainnet-run/proof.json
+Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba780351b8d
+```
 
-## Verdict
+## Final Approval Gate
 
-NO-GO - P0 BLOCKERS REMAIN
+Ask for approval before moving to:
 
-Remaining blockers are not code blockers: demo video, ZecHub PR, Discord posting, and final visual recording passes require human/external submission action.
+1. committing and pushing the route-aware submission build;
+2. deploying the current commit to production;
+3. recording the demo video from production;
+4. opening the ZecHub PR;
+5. posting the Discord submission.

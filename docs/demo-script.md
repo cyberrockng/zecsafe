@@ -1,26 +1,30 @@
 # Demo Script
 
 Target length: ~3 minutes.
-Record against commit `ac14904` or later. Two windows on screen: a terminal in
-the repo root and the browser at <https://zecsafe.vercel.app/demo>.
+Record against the final committed and deployed submission commit. Two windows on
+screen: a terminal in the repo root and the browser at the deployed proof page:
+<https://zecsafe.vercel.app/proof>.
 
-This script matches the current app exactly. Every claim in it is backed by the
-recorded proof bundle. Do not improvise claims — see "Do not claim" in `DEMO.md`.
+Do not record the hosted site until the current commit has been deployed. Every
+claim in this script is backed by the recorded proof bundle. Do not improvise
+claims — see "Do not claim" in `DEMO.md`.
 
 The spine of the demo: **re-verify every gate of the process live, then show the
 one time the final gate was opened on mainnet.**
 
-## Scene 1 — Hook (0:00–0:15)
+## Scene 1 — Product Hook (0:00–0:20)
 
-Browser: the hero at `https://zecsafe.vercel.app/demo`.
+Browser: the landing page at `https://zecsafe.vercel.app/`.
 
 Say:
 
 > "ZecSafe: lose one key, not your ZEC. A 2-of-3 FROST authorization control
-> plane for shielded Zcash. Let me walk you through every gate of the process
-> and re-verify it live."
+> plane for shielded Zcash. One signer can be unavailable, the transaction is
+> checked before signing, and the public proof can be verified by anyone."
 
-## Scene 2 — Every gate of the process, re-verified live (0:15–1:05)
+Click `Verify the mainnet proof` to open `/proof`.
+
+## Scene 2 — Every gate of the process, re-verified live (0:20–1:10)
 
 Switch to the terminal. Run, live on camera:
 
@@ -45,7 +49,7 @@ Point at the last two lines:
 > gate is deliberate — it *is* the product. Software prepares and proves;
 > a human releases funds."
 
-## Scene 3 — The one time the gate was opened (1:05–1:35)
+## Scene 3 — The one time the gate was opened (1:10–1:40)
 
 Switch to the browser. Point at the receipt panel: run ID, UTC timestamp,
 txid, `CONFIRMED`.
@@ -68,7 +72,7 @@ Say:
 > re-verified — with one
 > signer unavailable. The chain is the witness."
 
-## Scene 4 — What happens to a tampered transaction (1:35–2:05)
+## Scene 4 — What happens to a tampered transaction (1:40–2:10)
 
 Scroll to Step 2 — Verify on the page. Show the field-level PASS grid, then
 click the `Mismatch` toggle. Show:
@@ -98,7 +102,7 @@ Say:
 > in the txid and the bundle hash gate fails. Try it yourself on the live
 > page; you can even edit the JSON by hand."
 
-## Scene 5 — Verify it yourself (2:05–2:35)
+## Scene 5 — Verify it yourself (2:10–2:40)
 
 Terminal. Run, live on camera:
 
@@ -120,7 +124,7 @@ Say:
 > commands yourself: the first verifies the recorded mainnet run end to end;
 > the second shows a single edited byte being detected. Don't trust — verify."
 
-## Scene 6 — Honest close (2:35–2:55)
+## Scene 6 — Honest close (2:40–3:00)
 
 Browser, scrolled to the footer.
 

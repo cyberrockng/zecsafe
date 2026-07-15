@@ -21,9 +21,14 @@ Use this before submitting to the ZecHub repository.
 - [ ] `make judge-proof-mainnet-tamper` → `VERDICT: TAMPER DETECTION PASS`
 - [ ] `make proof-run-dry` → all gates PASS, broadcast gate WAIT
 
-## Live page (https://zecsafe.vercel.app/demo)
+## Live page
 
-- [ ] Hero replays the recorded run and is labeled as a recorded replay.
+- [ ] Current commit has been deployed before recording.
+- [ ] `https://zecsafe.vercel.app/` loads the product landing page.
+- [ ] `https://zecsafe.vercel.app/proof` loads the proof workflow.
+- [ ] `https://zecsafe.vercel.app/demo` remains a compatibility route for the proof workflow.
+
+- [ ] Landing page explains the product without showing the full proof console first.
 - [ ] Mismatch toggle shows the SAFETY TEST banner and disables the signing control.
 - [ ] Tamper Lab: `Verify recorded proof` passes; every attack preset is rejected with the
       failing gate shown.
