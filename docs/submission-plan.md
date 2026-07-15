@@ -57,7 +57,7 @@ VERDICT: TAMPER DETECTION PASS
 - Hosted landing page: `https://zecsafe.vercel.app/`
 - Hosted proof page: `https://zecsafe.vercel.app/proof`
 - Demo video:
-  `https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm`
+  `https://youtu.be/B16fPtEGfnY`
 - ZecHub PR: `https://github.com/ZecHub/zechub/pull/1843`
 - Explorer link:
   `https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527`
