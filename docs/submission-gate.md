@@ -8,12 +8,13 @@ Updated for the route-aware submission build on 2026-07-15.
 ENGINEERING / PROOF: PASS
 LOCAL ROUTE BUILD:   PASS
 HOSTED DEPLOYMENT:   PASS
-EXTERNAL SUBMISSION: PENDING HUMAN ACTION
+EXTERNAL SUBMISSION: DISCORD POST PENDING
 ```
 
 The recorded FROST/PCZT/mainnet proof is verified. The route-aware production
-deployment has been verified. The remaining gates are not cryptographic blockers;
-they are video, ZecHub PR, and Discord submission actions.
+deployment has been verified. The demo video has been published, the ZecHub PR
+has been opened, and the Discord post text has been prepared. The only remaining
+gate is posting it in Discord.
 
 ## Rule Compliance
 
@@ -27,9 +28,10 @@ they are video, ZecHub PR, and Discord submission actions.
 - [x] working prototype
 - [x] current screenshots regenerated
 - [x] current commit deployed to production
-- [ ] short demo video recorded against the deployed current commit
-- [ ] ZecHub PR prepared/created
-- [ ] Discord package prepared/posted
+- [x] short demo video recorded against the deployed current commit
+- [x] ZecHub PR prepared/created
+- [x] Discord package prepared
+- [ ] Discord post submitted
 
 ## Differentiator 1 — Unavailable Signer
 
@@ -90,11 +92,19 @@ Hosted route gate:
 - [x] verify `https://zecsafe.vercel.app/security`
 - [x] verify `https://zecsafe.vercel.app/docs`
 
-The hosted multi-page flow is ready for recording.
+The hosted multi-page flow has been recorded for submission.
+
+## External Submission Links
+
+- Demo video:
+  `https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm`
+- ZecHub PR: `https://github.com/ZecHub/zechub/pull/1843`
+- ZecHub submission path: `Hackathon/2026/ZecSafe/README.md`
+- Discord post text: `docs/discord-submission.md`
 
 ## Verification Results
 
-Run before deployment and again before recording:
+Run before deployment and again before recording or final posting:
 
 ```bash
 npm run check
@@ -126,8 +136,7 @@ Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba78035
 
 ## Final Approval Gate
 
-Ask for approval before moving to:
+Video recording and ZecHub PR submission are complete. Ask for approval before
+the remaining human-facing external step:
 
-1. recording the demo video from production;
-2. opening the ZecHub PR;
-3. posting the Discord submission.
+1. posting the Discord submission.

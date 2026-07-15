@@ -56,25 +56,30 @@ VERDICT: TAMPER DETECTION PASS
 - Public repository: `https://github.com/cyberrockng/zecsafe`
 - Hosted landing page: `https://zecsafe.vercel.app/`
 - Hosted proof page: `https://zecsafe.vercel.app/proof`
+- Demo video:
+  `https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm`
+- ZecHub PR: `https://github.com/ZecHub/zechub/pull/1843`
 - Explorer link:
   `https://mainnet.zcashexplorer.app/transactions/27d0e850202f3f2c37b7de0ded80bdaac1f9fef1fc663c7d6cf107fad55e8527`
 - Proof bundle: `fixtures/verified-mainnet-run/proof.json`
 - Public event log: `fixtures/verified-mainnet-run/events.public.json`
 - Core submission text: `SUBMISSION.md`
 - Demo script: `DEMO.md` and `docs/demo-script.md`
+- Discord post text: `docs/discord-submission.md`
 - PR checklist: `docs/pr-checklist.md`
 
 ## Final checklist
 
-- [ ] Current working tree reviewed and intentional changes committed.
-- [ ] `npm run check` passes.
-- [ ] `make judge-proof-mainnet` passes with the anchored bundle hash.
-- [ ] `make judge-proof-mainnet-tamper` rejects all covered semantic mutations.
-- [ ] Screenshots are current after UI changes (`npm run screenshots`).
-- [ ] Short demo video recorded against the current commit.
-- [ ] Video link added to the ZecHub PR and Discord post.
-- [ ] ZecHub PR opened for `Hackathon/2026/ZecSafe/`.
-- [ ] Discord post includes repo, hosted demo, explorer, PR, and video links.
+- [x] Current working tree reviewed and intentional changes committed.
+- [x] `npm run check` passes.
+- [x] `make judge-proof-mainnet` passes with the anchored bundle hash.
+- [x] `make judge-proof-mainnet-tamper` rejects all covered semantic mutations.
+- [x] Screenshots are current after UI changes (`npm run screenshots`).
+- [x] Short demo video recorded against the current commit.
+- [x] Video link added to the ZecHub PR.
+- [x] ZecHub PR opened for `Hackathon/2026/ZecSafe/`.
+- [x] Discord post text prepared with repo, hosted demo, explorer, PR, and video links.
+- [ ] Discord post submitted.
 
 ## Do not claim
 

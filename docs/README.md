@@ -19,6 +19,7 @@
 | `architecture.md` / `architecture-diagram.md` | Current system design |
 | `claim-to-code-matrix.md` | Claim-by-claim evidence map |
 | `submission-gate.md` | Live submission blocker status |
+| `discord-submission.md` | Ready-to-post Discord submission text |
 | `demo-script.md` | Video/demo walkthrough |
 | `frost-integration.md` / `frost-windows-setup.md` | FROST toolchain setup |
 | `mainnet-integration.md` / `mainnet-readonly.md` | Mainnet observation boundaries |

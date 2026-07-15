@@ -77,6 +77,18 @@ https://zecsafe.vercel.app/
 https://zecsafe.vercel.app/proof
 ```
 
+Demo video:
+
+```text
+https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm
+```
+
+ZecHub PR:
+
+```text
+https://github.com/ZecHub/zechub/pull/1843
+```
+
 Local:
 
 ```bash

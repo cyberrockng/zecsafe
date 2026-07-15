@@ -37,8 +37,12 @@ Use this before submitting to the ZecHub repository.
 
 ## Submission
 
-- [ ] Short video demo recorded against the current commit.
-- [ ] Video link added to the PR description and Discord post.
-- [ ] Pull request opened against the ZecHub repository (`Hackathon/2026/ZecSafe/`).
-- [ ] Discord `#zechub` message includes repo, live demo, explorer, PR, and video links —
+- [x] Short video demo recorded against the current commit:
+      `https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm`
+- [x] Video link added to the ZecHub PR description.
+- [x] Pull request opened against the ZecHub repository (`Hackathon/2026/ZecSafe/`):
+      `https://github.com/ZecHub/zechub/pull/1843`
+- [x] Discord `#zechub` message prepared with repo, live demo, explorer, PR, and video links:
+      `docs/discord-submission.md`
+- [ ] Discord `#zechub` message posted —
       before July 15, 2026 (UTC).

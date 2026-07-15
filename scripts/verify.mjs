@@ -34,6 +34,7 @@ const requiredFiles = [
   "docs/architecture.md",
   "docs/architecture-diagram.md",
   "docs/demo-script.md",
+  "docs/discord-submission.md",
   "docs/frost-integration.md",
   "docs/frost-windows-setup.md",
   "docs/mainnet-integration.md",
@@ -113,6 +114,7 @@ const server = await readFile("server.mjs", "utf8");
 const vercelConfig = JSON.parse(await readFile("vercel.json", "utf8"));
 const vercelBuild = await readFile("scripts/build-vercel.mjs", "utf8");
 const readme = await readFile("README.md", "utf8");
+const submissionGate = await readFile("docs/submission-gate.md", "utf8");
 const VERIFIED_PROOF_PATH = "fixtures/verified-mainnet-run/proof.json";
 const VERIFIED_EVENTS_PATH = "fixtures/verified-mainnet-run/events.public.json";
 const p0_018CompatPatch = await readFile("patches/zcash-devtool/p0-018-pre-ironwood-subtree-compat.patch");
@@ -198,7 +200,14 @@ const checks = [
   [(await readFile("PRIVACY.md", "utf8")).includes("classification labels, not the underlying recipient"), "PRIVACY documents public proof field-label exception"],
   [(await readFile("DEMO.md", "utf8")).includes("http://127.0.0.1:4173/proof"), "DEMO documents the proof route"],
   [(await readFile("docs/claim-to-code-matrix.md", "utf8")).includes("C-010"), "Claim matrix includes production/audit claim guard"],
-  [(await readFile("docs/submission-gate.md", "utf8")).includes("EXTERNAL SUBMISSION: PENDING HUMAN ACTION"), "Submission gate records current external blockers"],
+  [
+      submissionGate.includes("EXTERNAL SUBMISSION: DISCORD POST PENDING") &&
+      submissionGate.includes("- [x] short demo video recorded against the deployed current commit") &&
+      submissionGate.includes("- [x] ZecHub PR prepared/created") &&
+      submissionGate.includes("- [x] Discord package prepared") &&
+      submissionGate.includes("- [ ] Discord post submitted"),
+    "Submission gate records current external blockers",
+  ],
   [(await readFile("scripts/proof-event.mjs", "utf8")).includes("replay"), "ProofEvent CLI includes replay command"],
   [(await readFile("scripts/proof-event-v1.test.mjs", "utf8")).includes("unsupported public data field: recipient"), "ProofEvent tests reject private recipient field"],
   [(await readFile("src/fixed-runner-v1.mjs", "utf8")).includes("FIXED_OPERATIONS"), "Fixed runner module defines operation allowlist"],
