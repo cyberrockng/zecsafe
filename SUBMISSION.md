@@ -80,7 +80,43 @@ https://zecsafe.vercel.app/proof
 Demo video:
 
 ```text
-https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm
+https://youtu.be/B16fPtEGfnY
+```
+
+YouTube title:
+
+```text
+ZecSafe - Zcash Threshold Authorization Proof Demo
+```
+
+YouTube description:
+
+```text
+ZecSafe is a working web application for inspecting and verifying a recorded Zcash threshold-authorization proof.
+
+This demo shows:
+- Guided proof walkthrough
+- Recorded Zcash mainnet evidence
+- 2-of-3 threshold authorization
+- One unavailable signer
+- Browser-side proof verification
+- Binding mismatch testing
+- Tamper rejection
+- Clear security and production limits
+
+ZecSafe is a proof-of-concept hackathon submission, not production custody software.
+
+GitHub: https://github.com/cyberrockng/zecsafe
+Live app: https://zecsafe.vercel.app/
+```
+
+YouTube settings:
+
+```text
+Audience: No, it's not made for kids.
+Age restriction: No, don't restrict my video to viewers over 18 only.
+Paid promotion: No, unless a paid promotion or sponsorship is later added.
+Thumbnail: choose the frame showing "Lose one key, not your ZEC."
 ```
 
 ZecHub PR:

@@ -28,7 +28,7 @@ gate is posting it in Discord.
 - [x] working prototype
 - [x] current screenshots regenerated
 - [x] current commit deployed to production
-- [x] short demo video recorded against the deployed current commit
+- [x] short demo video recorded and uploaded to YouTube
 - [x] ZecHub PR prepared/created
 - [x] Discord package prepared
 - [ ] Discord post submitted
@@ -97,7 +97,11 @@ The hosted multi-page flow has been recorded for submission.
 ## External Submission Links
 
 - Demo video:
-  `https://github.com/cyberrockng/zecsafe/releases/download/zecsafe-demo-2026-07-15/zecsafe-demo-2026-07-15.webm`
+  `https://youtu.be/B16fPtEGfnY`
+- YouTube title:
+  `ZecSafe - Zcash Threshold Authorization Proof Demo`
+- YouTube audience:
+  `No, it's not made for kids`
 - ZecHub PR: `https://github.com/ZecHub/zechub/pull/1843`
 - ZecHub submission path: `Hackathon/2026/ZecSafe/README.md`
 - Discord post text: `docs/discord-submission.md`
