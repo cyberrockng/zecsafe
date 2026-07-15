@@ -680,16 +680,18 @@ function renderLandingPage() {
       </section>
 
       <section class="security-band">
-        <div>
+        <div class="security-band__copy">
           <p class="eyebrow">Honest by design</p>
           <h2>Strong evidence, clearly scoped.</h2>
+          <p>
+            This is a recorded proof-of-concept, not production custody software. Zcash validates the spend normally.
+            FROST provenance is shown by the recorded ZecSafe/FROST session and artifact fingerprints, not by a special
+            chain marker.
+          </p>
         </div>
-        <p>
-          This is a recorded proof-of-concept, not production custody software. The chain validates the spend
-          authorization normally; Zcash validates the resulting spend authorization normally. FROST provenance is shown by
-          the recorded ZecSafe/FROST session, not by a special chain marker.
-        </p>
-        <a class="text-link" href="/security" data-route="/security">Read the full trust model</a>
+        <div class="security-band__action">
+          <a class="text-link" href="/security" data-route="/security">Read the full trust model</a>
+        </div>
       </section>
     </main>
   `;
@@ -1061,14 +1063,16 @@ function renderSecurityPage() {
       </section>
 
       <section class="security-band security-band--page">
-        <div>
+        <div class="security-band__copy">
           <p class="eyebrow">Verify independently</p>
           <h2>Do not trust the website when the repository can verify the proof.</h2>
+          <p>
+            Run make judge-proof-mainnet for the recorded proof and make judge-proof-mainnet-tamper for tamper rejection.
+          </p>
         </div>
-        <p>
-          Run make judge-proof-mainnet for the recorded proof and make judge-proof-mainnet-tamper for tamper rejection.
-        </p>
-        <a class="button button--primary" href="/docs" data-route="/docs">Open documentation</a>
+        <div class="security-band__action">
+          <a class="button button--primary" href="/docs" data-route="/docs">Open documentation</a>
+        </div>
       </section>
     </main>
   `;
