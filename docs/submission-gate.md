@@ -7,13 +7,13 @@ Updated for the route-aware submission build on 2026-07-15.
 ```text
 ENGINEERING / PROOF: PASS
 LOCAL ROUTE BUILD:   PASS
-HOSTED DEPLOYMENT:   PENDING APPROVAL
+HOSTED DEPLOYMENT:   PASS
 EXTERNAL SUBMISSION: PENDING HUMAN ACTION
 ```
 
-The recorded FROST/PCZT/mainnet proof is verified. The remaining gates are not
-cryptographic blockers; they are deployment, video, ZecHub PR, and Discord submission
-actions.
+The recorded FROST/PCZT/mainnet proof is verified. The route-aware production
+deployment has been verified. The remaining gates are not cryptographic blockers;
+they are video, ZecHub PR, and Discord submission actions.
 
 ## Rule Compliance
 
@@ -26,7 +26,7 @@ actions.
 - [x] mainnet explanation
 - [x] working prototype
 - [x] current screenshots regenerated
-- [ ] current commit deployed to production
+- [x] current commit deployed to production
 - [ ] short demo video recorded against the deployed current commit
 - [ ] ZecHub PR prepared/created
 - [ ] Discord package prepared/posted
@@ -82,12 +82,15 @@ Local source routes:
 
 Hosted route gate:
 
-- [ ] deploy current commit
-- [ ] verify `https://zecsafe.vercel.app/`
-- [ ] verify `https://zecsafe.vercel.app/proof`
-- [ ] verify `https://zecsafe.vercel.app/demo`
+- [x] deploy current commit
+- [x] verify `https://zecsafe.vercel.app/`
+- [x] verify `https://zecsafe.vercel.app/proof`
+- [x] verify `https://zecsafe.vercel.app/demo`
+- [x] verify `https://zecsafe.vercel.app/how-it-works`
+- [x] verify `https://zecsafe.vercel.app/security`
+- [x] verify `https://zecsafe.vercel.app/docs`
 
-Do not record the hosted multi-page flow until those hosted checks pass.
+The hosted multi-page flow is ready for recording.
 
 ## Verification Results
 
@@ -125,8 +128,6 @@ Bundle hash: sha256:e4684eb1df7bbf48fda46ce4353968640f664c306b097e868e3b2ba78035
 
 Ask for approval before moving to:
 
-1. committing and pushing the route-aware submission build;
-2. deploying the current commit to production;
-3. recording the demo video from production;
-4. opening the ZecHub PR;
-5. posting the Discord submission.
+1. recording the demo video from production;
+2. opening the ZecHub PR;
+3. posting the Discord submission.
