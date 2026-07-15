@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
+    "build": "npm run build:vercel",
     "build:vercel": "node scripts/build-vercel.mjs",
     "verify": "node scripts/verify.mjs",
     "test:intent": "node scripts/intent-v1.test.mjs",

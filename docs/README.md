@@ -24,6 +24,7 @@
 | `frost-integration.md` / `frost-windows-setup.md` | FROST toolchain setup |
 | `mainnet-integration.md` / `mainnet-readonly.md` | Mainnet observation boundaries |
 | `threat-model.md`, `proof/` | Security and trust boundaries |
+| `post-hackathon-roadmap.md` | Production roadmap after the hackathon proof of concept |
 | `pr-checklist.md`, `submission-plan.md` | Submission process |
 | `screenshots/` | Current product screenshots (`npm run screenshots`) |
 | `ui-redesign/` | First-glance redesign verdict |

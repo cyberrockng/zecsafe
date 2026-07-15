@@ -21,6 +21,44 @@ const proofSteps = [
   { href: "#prove", label: "Prove" },
 ];
 
+const judgeWalkthroughSteps = [
+  {
+    action: "replay",
+    number: "01",
+    title: "Replay recorded run",
+    body: "Load the public ProofEvent replay and show the reviewed transaction intent.",
+    target: "#review",
+  },
+  {
+    action: "mismatch",
+    number: "02",
+    title: "Break the intent",
+    body: "Switch to the counterfactual mismatch and watch signing stop before FROST.",
+    target: "#verify",
+  },
+  {
+    action: "authorize",
+    number: "03",
+    title: "Show threshold approval",
+    body: "Return to the valid run and inspect A+B authorizing while signer C is offline.",
+    target: "#authorize",
+  },
+  {
+    action: "verify",
+    number: "04",
+    title: "Verify proof hash",
+    body: "Run the in-browser verifier against the recorded public proof bundle.",
+    target: "#prove",
+  },
+  {
+    action: "tamper",
+    number: "05",
+    title: "Reject tampering",
+    body: "Alter the txid in a local copy and confirm the verifier rejects it.",
+    target: "#tamper-lab",
+  },
+];
+
 const routeMeta = {
   "/": {
     title: "ZecSafe - Lose one key, not your ZEC.",
@@ -68,6 +106,7 @@ const state = {
     txidCopied: false,
     mobileNavOpen: false,
     previewMode: "authorization",
+    walkthroughStep: null,
   },
   lab: {
     busy: false,
@@ -132,6 +171,74 @@ function navigateTo(path) {
   state.ui.mobileNavOpen = false;
   render();
   window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function scrollToProofTarget(hash) {
+  window.history.replaceState({}, "", `/proof${hash}`);
+  render();
+  requestAnimationFrame(() => {
+    document.querySelector(hash)?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+  });
+}
+
+async function ensureVerifiedRun({ animate = false } = {}) {
+  if (!state.demo.events.length || state.demo.status !== "success") {
+    await loadVerifiedProof("verified", { animate });
+    return;
+  }
+
+  updateDemoReduction("verified");
+  state.demo.verifyStatus = "idle";
+  state.demo.message = "Recorded verified mainnet proof loaded.";
+  if (animate) {
+    animateFlowReveal(8);
+    animateHeroReveal();
+  } else {
+    render();
+  }
+}
+
+async function runWalkthroughAction(action) {
+  const step = judgeWalkthroughSteps.find((item) => item.action === action);
+  if (!step) return;
+
+  state.ui.walkthroughStep = action;
+
+  if (action === "replay") {
+    await ensureVerifiedRun({ animate: true });
+    scrollToProofTarget(step.target);
+    return;
+  }
+
+  if (action === "mismatch") {
+    if (!state.demo.events.length) await loadVerifiedProof("mismatch");
+    else setDemoMode("mismatch");
+    scrollToProofTarget(step.target);
+    return;
+  }
+
+  if (action === "authorize") {
+    await ensureVerifiedRun();
+    state.demo.revealCount = Infinity;
+    scrollToProofTarget(step.target);
+    return;
+  }
+
+  if (action === "verify") {
+    await ensureVerifiedRun();
+    await verifyLoadedPublicProof();
+    scrollToProofTarget(step.target);
+    return;
+  }
+
+  if (action === "tamper") {
+    await ensureVerifiedRun();
+    await runLabVerification({ presetId: "txid" });
+    scrollToProofTarget(step.target);
+  }
 }
 
 function demoProofEventsForMode(mode = state.demo.mode) {
@@ -508,7 +615,6 @@ function renderHashDisplay(label, value, { full = false } = {}) {
 }
 
 function renderHeroAuthorizationPreview({ proof, replay, presentation }) {
-  const txid = presentation.recorded.txid;
   const blockHeight = proof?.transaction?.observed_block_height ?? replay?.chain?.observed_block_height;
   const confirmations = proof?.transaction?.confirmations_at_recording ?? replay?.chain?.confirmations;
   const rows = [
@@ -516,25 +622,6 @@ function renderHeroAuthorizationPreview({ proof, replay, presentation }) {
     ["Signer B", "Ready", "verified", "Selected signer"],
     ["Signer C", "Offline", "blocked", "Unavailable participant"],
   ];
-  const checks = [
-    ["Intent", proof?.intent?.commitment ? "Bound" : "Loading", proof?.intent?.commitment ? "verified" : "pending"],
-    [
-      "PCZT",
-      replay?.readiness?.binding_passed ? "PASS" : (proof?.pczt?.binding_status ?? replay?.binding?.status),
-      replay?.readiness?.binding_passed ? "verified" : "pending",
-    ],
-    [
-      "FROST",
-      replay?.readiness?.threshold_reached ? "Reached" : replay?.frost?.threshold_status,
-      replay?.readiness?.threshold_reached ? "verified" : "pending",
-    ],
-    [
-      "Mainnet",
-      replay?.readiness?.chain_confirmed ? "Confirmed" : presentation.recorded.chainStatus,
-      replay?.readiness?.chain_confirmed ? "verified" : "pending",
-    ],
-  ];
-
   return `
     <aside class="hero-console" aria-label="ZecSafe recorded authorization preview">
       <div class="hero-console__topline">
@@ -551,8 +638,8 @@ function renderHeroAuthorizationPreview({ proof, replay, presentation }) {
           <small>threshold</small>
         </div>
         <div class="threshold-meter__copy">
-          <h2>Threshold reached with one signer unavailable.</h2>
-          <p>Two selected signers authorize the recorded shielded spend; the public proof stays checkable without exposing private transaction details.</p>
+          <h2>Threshold reached with one signer unavailable</h2>
+          <p>A+B approve the recorded spend; the exported proof remains checkable without private transaction details.</p>
         </div>
       </div>
 
@@ -570,27 +657,16 @@ function renderHeroAuthorizationPreview({ proof, replay, presentation }) {
           .join("")}
       </div>
 
-      <div class="console-checks" aria-label="Recorded verification gates">
-        ${checks
-          .map(
-            ([label, value, tone]) => `
-              <div>
-                ${renderStatusBadge(value ?? "Pending", tone)}
-                <span>${escapeHtml(label)}</span>
-              </div>
-            `,
-          )
-          .join("")}
-      </div>
-
       <div class="console-evidence">
         ${renderMetric("Network", proof?.network ?? "main", "mainnet")}
         ${renderMetric("Block height", blockHeight)}
         ${renderMetric("Confirmations", confirmations)}
       </div>
 
-      ${renderHashDisplay("Txid", txid)}
-      ${renderHashDisplay("Proof bundle hash", proof?.bundle_hash)}
+      <div class="hero-proof-footer">
+        ${renderHashDisplay("Proof fingerprint", proof?.bundle_hash)}
+        <a class="text-link text-link--light" href="/proof#walkthrough" data-route="/proof">Start click-through proof</a>
+      </div>
     </aside>
   `;
 }
@@ -822,7 +898,7 @@ function renderProductPreview({ proof, replay, presentation }) {
           <p class="eyebrow">Product preview</p>
           <h2>Show the security workflow, not just the pitch.</h2>
         </div>
-        <a class="button button--primary" href="/proof" data-route="/proof">Open proof application</a>
+        <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Open proof walkthrough</a>
       </div>
       <div class="product-preview">
         <div class="preview-tabs" role="tablist" aria-label="Homepage product preview mode">
@@ -862,7 +938,7 @@ function renderMainnetProofSection({ proof, presentation }) {
           judges to infer FROST from a chain marker that does not exist.
         </p>
         <div class="action-row">
-          <a class="button button--primary" href="/proof" data-route="/proof">Verify a proof</a>
+          <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Verify a proof</a>
           <a class="button button--secondary" href="https://mainnet.zcashexplorer.app/transactions/${encodeURIComponent(
             presentation.recorded.txid ?? "",
           )}" target="_blank" rel="noopener noreferrer">Open explorer</a>
@@ -986,7 +1062,7 @@ function renderFinalCta() {
       <p class="eyebrow">Ready for inspection</p>
       <h2>Authorization should remain available, verifiable, and human-controlled.</h2>
       <div class="action-row">
-        <a class="button button--primary" href="/proof" data-route="/proof">Verify Proof</a>
+        <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Verify Proof</a>
         <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">See How It Works</a>
         <a class="button button--ghost button--ghost-dark" href="/security" data-route="/security">Review Security</a>
       </div>
@@ -1009,14 +1085,17 @@ function renderLandingPage() {
       <section class="landing-hero">
         <div class="landing-hero__copy">
           <p class="eyebrow">2-of-3 threshold authorization for shielded Zcash</p>
-          <h1>Lose one key, not your ZEC.</h1>
+          <h1 class="hero-title">
+            <span>Lose one key,</span>
+            <span>not your ZEC.</span>
+          </h1>
           <p>
             ZecSafe demonstrates a threshold-controlled Zcash authorization path: one signer can be unavailable, the
             prepared PCZT is checked before signing, and the recorded mainnet proof can be verified without secret
             material.
           </p>
           <div class="action-row">
-            <a class="button button--primary" href="/proof" data-route="/proof">Verify Mainnet Proof</a>
+            <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Start Guided Proof</a>
             <a class="button button--secondary" href="/how-it-works" data-route="/how-it-works">See How It Works</a>
             <a class="text-link text-link--light" href="/security" data-route="/security">Read the Security Model</a>
           </div>
@@ -1056,6 +1135,62 @@ function renderProofStepper() {
         )
         .join("")}
     </nav>
+  `;
+}
+
+function walkthroughStatusFor(action, demo, mismatch, presentation) {
+  if (action === "replay") {
+    if (demo.status === "loading") return ["Loading", "pending"];
+    if (demo.status === "success") return ["Ready", "verified"];
+    if (demo.status === "error") return ["Failed", "failed"];
+    return ["Start", "pending"];
+  }
+  if (action === "mismatch") return [mismatch ? "Active" : "Safety test", mismatch ? "blocked" : "warning"];
+  if (action === "authorize") return [!mismatch && demo.status === "success" ? "2 of 3" : "Return to PASS", "verified"];
+  if (action === "verify") {
+    if (demo.verifyStatus === "pass") return ["Verified", "verified"];
+    if (demo.verifyStatus === "fail") return ["Failed", "failed"];
+    return [presentation.verifier.enabled ? "Run check" : "Load first", presentation.verifier.enabled ? "pending" : "warning"];
+  }
+  if (action === "tamper") {
+    if (state.lab.result?.status === "FAIL") return ["Rejected", "blocked"];
+    if (state.lab.result?.status === "PASS") return ["Unexpected PASS", "warning"];
+    if (state.lab.busy) return ["Checking", "pending"];
+    return ["Try attack", "warning"];
+  }
+  return ["Open", "pending"];
+}
+
+function renderJudgeWalkthrough({ demo, mismatch, presentation }) {
+  return `
+    <section class="judge-walkthrough" id="walkthrough" aria-labelledby="walkthroughTitle">
+      <div class="judge-walkthrough__intro">
+        <p class="eyebrow">Judge click-through</p>
+        <h2 id="walkthroughTitle">Take the proof apart in five clicks.</h2>
+        <p>
+          This is the shortest interactive path through ZecSafe's core claim: reviewed intent, failed tamper path,
+          threshold authorization, public proof verification, and tamper rejection.
+        </p>
+      </div>
+      <div class="judge-walkthrough__steps">
+        ${judgeWalkthroughSteps
+          .map((step) => {
+            const [label, tone] = walkthroughStatusFor(step.action, demo, mismatch, presentation);
+            const active = state.ui.walkthroughStep === step.action;
+            return `
+              <button class="judge-step ${active ? "judge-step--active" : ""}" type="button" data-walkthrough="${escapeHtml(
+                step.action,
+              )}" aria-pressed="${active ? "true" : "false"}">
+                <span>${escapeHtml(step.number)}</span>
+                ${renderStatusBadge(label, tone)}
+                <strong>${escapeHtml(step.title)}</strong>
+                <small>${escapeHtml(step.body)}</small>
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -1103,6 +1238,7 @@ function renderProofPage() {
         </aside>
       </section>
 
+      ${renderJudgeWalkthrough({ demo, mismatch, presentation })}
       ${renderProofStepper()}
 
       ${
@@ -1302,7 +1438,7 @@ function renderHowItWorksPage() {
             prepared transaction, authorize with enough signers, and publish a bounded proof.
           </p>
           <div class="action-row">
-            <a class="button button--primary" href="/proof" data-route="/proof">Open proof application</a>
+            <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Open proof walkthrough</a>
             <a class="button button--secondary" href="/security" data-route="/security">Review security model</a>
           </div>
         </div>
@@ -1343,7 +1479,7 @@ function renderHowItWorksPage() {
             The synthetic safety test is intentionally counterfactual: it proves the review gate blocks a tampered
             recipient and never imports the recorded run's later FROST, PCZT completion, broadcast, or proof export.
           </p>
-          <a class="button button--primary" href="/proof" data-route="/proof">Open mismatch test</a>
+          <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Open mismatch test</a>
         </div>
         <ol class="failure-steps">
           <li><strong>Reviewed intent</strong><span>Original private commitment</span></li>
@@ -1431,7 +1567,7 @@ function renderSecurityPage() {
             excludes, and which limits remain.
           </p>
           <div class="action-row">
-            <a class="button button--primary" href="/proof" data-route="/proof">Verify proof</a>
+            <a class="button button--primary" href="/proof#walkthrough" data-route="/proof">Verify proof</a>
             <a class="button button--secondary" href="/docs" data-route="/docs">Read docs</a>
           </div>
         </div>
@@ -1648,6 +1784,12 @@ function bindEvents() {
     button.addEventListener("click", () => {
       state.ui.previewMode = button.dataset.previewMode;
       render();
+    });
+  });
+
+  document.querySelectorAll("[data-walkthrough]").forEach((button) => {
+    button.addEventListener("click", () => {
+      runWalkthroughAction(button.dataset.walkthrough);
     });
   });
 

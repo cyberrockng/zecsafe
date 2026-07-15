@@ -5,6 +5,7 @@ logs/
 .env.*
 dist/
 coverage/
+artifacts/
 
 # ZecSafe private runtime material must stay outside the repository.
 .zecsafe/
